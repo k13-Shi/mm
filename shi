@@ -1,73 +1,71 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "DarkTheme")
 
--- IMAGE SECTION (Violet K13)
 local Main = Window:NewTab("K13 Home")
-local MainSection = Main:NewSection("K13 PREMIUM EXCLUSIVE")
-
-MainSection:NewLabel("K13 EXPLOIT - GOD SPEED MODE")
-MainSection:NewLabel("Violet Edition Loaded")
-
--- ADDING IMAGE (Gamit ang placeholder violet logo, palitan ang ID kung may sarili kang upload)
-MainSection:NewButton("K13 LOGO CLICK", "Click to see K13 Info", function()
-    print("K13 Violet Edition Active")
-end)
+local MainSection = Main:NewSection("K13 PREMIUM - VIOLET EDITION")
 
 local Farm = Window:NewTab("Farm")
-local FarmSection = Farm:NewSection("Ultra Instinct Farm")
+local FarmSection = Farm:NewSection("8-Pack Speed Farm")
 
-FarmSection:NewToggle("GOD SPEED LIFT (No Delay)", "HoneyDezz + Multi-Thread Mode", function(state)
+FarmSection:NewToggle("ULTRA FAST LIFT (8-PACK MODE)", "Pinakamabilis na Reps sa Muscle Masters", function(state)
     getgenv().AutoFarm = state
     if state then
-        -- Multi-Threaded Spam (5 sabay-sabay na loops para sa maximum speed)
-        for i = 1, 5 do
+        -- Multi-Threaded Spam (10 Threads para sa Maximum Speed)
+        for i = 1, 10 do
             task.spawn(function()
-                local VIM = game:GetService("VirtualInputManager")
                 local LP = game.Players.LocalPlayer
+                local Remote = LP:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
+                
                 while getgenv().AutoFarm do
-                    local remote = LP:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
-                    
-                    if remote then
-                        if remote.ClassName == "RemoteEvent" then
-                            remote:FireServer("rep")
+                    if Remote then
+                        if Remote.ClassName == "RemoteEvent" then
+                            Remote:FireServer("rep")
                         else
-                            remote:InvokeServer("rep")
+                            Remote:InvokeServer("rep")
                         end
                     end
-                    -- Instant Click
-                    VIM:SendMouseButtonEvent(0, 0, 0, true, game, 0)
-                    VIM:SendMouseButtonEvent(0, 0, 0, false, game, 0)
-                    task.wait() -- Minimal delay to prevent crash but keep max speed
+                    -- No Wait / Minimal Delay for 8-pack speed
+                    task.wait() 
                 end
             end)
         end
+        
+        -- Virtual Clicker Thread
+        task.spawn(function()
+            local VIM = game:GetService("VirtualInputManager")
+            while getgenv().AutoFarm do
+                VIM:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                VIM:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                task.wait()
+            end
+        end)
     end
 end)
 
-FarmSection:NewToggle("Instant Rebirth", "No animation rebirth", function(state)
+FarmSection:NewToggle("Instant Rebirth", "Automatic Rebirth", function(state)
     getgenv().AutoRebirth = state
     task.spawn(function()
         while getgenv().AutoRebirth do
             game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
-            task.wait()
+            task.wait(0.01)
         end
     end)
 end)
 
 local Misc = Window:NewTab("Misc")
-local MiscSection = Misc:NewSection("Abyss Hatching")
+local MiscSection = Misc:NewSection("Abyss & Utilities")
 
-MiscSection:NewToggle("Abyss Egg (Ultra)", "Spam hatch Abyss Egg", function(state)
+MiscSection:NewToggle("Auto Hatch Abyss (Fast)", "Spam Hatch Abyss Eggs", function(state)
     getgenv().AutoHatch = state
     task.spawn(function()
         while getgenv().AutoHatch do
             game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", "Abyss Egg", "triple")
-            task.wait()
+            task.wait(0.01)
         end
     end)
 end)
 
-MiscSection:NewToggle("Anti-AFK", "Stay online 24/7", function(state)
+MiscSection:NewToggle("Anti-AFK", "No Disconnect", function(state)
     getgenv().AntiAFK = state
 end)
 
@@ -78,38 +76,46 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
     end
 end)
 
--- UI MANAGEMENT (Minimize/Restore)
-local Settings = Window:NewTab("Settings")
-local SettingsSection = Settings:NewSection("Keybinds")
-
-SettingsSection:NewKeybind("Toggle UI Key", "Use this to Hide/Show", Enum.KeyCode.RightControl, function()
-	Library:ToggleUI()
-end)
-
--- VIOLET TOGGLE BUTTON
-if game:GetService("CoreGui"):FindFirstChild("K13_Violet") then
-    game:GetService("CoreGui"):FindFirstChild("K13_Violet"):Destroy()
+-- VIOLET K13 LOGO / TOGGLE BUTTON
+local CoreGui = game:GetService("CoreGui")
+if CoreGui:FindFirstChild("K13_Violet_Logo") then
+    CoreGui:FindFirstChild("K13_Violet_Logo"):Destroy()
 end
 
-local ToggleGui = Instance.new("ScreenGui")
-local MainButton = Instance.new("ImageButton")
-local Corner = Instance.new("UICorner")
+local ScreenGui = Instance.new("ScreenGui")
+local ImageButton = Instance.new("ImageButton")
+local UICorner = Instance.new("UICorner")
 
-ToggleGui.Name = "K13_Violet"
-ToggleGui.Parent = game:GetService("CoreGui")
+ScreenGui.Name = "K13_Violet_Logo"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-MainButton.Name = "K13_Logo"
-MainButton.Parent = ToggleGui
-MainButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Violet Color
-MainButton.Position = UDim2.new(0, 15, 0.5, 0)
-MainButton.Size = UDim2.new(0, 60, 0, 60)
--- Nilagyan ko ng ninja icon bilang placeholder para sa K13
-MainButton.Image = "rbxassetid://6031097225" 
-MainButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
+ImageButton.Parent = ScreenGui
+ImageButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Violet
+ImageButton.Position = UDim2.new(0, 20, 0.45, 0)
+ImageButton.Size = UDim2.new(0, 65, 0, 65)
+ImageButton.Image = "rbxassetid://123456789" -- Placeholder (Gagamit ng Violet Circle as base)
+ImageButton.Draggable = true -- Pwede mong i-move kahit saan sa screen
 
-Corner.CornerRadius = UDim.new(0, 15)
-Corner.Parent = MainButton
+UICorner.CornerRadius = UDim.new(1, 0) -- Perfect Circle
+UICorner.Parent = ImageButton
 
-MainButton.MouseButton1Click:Connect(function()
+-- Text Label sa loob ng button
+local Label = Instance.new("TextLabel")
+Label.Parent = ImageButton
+Label.Size = UDim2.new(1, 0, 1, 0)
+Label.BackgroundTransparency = 1
+Label.Text = "K13"
+Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+Label.TextSize = 20
+Label.Font = Enum.Font.GothamBold
+
+ImageButton.MouseButton1Click:Connect(function()
+    Library:ToggleUI()
+end)
+
+local Settings = Window:NewTab("Settings")
+local SettingsSection = Settings:NewSection("Options")
+SettingsSection:NewKeybind("Toggle UI", "Press to hide/show", Enum.KeyCode.RightControl, function()
     Library:ToggleUI()
 end)
