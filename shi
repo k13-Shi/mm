@@ -2,7 +2,7 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 
 local Window = Fluent:CreateWindow({
     Title = "K13 MUSCLE MASTERS 🔥",
-    SubTitle = "by shi | Premium Edition",
+    SubTitle = "by shi | Station & Hatch Edition",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
@@ -12,40 +12,55 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab({ Title = "Main Farm", Icon = "dumbbell" }),
+    Pets = Window:AddTab({ Title = "Auto Hatch", Icon = "dog" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
-Tabs.Main:AddParagraph({
-    Title = "Strength Farming",
-    Content = "Automatic strength training and fast reps."
-})
-
-local StrengthToggle = Tabs.Main:AddToggle("AutoStrength", {Title = "🔥 Auto Strength + Fast Rep", Default = false })
-StrengthToggle:OnChanged(function()
-    getgenv().StrengthFarm = StrengthToggle.Value
-    
+local function autoLift()
     task.spawn(function()
-        while getgenv().StrengthFarm do
-            local p = game.Players.LocalPlayer
-            local weight = p.Backpack:FindFirstChild("Weight") or p.Character:FindFirstChild("Weight")
-            if weight then
-                if weight.Parent == p.Backpack then
-                    p.Character.Humanoid:EquipTool(weight)
-                end
-                if weight:FindFirstChild("repTime") then
-                    weight.repTime.Value = 0
-                end
-            end
-            task.wait(0.5)
-        end
-    end)
-
-    task.spawn(function()
-        while getgenv().StrengthFarm do
+        while getgenv().StationFarm do
             game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
-            task.wait() 
+            task.wait()
         end
     end)
+end
+
+local function useStation(pos)
+    local char = game.Players.LocalPlayer.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        char.HumanoidRootPart.CFrame = pos
+        task.wait(0.3)
+        game:GetService("VirtualInputManager"):SendKeyEvent(true, "E", false, game)
+        task.wait(0.1)
+        game:GetService("VirtualInputManager"):SendKeyEvent(false, "E", false, game)
+    end
+end
+
+local SquatToggle = Tabs.Main:AddToggle("AutoSquat", {Title = "🏋️ Auto Squat (Jungle)", Default = false })
+SquatToggle:OnChanged(function()
+    getgenv().StationFarm = SquatToggle.Value
+    if getgenv().StationFarm then
+        useStation(CFrame.new(-8352, 34, 2878))
+        autoLift()
+    end
+end)
+
+local BenchToggle = Tabs.Main:AddToggle("AutoBench", {Title = "💪 Auto Bench Press", Default = false })
+BenchToggle:OnChanged(function()
+    getgenv().StationFarm = BenchToggle.Value
+    if getgenv().StationFarm then
+        useStation(CFrame.new(-8173, 64, 1898))
+        autoLift()
+    end
+end)
+
+local DeadliftToggle = Tabs.Main:AddToggle("AutoDeadlift", {Title = "🔥 Auto Deadlift", Default = false })
+DeadliftToggle:OnChanged(function()
+    getgenv().StationFarm = DeadliftToggle.Value
+    if getgenv().StationFarm then
+        useStation(CFrame.new(-8621, 34, 2684))
+        autoLift()
+    end
 end)
 
 local RebirthToggle = Tabs.Main:AddToggle("AutoRebirth", {Title = "⚡ Auto Fast Rebirth", Default = false })
@@ -54,48 +69,47 @@ RebirthToggle:OnChanged(function()
     task.spawn(function()
         while getgenv().FastRebirth do
             game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
-            task.wait(0.1)
+            task.wait(0.5)
         end
     end)
 end)
 
-local SpinToggle = Tabs.Main:AddToggle("AutoSpin", {Title = "🎡 Auto Spin Wheels", Default = false })
-SpinToggle:OnChanged(function()
-    getgenv().AutoSpin = SpinToggle.Value
+local AbyssHatch = Tabs.Pets:AddToggle("HatchAbyss", {Title = "🌌 Auto Hatch Abyss Egg", Default = false })
+AbyssHatch:OnChanged(function()
+    getgenv().AutoHatch = AbyssHatch.Value
     task.spawn(function()
-        while getgenv().AutoSpin do
-            game:GetService("ReplicatedStorage").rEvents.wheelRemote:InvokeServer("spinWheel")
-            task.wait(2)
+        while getgenv().AutoHatch do
+            game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", "Abyss Egg", "triple")
+            task.wait(0.2)
         end
     end)
 end)
 
-Tabs.Settings:AddParagraph({
-    Title = "Player Utilities",
-    Content = "Extra features to keep your account safe."
-})
+local EquipBest = Tabs.Pets:AddToggle("EquipBest", {Title = "🐾 Auto Equip Best Pets", Default = false })
+EquipBest:OnChanged(function()
+    getgenv().AutoEquip = EquipBest.Value
+    task.spawn(function()
+        while getgenv().AutoEquip do
+            game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("equipBest")
+            task.wait(5)
+        end
+    end)
+end)
 
-local AntiAFKToggle = Tabs.Settings:AddToggle("AntiAFK", {Title = "🚫 Anti-AFK (Stay Online)", Default = false })
+local AntiAFKToggle = Tabs.Settings:AddToggle("AntiAFK", {Title = "🚫 Anti-AFK", Default = false })
 AntiAFKToggle:OnChanged(function()
     getgenv().AntiAFK = AntiAFKToggle.Value
-    
-    if getgenv().AntiAFK then
-        Fluent:Notify({ Title = "Anti-AFK", Content = "Anti-AFK is now ACTIVE.", Duration = 3 })
-    else
-        Fluent:Notify({ Title = "Anti-AFK", Content = "Anti-AFK is now DISABLED.", Duration = 3 })
-    end
 end)
 
-local VirtualUser = game:GetService("VirtualUser")
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     if getgenv().AntiAFK then
-        VirtualUser:CaptureController()
-        VirtualUser:ClickButton2(Vector2.new())
+        game:GetService("VirtualUser"):CaptureController()
+        game:GetService("VirtualUser"):ClickButton2(Vector2.new())
     end
 end)
 
 Tabs.Settings:AddToggle("TinySize", {
-    Title = "Always Tiny Size",
+    Title = "Auto Tiny Size",
     Default = false,
     Callback = function(state)
         getgenv().TinySize = state
@@ -106,20 +120,6 @@ Tabs.Settings:AddToggle("TinySize", {
             end
         end)
     end
-})
-
-Tabs.Settings:AddButton({
-    Title = "Destroy UI",
-    Description = "Completely remove the script interface",
-    Callback = function()
-        Window:Destroy()
-    end
-})
-
-Fluent:Notify({
-    Title = "K13 Loaded",
-    Content = "Ready to build some muscles!",
-    Duration = 5
 })
 
 Window:SelectTab(1)
