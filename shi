@@ -2,12 +2,12 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 
 local Window = Fluent:CreateWindow({
     Title = "K13 MUSCLE MASTERS 🔥",
-    SubTitle = "by shi | Station & Hatch Edition",
+    SubTitle = "by shi | Premium Edition",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.RightControl
+    Theme = "Purple",
+    MinimizeKey = Enum.KeyCode.LeftControl
 })
 
 local Tabs = {
@@ -16,11 +16,14 @@ local Tabs = {
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
-local function autoLift()
+local function forceLift()
     task.spawn(function()
         while getgenv().StationFarm do
             game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
+            game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
             task.wait()
+            game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
+            task.wait(0.05)
         end
     end)
 end
@@ -29,19 +32,20 @@ local function useStation(pos)
     local char = game.Players.LocalPlayer.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
         char.HumanoidRootPart.CFrame = pos
-        task.wait(0.3)
+        task.wait(0.5)
         game:GetService("VirtualInputManager"):SendKeyEvent(true, "E", false, game)
         task.wait(0.1)
         game:GetService("VirtualInputManager"):SendKeyEvent(false, "E", false, game)
+        task.wait(0.5)
+        forceLift()
     end
 end
 
-local SquatToggle = Tabs.Main:AddToggle("AutoSquat", {Title = "🏋️ Auto Squat (Jungle)", Default = false })
+local SquatToggle = Tabs.Main:AddToggle("AutoSquat", {Title = "🏋️ Auto Squat", Default = false })
 SquatToggle:OnChanged(function()
     getgenv().StationFarm = SquatToggle.Value
     if getgenv().StationFarm then
         useStation(CFrame.new(-8352, 34, 2878))
-        autoLift()
     end
 end)
 
@@ -50,16 +54,6 @@ BenchToggle:OnChanged(function()
     getgenv().StationFarm = BenchToggle.Value
     if getgenv().StationFarm then
         useStation(CFrame.new(-8173, 64, 1898))
-        autoLift()
-    end
-end)
-
-local DeadliftToggle = Tabs.Main:AddToggle("AutoDeadlift", {Title = "🔥 Auto Deadlift", Default = false })
-DeadliftToggle:OnChanged(function()
-    getgenv().StationFarm = DeadliftToggle.Value
-    if getgenv().StationFarm then
-        useStation(CFrame.new(-8621, 34, 2684))
-        autoLift()
     end
 end)
 
@@ -80,7 +74,7 @@ AbyssHatch:OnChanged(function()
     task.spawn(function()
         while getgenv().AutoHatch do
             game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", "Abyss Egg", "triple")
-            task.wait(0.2)
+            task.wait(0.3)
         end
     end)
 end)
