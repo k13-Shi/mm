@@ -1,41 +1,42 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "Violet")
+local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "DarkTheme")
 
 local Main = Window:NewTab("K13 Home")
-local MainSection = Main:NewSection("🟣 K13 PREMIUM EXCLUSIVE 🟣")
-
-MainSection:NewLabel("K13 VIOLET EDITION LOADED")
-
-MainSection:NewLabel("✨ GOD-SPEED ACTIVE ✨")
+local MainSection = Main:NewSection("🟣 K13 PREMIUM VIOLET 🟣")
+MainSection:NewLabel("STATUS: MAXIMUM OVERDRIVE ACTIVE")
 
 local Farm = Window:NewTab("Farm")
 local FarmSection = Farm:NewSection("8-Pack Turbo Farm")
 
-FarmSection:NewToggle("8-PACK SPEED (NO DELAY)", "Pinakamabilis na Reps (Stay Mode)", function(state)
+FarmSection:NewToggle("GOD-SPEED LIFT (NO DELAY)", "Maximum 8-Pack Speed", function(state)
     getgenv().AutoFarm = state
     if state then
-        for i = 1, 15 do
-            task.spawn(function()
-                local LP = game.Players.LocalPlayer
-                local Remote = LP:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
-                while getgenv().AutoFarm do
-                    if Remote then
-                        if Remote.ClassName == "RemoteEvent" then
-                            Remote:FireServer("rep")
-                        else
-                            Remote:InvokeServer("rep")
-                        end
-                    end
-                    game:GetService("RunService").Heartbeat:Wait()
-                end
-            end)
-        end
         task.spawn(function()
+            local LP = game.Players.LocalPlayer
             local VIM = game:GetService("VirtualInputManager")
+            
             while getgenv().AutoFarm do
+                local Remote = LP:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
+                
+                if Remote then
+                    -- BATCH FIRING: 10 reps sabay-sabay para sa ML speed
+                    for i = 1, 10 do
+                        pcall(function()
+                            if Remote.ClassName == "RemoteEvent" then
+                                Remote:FireServer("rep")
+                            else
+                                Remote:InvokeServer("rep")
+                            end
+                        end)
+                    end
+                end
+                
+                -- Fast Visual Click
                 VIM:SendMouseButtonEvent(0, 0, 0, true, game, 0)
                 VIM:SendMouseButtonEvent(0, 0, 0, false, game, 0)
-                task.wait()
+                
+                -- Smallest possible wait para hindi mag-lag/spike ang ping
+                task.wait(0.001)
             end
         end)
     end
@@ -48,19 +49,19 @@ FarmSection:NewToggle("Instant Rebirth", "Automatic Rebirth", function(state)
             pcall(function()
                 game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
             end)
-            task.wait()
+            task.wait(0.1)
         end
     end)
 end)
 
 local Pets = Window:NewTab("Auto Hatch")
-local PetSection = Pets:NewSection("Egg Hatching")
+local PetSection = Pets:NewSection("Violet Egg Hatching")
 
-PetSection:NewDropdown("Select Egg", "Pili ka muna bago i-on", {"Abyss Egg", "Common Egg", "Rare Egg", "Legendary Egg"}, function(v)
+PetSection:NewDropdown("Select Egg", "Pili ka muna", {"Abyss Egg", "Common Egg", "Rare Egg"}, function(v)
     getgenv().SelectedEgg = v
 end)
 
-PetSection:NewToggle("Auto Hatch (Triple)", "Spam hatch pets", function(state)
+PetSection:NewToggle("Auto Hatch (Triple)", "Hatch pets instantly", function(state)
     getgenv().AutoHatch = state
     task.spawn(function()
         while getgenv().AutoHatch do
@@ -68,7 +69,7 @@ PetSection:NewToggle("Auto Hatch (Triple)", "Spam hatch pets", function(state)
             pcall(function()
                 game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", egg, "triple")
             end)
-            task.wait()
+            task.wait(0.1)
         end
     end)
 end)
@@ -80,6 +81,7 @@ SettingsSection:NewKeybind("Toggle UI", "Key: RightControl", Enum.KeyCode.RightC
     Library:ToggleUI()
 end)
 
+-- VIOLET K13 FLOATING BUTTON
 local CoreGui = game:GetService("CoreGui")
 if CoreGui:FindFirstChild("K13_Violet_Logo") then CoreGui:FindFirstChild("K13_Violet_Logo"):Destroy() end
 
