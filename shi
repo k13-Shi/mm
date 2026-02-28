@@ -1,13 +1,13 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "GrapeTheme")
 
--- [ TABS DEFINITION ]
+-- [ TABS ]
 local Home = Window:NewTab("K13 Home")
 local Farm = Window:NewTab("Farm")
 local Pets = Window:NewTab("Auto Hatch/Spin")
 local Settings = Window:NewTab("Settings")
 
--- [ 1. LOGO & BUTTON FIX (NO 3 LINES) ]
+-- [ 1. LOGO & BUTTON FIX (FORCE DELETE 3 LINES) ]
 local CoreGui = game:GetService("CoreGui")
 task.spawn(function()
     while task.wait(0.1) do
@@ -31,26 +31,24 @@ K13Button.Draggable = true
 Instance.new("UICorner", K13Button).CornerRadius = UDim.new(1, 0)
 K13Button.MouseButton1Click:Connect(function() Library:ToggleUI() end)
 
--- [ 2. HOME TAB ]
-Home:NewSection("🟣 K13 PREMIUM VIOLET 🟣")
-Home:NewSection("STATUS: COMBAT REMOVED / AFK FIXED")
-
--- [ 3. FARM TAB (WITH INSTANT REBIRTH) ]
+-- [ 2. FARM TAB (SUPER FAST REPS + INSTANT REBIRTH) ]
 local FarmSection = Farm:NewSection("Turbo Farming")
-FarmSection:NewToggle("8-PACK SPEED", "Fast Reps", function(state)
-    getgenv().AutoFarm = state
+
+FarmSection:NewToggle("ULTRA FAST REPS", "No Auto-Equip (Hawakan mo gamit mo)", function(state)
+    getgenv().FastRep = state
     task.spawn(function()
-        while getgenv().AutoFarm do
+        while getgenv().FastRep do
             local LP = game.Players.LocalPlayer
-            local tool = LP.Backpack:FindFirstChildOfClass("Tool") or LP.Character:FindFirstChildOfClass("Tool")
-            if tool then LP.Character.Humanoid:EquipTool(tool) end
-            pcall(function() LP.muscleEvent:FireServer("rep") end)
-            task.wait()
+            -- Remote call lang, walang Character Equip logic para hindi mag-punch
+            pcall(function() 
+                LP.muscleEvent:FireServer("rep") 
+            end)
+            task.wait() -- Mabilis na loop
         end
     end)
 end)
 
-FarmSection:NewToggle("⚡ INSTANT REBIRTH", "Awtomatikong Rebirth", function(state)
+FarmSection:NewToggle("⚡ INSTANT REBIRTH", "Auto Rebirth", function(state)
     getgenv().AutoRebirth = state
     task.spawn(function()
         while getgenv().AutoRebirth do
@@ -62,7 +60,7 @@ FarmSection:NewToggle("⚡ INSTANT REBIRTH", "Awtomatikong Rebirth", function(st
     end)
 end)
 
--- [ 4. ANTI-AFK TIMER BOX ]
+-- [ 3. ANTI-AFK TIMER ]
 local AfkGui = Instance.new("ScreenGui", CoreGui)
 local AfkFrame = Instance.new("Frame", AfkGui)
 AfkFrame.Size = UDim2.new(0, 110, 0, 45)
@@ -91,18 +89,18 @@ task.spawn(function()
     end
 end)
 
-FarmSection:NewToggle("Anti-AFK (With Timer)", "Stay online 24/7", function(state)
+FarmSection:NewToggle("Anti-AFK (With Timer)", "Stay online", function(state)
     getgenv().AntiAFK = state
     AfkFrame.Visible = state
 end)
 
--- [ 5. AUTO HATCH/SPIN ]
+-- [ 4. AUTO HATCH ]
 local PetSection = Pets:NewSection("Crystal Hatching")
-PetSection:NewDropdown("Select Crystal", "Pili ka Crystal", {"Common Crystal", "Rare Crystal", "Epic Crystal", "Legendary Crystal", "Abyss Crystal"}, function(v)
+PetSection:NewDropdown("Select Crystal", "Pili ka", {"Common Crystal", "Rare Crystal", "Epic Crystal", "Legendary Crystal", "Abyss Crystal"}, function(v)
     getgenv().SelectedCrystal = v
 end)
 
-PetSection:NewToggle("Auto Hatch (SINGLE)", "Dapat may Gems ka!", function(state)
+PetSection:NewToggle("Auto Hatch (SINGLE)", "Kailangan may Gems!", function(state)
     getgenv().AutoHatch = state
     task.spawn(function()
         while getgenv().AutoHatch do
@@ -115,24 +113,7 @@ PetSection:NewToggle("Auto Hatch (SINGLE)", "Dapat may Gems ka!", function(state
     end)
 end)
 
-PetSection:NewToggle("Auto Spin Wheel", "Awtomatikong Spin", function(state)
-    getgenv().AutoSpin = state
-    task.spawn(function()
-        while getgenv().AutoSpin do
-            pcall(function() 
-                game:GetService("ReplicatedStorage").rEvents.wheelEvent:FireServer("spinWheel") 
-            end)
-            task.wait(5)
-        end
-    end)
-end)
-
--- [ SETTINGS ]
-Settings:NewSection("UI Controls"):NewKeybind("Toggle UI", "RightControl", Enum.KeyCode.RightControl, function()
-    Library:ToggleUI()
-end)
-
--- AFK TRIGGER
+-- AFK LOGIC
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     if getgenv().AntiAFK then
         game:GetService("VirtualUser"):CaptureController()
