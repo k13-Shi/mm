@@ -1,9 +1,10 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥 (VIOLET OVERDRIVE)", "GrapeTheme")
+local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "GrapeTheme")
 
 -- [ TAB 1: HOME ]
 local Home = Window:NewTab("K13 Home")
-Home:NewSection("🟣 K13 PREMIUM VIOLET 🟣"):NewLabel("STATUS: ANTI-AFK NOTIF ADDED")
+Home:NewSection("🟣 K13 PREMIUM VIOLET 🟣")
+Home:NewSection("STATUS: ALL FEATURES FIXED")
 
 -- [ TAB 2: FARM ]
 local Farm = Window:NewTab("Farm")
@@ -33,55 +34,9 @@ FarmSection:NewToggle("Instant Auto Rebirth", "No delay", function(state)
     end)
 end)
 
--- [ ANTI-AFK WITH VIOLET NOTIFICATION ]
-local function createNotif()
-    local sg = Instance.new("ScreenGui", game.CoreGui)
-    sg.Name = "K13_AFK_Notif"
-    
-    local frame = Instance.new("Frame", sg)
-    frame.Size = UDim2.new(0, 200, 0, 100)
-    frame.Position = UDim2.new(0.5, -100, 0.1, 0)
-    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    frame.BorderSizePixel = 0
-    frame.Visible = false
-    
-    local corner = Instance.new("UICorner", frame)
-    local border = Instance.new("UIStroke", frame)
-    border.Color = Color3.fromRGB(138, 43, 226)
-    border.Thickness = 2
-    
-    local img = Instance.new("ImageLabel", frame)
-    img.Size = UDim2.new(0, 40, 0, 40)
-    img.Position = UDim2.new(0.5, -20, 0.1, 0)
-    img.Image = "rbxassetid://6031097225"
-    img.BackgroundTransparency = 1
-    
-    local txt = Instance.new("TextLabel", frame)
-    txt.Size = UDim2.new(1, 0, 0, 30)
-    txt.Position = UDim2.new(0, 0, 0.6, 0)
-    txt.Text = "ANTI-AFK ACTIVE"
-    txt.TextColor3 = Color3.fromRGB(138, 43, 226)
-    txt.BackgroundTransparency = 1
-    txt.Font = Enum.Font.GothamBold
-    txt.TextSize = 14
-    
-    return frame
-end
-
-local afkFrame = createNotif()
-
-FarmSection:NewToggle("Anti-AFK (No Kick)", "Stay online 24/7", function(state)
-    getgenv().AntiAFK = state
-    afkFrame.Visible = state
-end)
-
-FarmSection:NewButton("Toggle AFK Notif View", "Open/Close AFK Message", function()
-    afkFrame.Visible = not afkFrame.Visible
-end)
-
 -- [ TAB 3: COMBAT ]
 local Combat = Window:NewTab("Combat")
-local CombatSection = Combat:NewSection("Kill & View (No Teleport)")
+local CombatSection = Combat:NewSection("Kill & View (No TP)")
 
 local function forceEquipPunch()
     local LP = game.Players.LocalPlayer
@@ -115,11 +70,12 @@ end)
 
 -- [ TAB 4: AUTO HATCH ]
 local Pets = Window:NewTab("Auto Hatch")
-Pets:NewSection("Egg Hatching"):NewDropdown("Select Egg", "Complete List", {"Abyss Egg", "Legendary Egg", "Epic Egg", "Rare Egg", "Common Egg"}, function(v)
+local PetSection = Pets:NewSection("Egg Hatching")
+PetSection:NewDropdown("Select Egg", "List", {"Abyss Egg", "Legendary Egg", "Epic Egg", "Rare Egg", "Common Egg"}, function(v)
     getgenv().SelectedEgg = v
 end)
 
-Pets:NewSection("Hatch Controls"):NewToggle("Start Auto Hatch (Triple)", "Hatch instantly", function(state)
+PetSection:NewToggle("Start Auto Hatch (Triple)", "Hatch instantly", function(state)
     getgenv().AutoHatch = state
     task.spawn(function()
         while getgenv().AutoHatch do
@@ -130,28 +86,54 @@ Pets:NewSection("Hatch Controls"):NewToggle("Start Auto Hatch (Triple)", "Hatch 
     end)
 end)
 
--- [ SETTINGS & LOGO ]
+-- [ ANTI-AFK MINI NOTIF SYSTEM ]
 local CoreGui = game:GetService("CoreGui")
-if CoreGui:FindFirstChild("K13_Violet_Logo") then CoreGui:FindFirstChild("K13_Violet_Logo"):Destroy() end
-local ScreenGui = Instance.new("ScreenGui", CoreGui)
-ScreenGui.Name = "K13_Violet_Logo"
+local NotifGui = Instance.new("ScreenGui", CoreGui)
+NotifGui.Name = "K13_AFK_Mini"
 
-local ImageButton = Instance.new("ImageButton", ScreenGui)
-ImageButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
-ImageButton.Position = UDim2.new(0, 15, 0.5, 0)
-ImageButton.Size = UDim2.new(0, 60, 0, 60)
-ImageButton.Image = "rbxassetid://6031097225" 
-ImageButton.Draggable = true
-Instance.new("UICorner", ImageButton).CornerRadius = UDim.new(0, 15)
+local AfkButton = Instance.new("ImageButton", NotifGui)
+AfkButton.Name = "AFK_Indicator"
+AfkButton.Size = UDim2.new(0, 45, 0, 45)
+AfkButton.Position = UDim2.new(0, 15, 0.5, 70) -- Sa ilalim ng main button
+AfkButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+AfkButton.Image = "rbxassetid://6031097225"
+AfkButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
+AfkButton.Draggable = true
+Instance.new("UICorner", AfkButton).CornerRadius = UDim.new(1, 0) -- Perfect Circle
 
-ImageButton.MouseButton1Click:Connect(function() Library:ToggleUI() end)
+local Stroke = Instance.new("UIStroke", AfkButton)
+Stroke.Color = Color3.fromRGB(138, 43, 226)
+Stroke.Thickness = 2
+Stroke.Enabled = false -- Mag-e-enable lang pag active
 
+Farm:NewSection("Safety"):NewToggle("Anti-AFK (No Kick)", "Stay online 24/7", function(state)
+    getgenv().AntiAFK = state
+    Stroke.Enabled = state
+    AfkButton.ImageColor3 = state and Color3.fromRGB(138, 43, 226) or Color3.fromRGB(255, 255, 255)
+end)
+
+-- [ MAIN K13 LOGO BUTTON ]
+if CoreGui:FindFirstChild("K13_Main_Logo") then CoreGui:FindFirstChild("K13_Main_Logo"):Destroy() end
+local MainGui = Instance.new("ScreenGui", CoreGui)
+MainGui.Name = "K13_Main_Logo"
+
+local MainButton = Instance.new("ImageButton", MainGui)
+MainButton.Size = UDim2.new(0, 60, 0, 60)
+MainButton.Position = UDim2.new(0, 15, 0.5, -30)
+MainButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+MainButton.Image = "rbxassetid://6031097225" 
+MainButton.Draggable = true
+Instance.new("UICorner", MainButton).CornerRadius = UDim.new(1, 0) -- Perfect Circle
+
+MainButton.MouseButton1Click:Connect(function() Library:ToggleUI() end)
+
+-- [ SETTINGS ]
 local Settings = Window:NewTab("Settings")
 Settings:NewSection("Controls"):NewKeybind("Toggle UI", "Key: RightControl", Enum.KeyCode.RightControl, function()
     Library:ToggleUI()
 end)
 
--- [ ANTI-AFK TRIGGER ]
+-- [ AFK LOGIC ]
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     if getgenv().AntiAFK then
         game:GetService("VirtualUser"):CaptureController()
