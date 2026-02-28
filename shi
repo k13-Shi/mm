@@ -3,13 +3,11 @@ local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥 (VIOLET OVERDRIVE)", "
 
 -- [ TAB 1: HOME ]
 local Home = Window:NewTab("K13 Home")
-local HomeSection = Home:NewSection("🟣 K13 PREMIUM VIOLET 🟣")
-HomeSection:NewLabel("STATUS: ALL SYSTEMS OPERATIONAL")
-HomeSection:NewLabel("Toggle Key: RightControl")
+Home:NewSection("🟣 K13 PREMIUM VIOLET 🟣"):NewLabel("STATUS: ANTI-AFK NOTIF ADDED")
 
 -- [ TAB 2: FARM ]
 local Farm = Window:NewTab("Farm")
-local FarmSection = Farm:NewSection("8-Pack Turbo Farm")
+local FarmSection = Farm:NewSection("Turbo Farming")
 
 FarmSection:NewToggle("8-PACK SPEED (STABLE)", "Ultra Fast Reps + Auto Equip", function(state)
     getgenv().AutoFarm = state
@@ -18,17 +16,14 @@ FarmSection:NewToggle("8-PACK SPEED (STABLE)", "Ultra Fast Reps + Auto Equip", f
             local LP = game.Players.LocalPlayer
             local tool = LP.Backpack:FindFirstChildOfClass("Tool") or LP.Character:FindFirstChildOfClass("Tool")
             if tool and LP.Character then LP.Character.Humanoid:EquipTool(tool) end
-            
             local Remote = LP:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
-            if Remote then
-                for i = 1, 25 do pcall(function() Remote:FireServer("rep") end) end
-            end
+            if Remote then for i = 1, 25 do pcall(function() Remote:FireServer("rep") end) end end
             task.wait(0.001)
         end
     end)
 end)
 
-FarmSection:NewToggle("Instant Auto Rebirth", "No delay rebirth", function(state)
+FarmSection:NewToggle("Instant Auto Rebirth", "No delay", function(state)
     getgenv().AutoRebirth = state
     task.spawn(function()
         while getgenv().AutoRebirth do
@@ -38,50 +33,69 @@ FarmSection:NewToggle("Instant Auto Rebirth", "No delay rebirth", function(state
     end)
 end)
 
+-- [ ANTI-AFK WITH VIOLET NOTIFICATION ]
+local function createNotif()
+    local sg = Instance.new("ScreenGui", game.CoreGui)
+    sg.Name = "K13_AFK_Notif"
+    
+    local frame = Instance.new("Frame", sg)
+    frame.Size = UDim2.new(0, 200, 0, 100)
+    frame.Position = UDim2.new(0.5, -100, 0.1, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    frame.BorderSizePixel = 0
+    frame.Visible = false
+    
+    local corner = Instance.new("UICorner", frame)
+    local border = Instance.new("UIStroke", frame)
+    border.Color = Color3.fromRGB(138, 43, 226)
+    border.Thickness = 2
+    
+    local img = Instance.new("ImageLabel", frame)
+    img.Size = UDim2.new(0, 40, 0, 40)
+    img.Position = UDim2.new(0.5, -20, 0.1, 0)
+    img.Image = "rbxassetid://6031097225"
+    img.BackgroundTransparency = 1
+    
+    local txt = Instance.new("TextLabel", frame)
+    txt.Size = UDim2.new(1, 0, 0, 30)
+    txt.Position = UDim2.new(0, 0, 0.6, 0)
+    txt.Text = "ANTI-AFK ACTIVE"
+    txt.TextColor3 = Color3.fromRGB(138, 43, 226)
+    txt.BackgroundTransparency = 1
+    txt.Font = Enum.Font.GothamBold
+    txt.TextSize = 14
+    
+    return frame
+end
+
+local afkFrame = createNotif()
+
 FarmSection:NewToggle("Anti-AFK (No Kick)", "Stay online 24/7", function(state)
     getgenv().AntiAFK = state
+    afkFrame.Visible = state
+end)
+
+FarmSection:NewButton("Toggle AFK Notif View", "Open/Close AFK Message", function()
+    afkFrame.Visible = not afkFrame.Visible
 end)
 
 -- [ TAB 3: COMBAT ]
 local Combat = Window:NewTab("Combat")
 local CombatSection = Combat:NewSection("Kill & View (No Teleport)")
 
-local function getPlayers()
-    local p = {}
-    for _, v in pairs(game.Players:GetPlayers()) do
-        if v ~= game.Players.LocalPlayer then table.insert(p, v.Name) end
+local function forceEquipPunch()
+    local LP = game.Players.LocalPlayer
+    local punch = LP.Backpack:FindFirstChild("Punch") or LP.Character:FindFirstChild("Punch")
+    if punch and LP.Character and punch.Parent ~= LP.Character then
+        LP.Character.Humanoid:EquipTool(punch)
     end
-    return p
 end
-
-local TargetDropdown = CombatSection:NewDropdown("Select Player", "Target name", getPlayers(), function(v)
-    getgenv().SelectedPlayer = v
-end)
-
-CombatSection:NewButton("🔄 Refresh Player List", "Update names", function()
-    TargetDropdown:Refresh(getPlayers())
-end)
-
-CombatSection:NewToggle("⚔️ Auto Kill Selected (No TP)", "Damage target without moving", function(state)
-    getgenv().AutoKill = state
-    task.spawn(function()
-        while getgenv().AutoKill do
-            local target = game.Players:FindFirstChild(getgenv().SelectedPlayer)
-            if target and target.Character then
-                pcall(function()
-                    game.Players.LocalPlayer.muscleEvent:FireServer("punchClick", target.Character)
-                    game.Players.LocalPlayer.muscleEvent:FireServer("rep", target.Character)
-                end)
-            end
-            task.wait(0.01)
-        end
-    end)
-end)
 
 CombatSection:NewToggle("💀 KILL ALL (NO TELEPORT)", "Instant kill everyone", function(state)
     getgenv().KillAll = state
     task.spawn(function()
         while getgenv().KillAll do
+            forceEquipPunch()
             for _, v in pairs(game.Players:GetPlayers()) do
                 if v ~= game.Players.LocalPlayer and v.Character then
                     pcall(function()
@@ -95,33 +109,17 @@ CombatSection:NewToggle("💀 KILL ALL (NO TELEPORT)", "Instant kill everyone", 
     end)
 end)
 
-CombatSection:NewToggle("👁️ View Player", "Spectate target", function(state)
-    getgenv().ViewPlayer = state
-    task.spawn(function()
-        while getgenv().ViewPlayer do
-            local target = game.Players:FindFirstChild(getgenv().SelectedPlayer)
-            if target and target.Character then
-                workspace.CurrentCamera.CameraSubject = target.Character.Humanoid
-            end
-            task.wait(0.1)
-        end
-        workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character.Humanoid
-    end)
-end)
-
-CombatSection:NewToggle("☣️ Auto Toxic Message", "Chat toxic lines", function(state)
+CombatSection:NewToggle("☣️ Auto Toxic", "Chat L on kill", function(state)
     getgenv().AutoToxic = state
 end)
 
 -- [ TAB 4: AUTO HATCH ]
 local Pets = Window:NewTab("Auto Hatch")
-local PetSection = Pets:NewSection("Complete Egg List")
-
-PetSection:NewDropdown("Select Egg", "Pili ka dito", {"Abyss Egg", "Legendary Egg", "Epic Egg", "Rare Egg", "Common Egg"}, function(v)
+Pets:NewSection("Egg Hatching"):NewDropdown("Select Egg", "Complete List", {"Abyss Egg", "Legendary Egg", "Epic Egg", "Rare Egg", "Common Egg"}, function(v)
     getgenv().SelectedEgg = v
 end)
 
-PetSection:NewToggle("Start Auto Hatch (Triple)", "Hatch instantly", function(state)
+Pets:NewSection("Hatch Controls"):NewToggle("Start Auto Hatch (Triple)", "Hatch instantly", function(state)
     getgenv().AutoHatch = state
     task.spawn(function()
         while getgenv().AutoHatch do
@@ -133,28 +131,25 @@ PetSection:NewToggle("Start Auto Hatch (Triple)", "Hatch instantly", function(st
 end)
 
 -- [ SETTINGS & LOGO ]
-local Settings = Window:NewTab("Settings")
-Settings:NewSection("UI Controls"):NewKeybind("Toggle UI", "Key: RightControl", Enum.KeyCode.RightControl, function()
-    Library:ToggleUI()
-end)
-
 local CoreGui = game:GetService("CoreGui")
 if CoreGui:FindFirstChild("K13_Violet_Logo") then CoreGui:FindFirstChild("K13_Violet_Logo"):Destroy() end
-local ScreenGui = Instance.new("ScreenGui")
-local ImageButton = Instance.new("ImageButton")
-local UICorner = Instance.new("UICorner")
-
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
 ScreenGui.Name = "K13_Violet_Logo"
-ScreenGui.Parent = CoreGui
-ImageButton.Parent = ScreenGui
+
+local ImageButton = Instance.new("ImageButton", ScreenGui)
 ImageButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
 ImageButton.Position = UDim2.new(0, 15, 0.5, 0)
 ImageButton.Size = UDim2.new(0, 60, 0, 60)
-ImageButton.Image = "rbxassetid://6031097225" -- K13 Ninja Logo
+ImageButton.Image = "rbxassetid://6031097225" 
 ImageButton.Draggable = true
-UICorner.CornerRadius = UDim.new(0, 15)
-UICorner.Parent = ImageButton
+Instance.new("UICorner", ImageButton).CornerRadius = UDim.new(0, 15)
+
 ImageButton.MouseButton1Click:Connect(function() Library:ToggleUI() end)
+
+local Settings = Window:NewTab("Settings")
+Settings:NewSection("Controls"):NewKeybind("Toggle UI", "Key: RightControl", Enum.KeyCode.RightControl, function()
+    Library:ToggleUI()
+end)
 
 -- [ ANTI-AFK TRIGGER ]
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
