@@ -1,18 +1,16 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥 (VIOLET FIX)", "GrapeTheme")
+local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "GrapeTheme")
 
--- [ TABS DEFINITION ]
+-- [ TABS ]
 local Home = Window:NewTab("K13 Home")
 local Farm = Window:NewTab("Farm")
 local Combat = Window:NewTab("Combat")
 local Pets = Window:NewTab("Auto Hatch")
 local Settings = Window:NewTab("Settings")
 
--- [ HOME TAB ]
 Home:NewSection("🟣 K13 PREMIUM VIOLET 🟣")
-Home:NewSection("STATUS: COMBAT RESTORED & FIXED")
 
--- [ FARM TAB - UNCHANGED ]
+-- [ FARM SECTION ]
 local FarmSection = Farm:NewSection("Turbo Farming")
 FarmSection:NewToggle("8-PACK SPEED", "Fast Reps + Auto Equip", function(state)
     getgenv().AutoFarm = state
@@ -38,7 +36,7 @@ FarmSection:NewToggle("Instant Rebirth", "No delay", function(state)
     end)
 end)
 
--- [ ANTI-AFK TIMER - UNCHANGED ]
+-- [ ANTI-AFK TIMER ]
 local CoreGui = game:GetService("CoreGui")
 local AfkGui = Instance.new("ScreenGui", CoreGui)
 local AfkFrame = Instance.new("Frame", AfkGui)
@@ -49,7 +47,6 @@ AfkFrame.Visible = false
 AfkFrame.Draggable = true
 Instance.new("UICorner", AfkFrame)
 Instance.new("UIStroke", AfkFrame).Color = Color3.fromRGB(138, 43, 226)
-
 local AfkText = Instance.new("TextLabel", AfkFrame)
 AfkText.Size = UDim2.new(1, 0, 1, 0)
 AfkText.BackgroundTransparency = 1
@@ -57,7 +54,6 @@ AfkText.Text = "AFK: 0s"
 AfkText.TextColor3 = Color3.fromRGB(138, 43, 226)
 AfkText.Font = Enum.Font.GothamBold
 AfkText.TextSize = 14
-
 local seconds = 0
 task.spawn(function()
     while task.wait(1) do
@@ -67,13 +63,12 @@ task.spawn(function()
         else seconds = 0 end
     end
 end)
-
 FarmSection:NewToggle("Anti-AFK (With Timer)", "Stay online", function(state)
     getgenv().AntiAFK = state
     AfkFrame.Visible = state
 end)
 
--- [ COMBAT TAB - RESTORED & IMPROVED ]
+-- [ COMBAT SECTION - FULL RESTORE ]
 local CombatSection = Combat:NewSection("Player Kill & View System")
 
 local function getPlayers()
@@ -92,11 +87,11 @@ local function forceEquipPunch()
     end
 end
 
-local TargetDropdown = CombatSection:NewDropdown("Select Player", "Target names here", getPlayers(), function(v)
+local TargetDropdown = CombatSection:NewDropdown("Select Player", "Piliin ang biktima", getPlayers(), function(v)
     getgenv().SelectedPlayer = v
 end)
 
-CombatSection:NewButton("🔄 Refresh Player List", "Click if players are missing", function()
+CombatSection:NewButton("🔄 Refresh Player List", "Update Names", function()
     TargetDropdown:Refresh(getPlayers())
 end)
 
@@ -131,7 +126,7 @@ CombatSection:NewToggle("👁️ View Player", "Stalk target", function(state)
     end)
 end)
 
-CombatSection:NewToggle("💀 KILL ALL (REMOTE REACH)", "Sapak lahat kahit malayo ka", function(state)
+CombatSection:NewToggle("💀 KILL ALL (REMOTE REACH)", "Sapak lahat sa server", function(state)
     getgenv().KillAll = state
     task.spawn(function()
         while getgenv().KillAll do
@@ -153,12 +148,11 @@ CombatSection:NewToggle("☣️ Auto Toxic", "Chat L on kill", function(state)
     getgenv().AutoToxic = state
 end)
 
--- [ AUTO HATCH - UNCHANGED ]
+-- [ PETS ]
 Pets:NewSection("Egg Hatching"):NewDropdown("Select Egg", "List", {"Abyss Egg", "Legendary Egg", "Epic Egg", "Rare Egg", "Common Egg"}, function(v)
     getgenv().SelectedEgg = v
 end)
-
-Pets:NewSection("Hatch Controls"):NewToggle("Start Auto Hatch", "Triple Hatch", function(state)
+Pets:NewSection("Controls"):NewToggle("Start Auto Hatch", "Triple", function(state)
     getgenv().AutoHatch = state
     task.spawn(function()
         while getgenv().AutoHatch do
@@ -169,17 +163,21 @@ Pets:NewSection("Hatch Controls"):NewToggle("Start Auto Hatch", "Triple Hatch", 
     end)
 end)
 
--- [ MAIN BUTTON & SETTINGS ]
+-- [ THE K13 LOGO BUTTON (FIXED) ]
 if CoreGui:FindFirstChild("K13_Main_Logo") then CoreGui:FindFirstChild("K13_Main_Logo"):Destroy() end
 local MainGui = Instance.new("ScreenGui", CoreGui)
+MainGui.Name = "K13_Main_Logo"
 local MainButton = Instance.new("ImageButton", MainGui)
 MainButton.Size = UDim2.new(0, 60, 0, 60)
 MainButton.Position = UDim2.new(0, 15, 0.5, -30)
 MainButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
-MainButton.Image = "rbxassetid://6031097225" 
+MainButton.Image = "rbxassetid://6031097225" -- K13 Ninja Logo
 MainButton.Draggable = true
 Instance.new("UICorner", MainButton).CornerRadius = UDim.new(1, 0)
-MainButton.MouseButton1Click:Connect(function() Library:ToggleUI() end)
+
+MainButton.MouseButton1Click:Connect(function()
+    Library:ToggleUI()
+end)
 
 Settings:NewSection("Controls"):NewKeybind("Toggle UI", "RightControl", Enum.KeyCode.RightControl, function()
     Library:ToggleUI()
