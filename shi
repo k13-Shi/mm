@@ -2,11 +2,11 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 
 local Window = Fluent:CreateWindow({
     Title = "K13 MUSCLE MASTERS 🔥",
-    SubTitle = "by shi | Premium Edition",
+    SubTitle = "by shi | No-TP Edition",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
-    Theme = "Purple",
+    Theme = "Dark",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 
@@ -16,44 +16,23 @@ local Tabs = {
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
-local function forceLift()
+local function startLifting()
     task.spawn(function()
-        while getgenv().StationFarm do
+        while getgenv().AutoLift do
             game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
             game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
             task.wait()
             game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
-            task.wait(0.05)
+            task.wait(0.01)
         end
     end)
 end
 
-local function useStation(pos)
-    local char = game.Players.LocalPlayer.Character
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        char.HumanoidRootPart.CFrame = pos
-        task.wait(0.5)
-        game:GetService("VirtualInputManager"):SendKeyEvent(true, "E", false, game)
-        task.wait(0.1)
-        game:GetService("VirtualInputManager"):SendKeyEvent(false, "E", false, game)
-        task.wait(0.5)
-        forceLift()
-    end
-end
-
-local SquatToggle = Tabs.Main:AddToggle("AutoSquat", {Title = "🏋️ Auto Squat", Default = false })
-SquatToggle:OnChanged(function()
-    getgenv().StationFarm = SquatToggle.Value
-    if getgenv().StationFarm then
-        useStation(CFrame.new(-8352, 34, 2878))
-    end
-end)
-
-local BenchToggle = Tabs.Main:AddToggle("AutoBench", {Title = "💪 Auto Bench Press", Default = false })
-BenchToggle:OnChanged(function()
-    getgenv().StationFarm = BenchToggle.Value
-    if getgenv().StationFarm then
-        useStation(CFrame.new(-8173, 64, 1898))
+local LiftToggle = Tabs.Main:AddToggle("AutoLift", {Title = "🏋️ Start Auto Lift (No TP)", Default = false })
+LiftToggle:OnChanged(function()
+    getgenv().AutoLift = LiftToggle.Value
+    if getgenv().AutoLift then
+        startLifting()
     end
 end)
 
