@@ -2,74 +2,62 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHept
 local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "DarkTheme")
 
 local Farm = Window:NewTab("Farm")
-local FarmSection = Farm:NewSection("Main Farming")
+local FarmSection = Farm:NewSection("Turbo Farming")
 
-FarmSection:NewToggle("Auto Farm (Turbo)", "Ultra fast clicking and reps", function(state)
+FarmSection:NewToggle("Auto Farm (HoneyDezz Speed)", "Ultra Fast God Mode Reps", function(state)
     getgenv().AutoFarm = state
     if state then
         task.spawn(function()
+            local RS = game:GetService("RunService")
+            local VIM = game:GetService("VirtualInputManager")
+            local LP = game.Players.LocalPlayer
+            
             while getgenv().AutoFarm do
-                local remote = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
+                RS.Heartbeat:Wait()
+                local remote = LP:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
+                
                 if remote then
                     if remote.ClassName == "RemoteEvent" then
                         remote:FireServer("rep")
-                    elseif remote.ClassName == "RemoteFunction" then
+                    else
                         remote:InvokeServer("rep")
                     end
                 end
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
-                task.wait() 
+                VIM:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                VIM:SendMouseButtonEvent(0, 0, 0, false, game, 0)
             end
         end)
     end
 end)
 
-FarmSection:NewToggle("Auto Rebirth", "Automatic rebirth", function(state)
+FarmSection:NewToggle("Auto Rebirth", "Instant Rebirth", function(state)
     getgenv().AutoRebirth = state
     task.spawn(function()
         while getgenv().AutoRebirth do
             pcall(function()
                 game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
             end)
-            task.wait(0.1)
+            task.wait()
         end
     end)
 end)
 
 local Misc = Window:NewTab("Misc")
-local MiscSection = Misc:NewSection("Eggs & Utilities")
+local MiscSection = Misc:NewSection("Abyss & Eggs")
 
-MiscSection:NewDropdown("Select Eggs", "Choose Abyss Egg for Titan", {"Abyss Egg", "Common Egg", "Rare Egg"}, function(v)
-    getgenv().SelectedEgg = v
-end)
-
-MiscSection:NewToggle("Auto Hatch", "Hatch selected egg", function(state)
+MiscSection:NewToggle("Auto Hatch Abyss", "Focus on Abyss Titan", function(state)
     getgenv().AutoHatch = state
     task.spawn(function()
         while getgenv().AutoHatch do
-            local egg = getgenv().SelectedEgg or "Abyss Egg"
             pcall(function()
-                game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", egg, "triple")
+                game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", "Abyss Egg", "triple")
             end)
-            task.wait(0.01)
+            task.wait()
         end
     end)
 end)
 
-MiscSection:NewToggle("Auto Spin", "Auto spin wheel", function(state)
-    getgenv().AutoSpin = state
-    task.spawn(function()
-        while getgenv().AutoSpin do
-            pcall(function()
-                game:GetService("ReplicatedStorage").rEvents.wheelRemote:InvokeServer("spinWheel")
-            end)
-            task.wait(1)
-        end
-    end)
-end)
-
-MiscSection:NewToggle("Anti AFK", "No kick", function(state)
+MiscSection:NewToggle("Anti AFK", "No Kick Mode", function(state)
     getgenv().AntiAFK = state
 end)
 
@@ -81,10 +69,23 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
 end)
 
 local Settings = Window:NewTab("Settings")
-local SettingsSection = Settings:NewSection("UI Controls")
+local SettingsSection = Settings:NewSection("UI Management")
 
-SettingsSection:NewLabel("Press 'RightControl' to Hide/Show UI")
-
-SettingsSection:NewKeybind("Toggle Key", "Change hide/show key", Enum.KeyCode.RightControl, function()
+SettingsSection:NewKeybind("Toggle UI Key", "Default: RightControl", Enum.KeyCode.RightControl, function()
 	Library:ToggleUI()
+end)
+
+local ToggleButton = Instance.new("ScreenGui")
+local Button = Instance.new("TextButton")
+ToggleButton.Name = "K13Toggle"
+ToggleButton.Parent = game:GetService("CoreGui")
+Button.Name = "OpenClose"
+Button.Parent = ToggleButton
+Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Button.Position = UDim2.new(0, 10, 0.5, 0)
+Button.Size = UDim2.new(0, 50, 0, 50)
+Button.Text = "K13"
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.MouseButton1Click:Connect(function()
+    Library:ToggleUI()
 end)
