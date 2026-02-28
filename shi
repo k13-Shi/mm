@@ -1,44 +1,35 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥 (TOXIC VIOLET)", "DarkTheme")
+local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "GrapeTheme")
 
-local Main = Window:NewTab("K13 Home")
-local MainSection = Main:NewSection("🟣 K13 PREMIUM VIOLET 🟣")
-MainSection:NewLabel("STATUS: GOD-SPEED & TOXIC ACTIVE")
+-- 1. HOME TAB
+local Home = Window:NewTab("K13 Home")
+local HomeSection = Home:NewSection("🟣 K13 PREMIUM VIOLET 🟣")
+HomeSection:NewLabel("STATUS: NO-ANIMATION KILL ACTIVE")
 
+-- 2. FARM TAB
 local Farm = Window:NewTab("Farm")
 local FarmSection = Farm:NewSection("8-Pack Turbo Farm")
 
-FarmSection:NewToggle("8-PACK SPEED (STABLE)", "Fast Reps (Stay Mode)", function(state)
+FarmSection:NewToggle("8-PACK SPEED (NO ANIM)", "Fast Reps No Animation", function(state)
     getgenv().AutoFarm = state
     if state then
         task.spawn(function()
             while getgenv().AutoFarm do
                 local Remote = game.Players.LocalPlayer:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
                 if Remote then
-                    for i = 1, 15 do
+                    for i = 1, 20 do -- Mas mabilis na batch
                         pcall(function() Remote:FireServer("rep") end)
                     end
                 end
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
-                task.wait(0.01)
+                task.wait(0.001) -- Minimum delay for God Speed
             end
         end)
     end
 end)
 
-FarmSection:NewToggle("Instant Rebirth", "Auto Rebirth", function(state)
-    getgenv().AutoRebirth = state
-    task.spawn(function()
-        while getgenv().AutoRebirth do
-            pcall(function() game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest") end)
-            task.wait(0.1)
-        end
-    end)
-end)
-
+-- 3. COMBAT TAB (NO-TELEPORT KILL)
 local Combat = Window:NewTab("Combat")
-local CombatSection = Combat:NewSection("Player Kill & Toxic System")
+local CombatSection = Combat:NewSection("Kill Aura & No-Anim Combat")
 
 local PlayerList = {}
 local function getPlayers()
@@ -51,49 +42,36 @@ local function getPlayers()
     return PlayerList
 end
 
-local TargetDropdown = CombatSection:NewDropdown("Select Target Player", "Piliin ang biktima", getPlayers(), function(v)
+local TargetDropdown = CombatSection:NewDropdown("Select Target Player", "Sino ang pababagsakin?", getPlayers(), function(v)
     getgenv().SelectedPlayer = v
 end)
 
-CombatSection:NewButton("🔄 Refresh Player List", "Update list", function()
+CombatSection:NewButton("🔄 Refresh Player List", "Update names", function()
     TargetDropdown:Refresh(getPlayers())
 end)
 
-local ToxicMessages = {
-    "L",
-    "K13 OWNED YOU!",
-    "EZ STATS",
-    "GO CRY TO YOUR MOM",
-    "PRACTICE MORE KID",
-    "K13 ON TOP",
-    "STOP RUNNING EZ",
-    "I'M JUST BETTER",
-    "Hacker? No, just K13.",
-    "Imagine being this weak lol"
-}
-
-CombatSection:NewToggle("☣️ Auto Toxic Message", "Magcha-chat ng toxic pag pumapatay", function(state)
+CombatSection:NewToggle("☣️ Auto Toxic Message", "Chat L when they die", function(state)
     getgenv().AutoToxic = state
 end)
 
-local function sayToxic()
-    if getgenv().AutoToxic then
-        local msg = ToxicMessages[math.random(1, #ToxicMessages)]
-        game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
-    end
-end
-
-CombatSection:NewToggle("⚔️ Auto Kill Selected", "TP and Kill target", function(state)
-    getgenv().AutoKill = state
+-- KILL LOGIC (NO ANIMATION / NO TELEPORT)
+CombatSection:NewToggle("💀 INSTANT KILL AURA", "Papatayin lahat ng malapit sa'yo", function(state)
+    getgenv().KillAura = state
     task.spawn(function()
-        while getgenv().AutoKill do
-            local target = game.Players:FindFirstChild(getgenv().SelectedPlayer)
-            if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
-                game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
-                if target.Character.Humanoid.Health <= 0 then
-                    sayToxic()
-                    task.wait(1)
+        while getgenv().KillAura do
+            for _, v in pairs(game.Players:GetPlayers()) do
+                if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                    local dist = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+                    if dist < 20 then -- Range ng aura (20 studs)
+                        -- Remote Spam (Damage without animation)
+                        for i = 1, 10 do
+                            game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep", v.Character)
+                        end
+                        if v.Character.Humanoid.Health <= 0 and getgenv().AutoToxic then
+                            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("K13 OWNED YOU. EZ.", "All")
+                            task.wait(1)
+                        end
+                    end
                 end
             end
             task.wait()
@@ -115,43 +93,19 @@ CombatSection:NewToggle("👁️ View Player", "Stalk target", function(state)
     end)
 end)
 
-CombatSection:NewToggle("💀 KILL ALL", "Papatayin lahat sa server", function(state)
-    getgenv().KillAll = state
-    task.spawn(function()
-        while getgenv().KillAll do
-            for _, v in pairs(game.Players:GetPlayers()) do
-                if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
-                    game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
-                    if v.Character.Humanoid.Health <= 0 then
-                        sayToxic()
-                    end
-                    task.wait(0.3)
-                end
-            end
-            task.wait()
-        end
-    end)
-end)
-
+-- 4. AUTO HATCH
 local Pets = Window:NewTab("Auto Hatch")
-local PetSection = Pets:NewSection("Abyss Hatching")
-
-PetSection:NewDropdown("Egg Choice", "Pili ka muna", {"Abyss Egg", "Common Egg", "Rare Egg"}, function(v)
-    getgenv().SelectedEgg = v
-end)
-
-PetSection:NewToggle("Start Hatching", "Hatch Triple", function(state)
+Pets:NewSection("Abyss Hatching"):NewToggle("Start Hatching", "Hatch Triple", function(state)
     getgenv().AutoHatch = state
     task.spawn(function()
         while getgenv().AutoHatch do
-            local egg = getgenv().SelectedEgg or "Abyss Egg"
-            pcall(function() game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", egg, "triple") end)
+            pcall(function() game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", "Abyss Egg", "triple") end)
             task.wait(0.1)
         end
     end)
 end)
 
+-- VIOLET FLOATING BUTTON
 local CoreGui = game:GetService("CoreGui")
 if CoreGui:FindFirstChild("K13_Violet_Logo") then CoreGui:FindFirstChild("K13_Violet_Logo"):Destroy() end
 local ScreenGui = Instance.new("ScreenGui")
@@ -159,7 +113,6 @@ local ImageButton = Instance.new("ImageButton")
 local UICorner = Instance.new("UICorner")
 ScreenGui.Name = "K13_Violet_Logo"
 ScreenGui.Parent = CoreGui
-ImageButton.Name = "K13_Floating_Button"
 ImageButton.Parent = ScreenGui
 ImageButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
 ImageButton.Position = UDim2.new(0, 15, 0.5, 0)
@@ -169,6 +122,3 @@ ImageButton.Draggable = true
 UICorner.CornerRadius = UDim.new(0, 15)
 UICorner.Parent = ImageButton
 ImageButton.MouseButton1Click:Connect(function() Library:ToggleUI() end)
-
-local Settings = Window:NewTab("Settings")
-Settings:NewSection("UI Controls"):NewKeybind("Toggle UI", "RightControl", Enum.KeyCode.RightControl, function() Library:ToggleUI() end)
