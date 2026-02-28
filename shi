@@ -1,74 +1,58 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥 (FINAL FIX)", "GrapeTheme")
+local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "GrapeTheme")
 
 -- [ TABS ]
 local Home = Window:NewTab("K13 Home")
 local Farm = Window:NewTab("Farm")
 local Combat = Window:NewTab("Combat")
 local Pets = Window:NewTab("Auto Hatch/Spin")
-local Settings = Window:NewTab("Settings")
 
--- [ HOME ]
-Home:NewSection("🟣 K13 PREMIUM VIOLET 🟣")
-Home:NewSection("STATUS: AUTO-HATCH & SPIN FIXED")
-
--- [ FARM ]
-local FarmSection = Farm:NewSection("Turbo Farming")
-FarmSection:NewToggle("8-PACK SPEED", "Fast Reps", function(state)
-    getgenv().AutoFarm = state
-    task.spawn(function()
-        while getgenv().AutoFarm do
-            local LP = game.Players.LocalPlayer
-            local tool = LP.Backpack:FindFirstChildOfClass("Tool") or LP.Character:FindFirstChildOfClass("Tool")
-            if tool then LP.Character.Humanoid:EquipTool(tool) end
-            pcall(function() LP.muscleEvent:FireServer("rep") end)
-            task.wait()
-        end
-    end)
-end)
-
-FarmSection:NewToggle("Anti-AFK + Timer", "No Kick", function(state)
-    getgenv().AntiAFK = state
-    _G.AfkFrame.Visible = state
-end)
-
--- [ COMBAT - FAR REACH FIXED ]
-local CombatSection = Combat:NewSection("Player Kill System")
-
-CombatSection:NewToggle("💀 KILL ALL (NO TELEPORT)", "Sapak sa malayo", function(state)
-    getgenv().KillAll = state
-    task.spawn(function()
-        while getgenv().KillAll do
-            local LP = game.Players.LocalPlayer
-            local punch = LP.Backpack:FindFirstChild("Punch") or LP.Character:FindFirstChild("Punch")
-            if punch then LP.Character.Humanoid:EquipTool(punch) end
-            for _, v in pairs(game.Players:GetPlayers()) do
-                if v ~= LP and v.Character then
-                    pcall(function() LP.muscleEvent:FireServer("punchClick", v.Character) end)
-                end
+-- [ 1. LOGO FIX - PINATAY ANG 3 LINES ]
+local CoreGui = game:GetService("CoreGui")
+task.spawn(function()
+    while task.wait(0.5) do
+        -- Hahanapin at tatanggalin 'yung default na 3 lines ng Kavo
+        for _, v in pairs(CoreGui:GetDescendants()) do
+            if v:IsA("ImageButton") and v.Name == "ToggleButton" then
+                v.Visible = false
             end
-            task.wait(0.1)
         end
-    end)
+    end
 end)
 
--- [ AUTO HATCH & SPIN - ITO ANG FIX ]
-local PetSection = Pets:NewSection("Auto Pet & Spin Fix")
+if CoreGui:FindFirstChild("K13_Final_Logo") then CoreGui:FindFirstChild("K13_Final_Logo"):Destroy() end
+local MainGui = Instance.new("ScreenGui", CoreGui)
+MainGui.Name = "K13_Final_Logo"
 
-PetSection:NewDropdown("Select Crystal", "Pili ka dito", {"Common Crystal", "Rare Crystal", "Epic Crystal", "Legendary Crystal", "Abyss Crystal"}, function(v)
+local K13Button = Instance.new("ImageButton", MainGui)
+K13Button.Size = UDim2.new(0, 60, 0, 60)
+K13Button.Position = UDim2.new(0, 15, 0.5, -30)
+K13Button.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+K13Button.Image = "rbxassetid://6031097225" -- K13 Ninja Logo
+K13Button.Draggable = true
+Instance.new("UICorner", K13Button).CornerRadius = UDim.new(1, 0)
+
+K13Button.MouseButton1Click:Connect(function()
+    Library:ToggleUI()
+end)
+
+-- [ 2. AUTO HATCH FIX - SINGLE HATCH NA ]
+local PetSection = Pets:NewSection("Auto Pet & Spin")
+
+PetSection:NewDropdown("Select Crystal", "Pili ka Crystal", {"Common Crystal", "Rare Crystal", "Epic Crystal", "Legendary Crystal", "Abyss Crystal"}, function(v)
     getgenv().SelectedCrystal = v
 end)
 
-PetSection:NewToggle("Auto Hatch (Triple)", "Bibiling kusa", function(state)
+PetSection:NewToggle("Auto Hatch (SINGLE)", "Para sa hindi VIP / Konti Gems", function(state)
     getgenv().AutoHatch = state
     task.spawn(function()
         while getgenv().AutoHatch do
             local crys = getgenv().SelectedCrystal or "Common Crystal"
-            -- Muscle Masters Remote Path Fix
+            -- SINGLE HATCH LANG PARA SIGURADONG GAGANA
             pcall(function() 
-                game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", crys, "triple") 
+                game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", crys, "single") 
             end)
-            task.wait(0.2)
+            task.wait(0.5) 
         end
     end)
 end)
@@ -85,50 +69,40 @@ PetSection:NewToggle("Auto Spin Wheel", "Awtomatikong Spin", function(state)
     end)
 end)
 
--- [ THE K13 VIOLET CIRCLE BUTTON - NO MORE 3 LINES ]
-local CoreGui = game:GetService("CoreGui")
-if CoreGui:FindFirstChild("K13_Final_Logo") then CoreGui:FindFirstChild("K13_Final_Logo"):Destroy() end
-
-local MainGui = Instance.new("ScreenGui", CoreGui)
-MainGui.Name = "K13_Final_Logo"
-
-local K13Button = Instance.new("ImageButton", MainGui)
-K13Button.Size = UDim2.new(0, 60, 0, 60)
-K13Button.Position = UDim2.new(0, 15, 0.5, -30)
-K13Button.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
-K13Button.Image = "rbxassetid://6031097225" -- K13 Ninja Logo
-K13Button.Draggable = true
-Instance.new("UICorner", K13Button).CornerRadius = UDim.new(1, 0)
-
-K13Button.MouseButton1Click:Connect(function()
-    Library:ToggleUI()
+-- [ 3. FARM & COMBAT - NO CHANGES ]
+local FarmSection = Farm:NewSection("Turbo Farming")
+FarmSection:NewToggle("8-PACK SPEED", "Fast Reps", function(state)
+    getgenv().AutoFarm = state
+    task.spawn(function()
+        while getgenv().AutoFarm do
+            local LP = game.Players.LocalPlayer
+            local tool = LP.Backpack:FindFirstChildOfClass("Tool") or LP.Character:FindFirstChildOfClass("Tool")
+            if tool then LP.Character.Humanoid:EquipTool(tool) end
+            pcall(function() LP.muscleEvent:FireServer("rep") end)
+            task.wait()
+        end
+    end)
 end)
 
--- [ AFK TIMER BOX ]
-local AfkFrame = Instance.new("Frame", MainGui)
-AfkFrame.Size = UDim2.new(0, 100, 0, 40)
-AfkFrame.Position = UDim2.new(0, 15, 0.5, 40)
-AfkFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-AfkFrame.Visible = false
-_G.AfkFrame = AfkFrame
-Instance.new("UICorner", AfkFrame)
-local AfkText = Instance.new("TextLabel", AfkFrame)
-AfkText.Size = UDim2.new(1, 0, 1, 0)
-AfkText.TextColor3 = Color3.fromRGB(138, 43, 226)
-AfkText.BackgroundTransparency = 1
-AfkText.Text = "AFK: 0s"
-
-local sec = 0
-task.spawn(function()
-    while task.wait(1) do
-        if getgenv().AntiAFK then
-            sec = sec + 1
-            AfkText.Text = "AFK: "..sec.."s"
-        else sec = 0 end
-    end
+local CombatSection = Combat:NewSection("Player Kill System")
+CombatSection:NewToggle("💀 KILL ALL (REMOTE REACH)", "Sapak kahit malayo", function(state)
+    getgenv().KillAll = state
+    task.spawn(function()
+        while getgenv().KillAll do
+            local LP = game.Players.LocalPlayer
+            local punch = LP.Backpack:FindFirstChild("Punch") or LP.Character:FindFirstChild("Punch")
+            if punch then LP.Character.Humanoid:EquipTool(punch) end
+            for _, v in pairs(game.Players:GetPlayers()) do
+                if v ~= LP and v.Character then
+                    pcall(function() LP.muscleEvent:FireServer("punchClick", v.Character) end)
+                end
+            end
+            task.wait(0.1)
+        end
+    end)
 end)
 
--- [ AFK LOGIC ]
+-- ANTI-AFK TRIGGER
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     if getgenv().AntiAFK then
         game:GetService("VirtualUser"):CaptureController()
