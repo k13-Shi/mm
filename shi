@@ -13,7 +13,7 @@ local Farm = Window:NewTab("Farm")
 local Settings = Window:NewTab("Settings")
 
 Main:NewSection("K13 PREMIUM")
-Main:NewSection("STATUS:")
+Main:NewSection("STATUS: ACTIVE")
 
 local FarmSection = Farm:NewSection("Farming")
 
@@ -103,7 +103,7 @@ end)
 task.spawn(function()
     while task.wait(0.5) do
         for _, v in pairs(CoreGui:GetDescendants()) do
-            if v:IsA("ImageButton") and (v.Name == "ToggleButton" or v.Name == "Dezz") then
+            if v:IsA("ImageButton") and (v.Parent.Name == "Kavo-UI" or v.Name:find("Toggle")) then
                 v.Visible = false
             end
         end
