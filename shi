@@ -1,122 +1,78 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "GrapeTheme")
+local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "DarkTheme")
 
--- [ TABS ]
-local Home = Window:NewTab("K13 Home")
+-- MAIN TAB (K13 HOME)
+local Main = Window:NewTab("K13 Home")
+local MainSection = Main:NewSection("🟣 K13 PREMIUM VIOLET 🟣")
+MainSection:NewLabel("STATUS: GOD-SPEED LOADED")
+
+-- FARM TAB (8-PACK SPEED)
 local Farm = Window:NewTab("Farm")
-local Pets = Window:NewTab("Auto Hatch/Spin")
-local Settings = Window:NewTab("Settings")
+local FarmSection = Farm:NewSection("Turbo Farming")
 
--- [ 1. LOGO & BUTTON FIX (FORCE DELETE 3 LINES) ]
-local CoreGui = game:GetService("CoreGui")
-task.spawn(function()
-    while task.wait(0.1) do
-        for _, v in pairs(CoreGui:GetDescendants()) do
-            if v:IsA("ImageButton") and (v.Name == "ToggleButton" or v.Name == "KavoToggleButton") then
-                v:Destroy()
+FarmSection:NewToggle("Fast Farm", "Pinakamabilis na Reps (Stay Mode)", function(state)
+    getgenv().AutoFarm = state
+    if state then
+        task.spawn(function()
+            while getgenv().AutoFarm do
+                local LP = game.Players.LocalPlayer
+                local Remote = LP:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
+                if Remote then
+                    for i = 1, 15 do -- 15 Reps sabay-sabay bawat loop
+                        pcall(function()
+                            Remote:FireServer("rep")
+                        end)
+                    end
+                end
+                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                task.wait(0.001)
             end
-        end
+        end)
     end
 end)
 
-if CoreGui:FindFirstChild("K13_Violet_Logo") then CoreGui:FindFirstChild("K13_Violet_Logo"):Destroy() end
-local MainGui = Instance.new("ScreenGui", CoreGui)
-MainGui.Name = "K13_Violet_Logo"
-local K13Button = Instance.new("ImageButton", MainGui)
-K13Button.Size = UDim2.new(0, 60, 0, 60)
-K13Button.Position = UDim2.new(0, 15, 0.5, -30)
-K13Button.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
-K13Button.Image = "rbxassetid://6031097225" 
-K13Button.Draggable = true
-Instance.new("UICorner", K13Button).CornerRadius = UDim.new(1, 0)
-K13Button.MouseButton1Click:Connect(function() Library:ToggleUI() end)
-
--- [ 2. FARM TAB (SUPER FAST REPS + INSTANT REBIRTH) ]
-local FarmSection = Farm:NewSection("Turbo Farming")
-
-FarmSection:NewToggle("ULTRA FAST REPS", "No Auto-Equip (Hawakan mo gamit mo)", function(state)
-    getgenv().FastRep = state
-    task.spawn(function()
-        while getgenv().FastRep do
-            local LP = game.Players.LocalPlayer
-            -- Remote call lang, walang Character Equip logic para hindi mag-punch
-            pcall(function() 
-                LP.muscleEvent:FireServer("rep") 
-            end)
-            task.wait() -- Mabilis na loop
-        end
-    end)
-end)
-
-FarmSection:NewToggle("⚡ INSTANT REBIRTH", "Auto Rebirth", function(state)
+FarmSection:NewToggle("Instant Rebirth", "Auto Rebirth", function(state)
     getgenv().AutoRebirth = state
     task.spawn(function()
         while getgenv().AutoRebirth do
-            pcall(function() 
-                game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest") 
-            end)
+            game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
             task.wait(0.1)
         end
     end)
 end)
 
--- [ 3. ANTI-AFK TIMER ]
-local AfkGui = Instance.new("ScreenGui", CoreGui)
-local AfkFrame = Instance.new("Frame", AfkGui)
-AfkFrame.Size = UDim2.new(0, 110, 0, 45)
-AfkFrame.Position = UDim2.new(0, 15, 0.5, 45)
-AfkFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-AfkFrame.Visible = false
-Instance.new("UICorner", AfkFrame)
-Instance.new("UIStroke", AfkFrame).Color = Color3.fromRGB(138, 43, 226)
-
-local AfkText = Instance.new("TextLabel", AfkFrame)
-AfkText.Size = UDim2.new(1, 0, 1, 0)
-AfkText.TextColor3 = Color3.fromRGB(138, 43, 226)
-AfkText.BackgroundTransparency = 1
-AfkText.Text = "AFK: 0s"
-AfkText.Font = Enum.Font.GothamBold
-
-local sec = 0
-task.spawn(function()
-    while task.wait(1) do
-        if getgenv().AntiAFK then 
-            sec = sec + 1 
-            AfkText.Text = "AFK: "..sec.."s" 
-        else 
-            sec = 0 
-        end
-    end
-end)
-
-FarmSection:NewToggle("Anti-AFK (With Timer)", "Stay online", function(state)
+FarmSection:NewToggle("Anti-AFK + Timer", "No Kick", function(state)
     getgenv().AntiAFK = state
-    AfkFrame.Visible = state
+    _G.AfkFrame.Visible = state
 end)
 
--- [ 4. AUTO HATCH ]
-local PetSection = Pets:NewSection("Crystal Hatching")
-PetSection:NewDropdown("Select Crystal", "Pili ka", {"Common Crystal", "Rare Crystal", "Epic Crystal", "Legendary Crystal", "Abyss Crystal"}, function(v)
-    getgenv().SelectedCrystal = v
+local CoreGui = game:GetService("CoreGui")
+if CoreGui:FindFirstChild("K13_Violet_Logo") then CoreGui:FindFirstChild("K13_Violet_Logo"):Destroy() end
+
+local ScreenGui = Instance.new("ScreenGui")
+local ImageButton = Instance.new("ImageButton")
+local UICorner = Instance.new("UICorner")
+
+ScreenGui.Name = "K13_Violet_Logo"
+ScreenGui.Parent = CoreGui
+
+ImageButton.Name = "K13_Floating_Button"
+ImageButton.Parent = ScreenGui
+ImageButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+ImageButton.Position = UDim2.new(0, 15, 0.5, 0)
+ImageButton.Size = UDim2.new(0, 60, 0, 60)
+ImageButton.Image = "rbxassetid://6031097225" -- Ninja/Shield Logo
+ImageButton.Draggable = true
+
+UICorner.CornerRadius = UDim.new(0, 15)
+UICorner.Parent = ImageButton
+
+ImageButton.MouseButton1Click:Connect(function()
+    Library:ToggleUI()
 end)
 
-PetSection:NewToggle("Auto Hatch (SINGLE)", "Kailangan may Gems!", function(state)
-    getgenv().AutoHatch = state
-    task.spawn(function()
-        while getgenv().AutoHatch do
-            local crys = getgenv().SelectedCrystal or "Common Crystal"
-            pcall(function() 
-                game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", crys, "single") 
-            end)
-            task.wait(0.5) 
-        end
-    end)
-end)
-
--- AFK LOGIC
-game:GetService("Players").LocalPlayer.Idled:Connect(function()
-    if getgenv().AntiAFK then
-        game:GetService("VirtualUser"):CaptureController()
-        game:GetService("VirtualUser"):ClickButton2(Vector2.new())
-    end
+local Settings = Window:NewTab("Settings")
+Settings:NewSection("UI Controls"):NewKeybind("Toggle UI", "RightControl", Enum.KeyCode.RightControl, function()
+    Library:ToggleUI()
 end)
