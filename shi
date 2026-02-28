@@ -1,99 +1,78 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "GrapeTheme")
+local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥 (GOD MODE)", "GrapeTheme")
 
 -- 1. HOME TAB
 local Home = Window:NewTab("K13 Home")
 local HomeSection = Home:NewSection("🟣 K13 PREMIUM VIOLET 🟣")
-HomeSection:NewLabel("STATUS: NO-ANIMATION KILL ACTIVE")
+HomeSection:NewLabel("STATUS: AUTO-EQUIP & KILL ACTIVE")
 
 -- 2. FARM TAB
 local Farm = Window:NewTab("Farm")
 local FarmSection = Farm:NewSection("8-Pack Turbo Farm")
 
-FarmSection:NewToggle("8-PACK SPEED (NO ANIM)", "Fast Reps No Animation", function(state)
+FarmSection:NewToggle("8-PACK SPEED (NO ANIM)", "Ultra Fast Reps", function(state)
     getgenv().AutoFarm = state
     if state then
         task.spawn(function()
             while getgenv().AutoFarm do
-                local Remote = game.Players.LocalPlayer:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
+                local LP = game.Players.LocalPlayer
+                -- Auto Equip Tool for Lifting
+                local tool = LP.Backpack:FindFirstChildOfClass("Tool") or LP.Character:FindFirstChildOfClass("Tool")
+                if tool and LP.Character then
+                    LP.Character.Humanoid:EquipTool(tool)
+                end
+                
+                local Remote = LP:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
                 if Remote then
-                    for i = 1, 20 do -- Mas mabilis na batch
+                    for i = 1, 20 do
                         pcall(function() Remote:FireServer("rep") end)
                     end
                 end
-                task.wait(0.001) -- Minimum delay for God Speed
+                task.wait(0.001)
             end
         end)
     end
 end)
 
--- 3. COMBAT TAB (NO-TELEPORT KILL)
+-- 3. COMBAT TAB (FIXED AUTO-KILL)
 local Combat = Window:NewTab("Combat")
-local CombatSection = Combat:NewSection("Kill Aura & No-Anim Combat")
+local CombatSection = Combat:NewSection("Kill Aura (No Click Needed)")
 
-local PlayerList = {}
-local function getPlayers()
-    PlayerList = {}
-    for _, v in pairs(game.Players:GetPlayers()) do
-        if v ~= game.Players.LocalPlayer then
-            table.insert(PlayerList, v.Name)
-        end
-    end
-    return PlayerList
-end
-
-local TargetDropdown = CombatSection:NewDropdown("Select Target Player", "Sino ang pababagsakin?", getPlayers(), function(v)
-    getgenv().SelectedPlayer = v
-end)
-
-CombatSection:NewButton("🔄 Refresh Player List", "Update names", function()
-    TargetDropdown:Refresh(getPlayers())
-end)
-
-CombatSection:NewToggle("☣️ Auto Toxic Message", "Chat L when they die", function(state)
-    getgenv().AutoToxic = state
-end)
-
--- KILL LOGIC (NO ANIMATION / NO TELEPORT)
-CombatSection:NewToggle("💀 INSTANT KILL AURA", "Papatayin lahat ng malapit sa'yo", function(state)
+CombatSection:NewToggle("💀 KILL AURA (AUTO-EQUIP)", "Papatay sa lahat ng lalapit", function(state)
     getgenv().KillAura = state
     task.spawn(function()
         while getgenv().KillAura do
+            local LP = game.Players.LocalPlayer
+            -- Siguradong naka-equip ang Punch
+            local punch = LP.Backpack:FindFirstChild("Punch") or LP.Character:FindFirstChild("Punch")
+            if punch and not LP.Character:FindFirstChild("Punch") then
+                LP.Character.Humanoid:EquipTool(punch)
+            end
+
             for _, v in pairs(game.Players:GetPlayers()) do
-                if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                    local dist = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
-                    if dist < 20 then -- Range ng aura (20 studs)
-                        -- Remote Spam (Damage without animation)
-                        for i = 1, 10 do
-                            game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep", v.Character)
-                        end
-                        if v.Character.Humanoid.Health <= 0 and getgenv().AutoToxic then
-                            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("K13 OWNED YOU. EZ.", "All")
-                            task.wait(1)
+                if v ~= LP and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character.Humanoid.Health > 0 then
+                    local dist = (LP.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+                    if dist < 25 then -- Range ng Kill Aura
+                        -- Instant Damage Remote Spam
+                        for i = 1, 15 do
+                            pcall(function()
+                                LP.muscleEvent:FireServer("punchClick", v.Character)
+                                LP.muscleEvent:FireServer("rep", v.Character)
+                            end)
                         end
                     end
                 end
             end
-            task.wait()
+            task.wait(0.01)
         end
     end)
 end)
 
-CombatSection:NewToggle("👁️ View Player", "Stalk target", function(state)
-    getgenv().ViewPlayer = state
-    task.spawn(function()
-        while getgenv().ViewPlayer do
-            local target = game.Players:FindFirstChild(getgenv().SelectedPlayer)
-            if target and target.Character then
-                workspace.CurrentCamera.CameraSubject = target.Character.Humanoid
-            end
-            task.wait(0.1)
-        end
-        workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character.Humanoid
-    end)
+CombatSection:NewToggle("☣️ Auto Toxic", "Chat L on Kill", function(state)
+    getgenv().AutoToxic = state
 end)
 
--- 4. AUTO HATCH
+-- 4. MISC & LOGO
 local Pets = Window:NewTab("Auto Hatch")
 Pets:NewSection("Abyss Hatching"):NewToggle("Start Hatching", "Hatch Triple", function(state)
     getgenv().AutoHatch = state
