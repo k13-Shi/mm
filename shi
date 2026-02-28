@@ -1,77 +1,77 @@
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "DarkTheme")
 
-local Window = Fluent:CreateWindow({
-    Title = "K13 MUSCLE MASTERS 🔥",
-    SubTitle = "by shi | No-TP Edition",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
-    Acrylic = true,
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.LeftControl
-})
+local Farm = Window:NewTab("Farm")
+local FarmSection = Farm:NewSection("Main Farming")
 
-local Tabs = {
-    Main = Window:AddTab({ Title = "Main Farm", Icon = "dumbbell" }),
-    Pets = Window:AddTab({ Title = "Auto Hatch", Icon = "dog" }),
-    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
-}
-
-local function startLifting()
-    task.spawn(function()
-        while getgenv().AutoLift do
-            game:GetService("Players").LocalPlayer.muscleEvent:FireServer("rep")
-            game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
-            task.wait()
-            game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
-            task.wait(0.01)
-        end
-    end)
-end
-
-local LiftToggle = Tabs.Main:AddToggle("AutoLift", {Title = "🏋️ Start Auto Lift (No TP)", Default = false })
-LiftToggle:OnChanged(function()
-    getgenv().AutoLift = LiftToggle.Value
-    if getgenv().AutoLift then
-        startLifting()
+FarmSection:NewToggle("Auto Farm", "Starts clicking and lifting reps", function(state)
+    getgenv().AutoFarm = state
+    if state then
+        task.spawn(function()
+            while getgenv().AutoFarm do
+                local remote = game:GetService("Players").LocalPlayer:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
+                if remote then
+                    if remote.ClassName == "RemoteEvent" then
+                        remote:FireServer("rep")
+                    elseif remote.ClassName == "RemoteFunction" then
+                        remote:InvokeServer("rep")
+                    end
+                end
+                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                task.wait()
+                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                task.wait(0.001)
+            end
+        end)
     end
 end)
 
-local RebirthToggle = Tabs.Main:AddToggle("AutoRebirth", {Title = "⚡ Auto Fast Rebirth", Default = false })
-RebirthToggle:OnChanged(function()
-    getgenv().FastRebirth = RebirthToggle.Value
+FarmSection:NewToggle("Auto Rebirth", "Automatic rebirth when possible", function(state)
+    getgenv().AutoRebirth = state
     task.spawn(function()
-        while getgenv().FastRebirth do
-            game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+        while getgenv().AutoRebirth do
+            pcall(function()
+                game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+            end)
             task.wait(0.5)
         end
     end)
 end)
 
-local AbyssHatch = Tabs.Pets:AddToggle("HatchAbyss", {Title = "🌌 Auto Hatch Abyss Egg", Default = false })
-AbyssHatch:OnChanged(function()
-    getgenv().AutoHatch = AbyssHatch.Value
+local Misc = Window:NewTab("Misc")
+local MiscSection = Misc:NewSection("Eggs & Utilities")
+
+MiscSection:NewDropdown("Select Eggs", "Choose which egg to hatch", {"Abyss Egg", "Common Egg", "Rare Egg"}, function(currentOption)
+    getgenv().SelectedEgg = currentOption
+end)
+
+MiscSection:NewToggle("Auto Eggs", "Auto hatch selected egg", function(state)
+    getgenv().AutoHatch = state
     task.spawn(function()
         while getgenv().AutoHatch do
-            game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", "Abyss Egg", "triple")
+            local egg = getgenv().SelectedEgg or "Abyss Egg"
+            pcall(function()
+                game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", egg, "triple")
+            end)
             task.wait(0.3)
         end
     end)
 end)
 
-local EquipBest = Tabs.Pets:AddToggle("EquipBest", {Title = "🐾 Auto Equip Best Pets", Default = false })
-EquipBest:OnChanged(function()
-    getgenv().AutoEquip = EquipBest.Value
+MiscSection:NewToggle("Auto Spin", "Auto spin the wheel", function(state)
+    getgenv().AutoSpin = state
     task.spawn(function()
-        while getgenv().AutoEquip do
-            game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("equipBest")
-            task.wait(5)
+        while getgenv().AutoSpin do
+            pcall(function()
+                game:GetService("ReplicatedStorage").rEvents.wheelRemote:InvokeServer("spinWheel")
+            end)
+            task.wait(2)
         end
     end)
 end)
 
-local AntiAFKToggle = Tabs.Settings:AddToggle("AntiAFK", {Title = "🚫 Anti-AFK", Default = false })
-AntiAFKToggle:OnChanged(function()
-    getgenv().AntiAFK = AntiAFKToggle.Value
+MiscSection:NewToggle("Anti AFK", "Prevents getting kicked", function(state)
+    getgenv().AntiAFK = state
 end)
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -81,18 +81,9 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
     end
 end)
 
-Tabs.Settings:AddToggle("TinySize", {
-    Title = "Auto Tiny Size",
-    Default = false,
-    Callback = function(state)
-        getgenv().TinySize = state
-        task.spawn(function()
-            while getgenv().TinySize do
-                game:GetService("ReplicatedStorage").rEvents.changeSpeedSizeRemote:InvokeServer("changeSize", 0)
-                task.wait(1)
-            end
-        end)
-    end
-})
+local Settings = Window:NewTab("Settings")
+local SettingsSection = Settings.NewSection("UI Controls")
 
-Window:SelectTab(1)
+SettingsSection:NewKeybind("Toggle UI", "Key to hide/show menu", Enum.KeyCode.RightControl, function()
+	Library:ToggleUI()
+end)
