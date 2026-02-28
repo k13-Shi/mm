@@ -1,26 +1,16 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "GrapeTheme")
 
--- [ TABS ]
+-- [ TABS DEFINITION ]
 local Home = Window:NewTab("K13 Home")
 local Farm = Window:NewTab("Farm")
 local Combat = Window:NewTab("Combat")
 local Pets = Window:NewTab("Auto Hatch/Spin")
 
--- [ 1. LOGO FIX - PINATAY ANG 3 LINES ]
+-- [ 1. K13 LOGO BUTTON - SIGURADONG LALABAS ]
 local CoreGui = game:GetService("CoreGui")
-task.spawn(function()
-    while task.wait(0.5) do
-        -- Hahanapin at tatanggalin 'yung default na 3 lines ng Kavo
-        for _, v in pairs(CoreGui:GetDescendants()) do
-            if v:IsA("ImageButton") and v.Name == "ToggleButton" then
-                v.Visible = false
-            end
-        end
-    end
-end)
-
 if CoreGui:FindFirstChild("K13_Final_Logo") then CoreGui:FindFirstChild("K13_Final_Logo"):Destroy() end
+
 local MainGui = Instance.new("ScreenGui", CoreGui)
 MainGui.Name = "K13_Final_Logo"
 
@@ -28,7 +18,7 @@ local K13Button = Instance.new("ImageButton", MainGui)
 K13Button.Size = UDim2.new(0, 60, 0, 60)
 K13Button.Position = UDim2.new(0, 15, 0.5, -30)
 K13Button.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
-K13Button.Image = "rbxassetid://6031097225" -- K13 Ninja Logo
+K13Button.Image = "rbxassetid://6031097225" 
 K13Button.Draggable = true
 Instance.new("UICorner", K13Button).CornerRadius = UDim.new(1, 0)
 
@@ -36,19 +26,73 @@ K13Button.MouseButton1Click:Connect(function()
     Library:ToggleUI()
 end)
 
--- [ 2. AUTO HATCH FIX - SINGLE HATCH NA ]
-local PetSection = Pets:NewSection("Auto Pet & Spin")
+-- [ 2. HOME TAB ]
+Home:NewSection("🟣 K13 PREMIUM VIOLET 🟣")
+Home:NewSection("STATUS: ALL TABS VISIBLE")
+
+-- [ 3. FARM TAB ]
+local FarmSection = Farm:NewSection("Turbo Farming")
+FarmSection:NewToggle("8-PACK SPEED", "Fast Reps", function(state)
+    getgenv().AutoFarm = state
+    task.spawn(function()
+        while getgenv().AutoFarm do
+            local LP = game.Players.LocalPlayer
+            local tool = LP.Backpack:FindFirstChildOfClass("Tool") or LP.Character:FindFirstChildOfClass("Tool")
+            if tool then LP.Character.Humanoid:EquipTool(tool) end
+            pcall(function() LP.muscleEvent:FireServer("rep") end)
+            task.wait()
+        end
+    end)
+end)
+
+-- [ 4. COMBAT TAB - BINABALIK KO YUNG DROPDOWN MO ]
+local CombatSection = Combat:NewSection("Player Kill System")
+
+local function getPlayers()
+    local p = {}
+    for _, v in pairs(game.Players:GetPlayers()) do
+        if v ~= game.Players.LocalPlayer then table.insert(p, v.Name) end
+    end
+    return p
+end
+
+local TargetDropdown = CombatSection:NewDropdown("Select Player", "Target", getPlayers(), function(v)
+    getgenv().SelectedPlayer = v
+end)
+
+CombatSection:NewButton("🔄 Refresh Player List", "Update Names", function()
+    TargetDropdown:Refresh(getPlayers())
+end)
+
+CombatSection:NewToggle("💀 KILL ALL (NO TELEPORT)", "Sapak kahit malayo", function(state)
+    getgenv().KillAll = state
+    task.spawn(function()
+        while getgenv().KillAll do
+            local LP = game.Players.LocalPlayer
+            local punch = LP.Backpack:FindFirstChild("Punch") or LP.Character:FindFirstChild("Punch")
+            if punch then LP.Character.Humanoid:EquipTool(punch) end
+            for _, v in pairs(game.Players:GetPlayers()) do
+                if v ~= LP and v.Character then
+                    pcall(function() LP.muscleEvent:FireServer("punchClick", v.Character) end)
+                end
+            end
+            task.wait(0.1)
+        end
+    end)
+end)
+
+-- [ 5. AUTO HATCH/SPIN FIX ]
+local PetSection = Pets:NewSection("Crystal Hatching")
 
 PetSection:NewDropdown("Select Crystal", "Pili ka Crystal", {"Common Crystal", "Rare Crystal", "Epic Crystal", "Legendary Crystal", "Abyss Crystal"}, function(v)
     getgenv().SelectedCrystal = v
 end)
 
-PetSection:NewToggle("Auto Hatch (SINGLE)", "Para sa hindi VIP / Konti Gems", function(state)
+PetSection:NewToggle("Auto Hatch (SINGLE)", "Dapat may Gems ka!", function(state)
     getgenv().AutoHatch = state
     task.spawn(function()
         while getgenv().AutoHatch do
             local crys = getgenv().SelectedCrystal or "Common Crystal"
-            -- SINGLE HATCH LANG PARA SIGURADONG GAGANA
             pcall(function() 
                 game:GetService("ReplicatedStorage").rEvents.petEvent:FireServer("openEgg", crys, "single") 
             end)
@@ -69,43 +113,8 @@ PetSection:NewToggle("Auto Spin Wheel", "Awtomatikong Spin", function(state)
     end)
 end)
 
--- [ 3. FARM & COMBAT - NO CHANGES ]
-local FarmSection = Farm:NewSection("Turbo Farming")
-FarmSection:NewToggle("8-PACK SPEED", "Fast Reps", function(state)
-    getgenv().AutoFarm = state
-    task.spawn(function()
-        while getgenv().AutoFarm do
-            local LP = game.Players.LocalPlayer
-            local tool = LP.Backpack:FindFirstChildOfClass("Tool") or LP.Character:FindFirstChildOfClass("Tool")
-            if tool then LP.Character.Humanoid:EquipTool(tool) end
-            pcall(function() LP.muscleEvent:FireServer("rep") end)
-            task.wait()
-        end
-    end)
-end)
-
-local CombatSection = Combat:NewSection("Player Kill System")
-CombatSection:NewToggle("💀 KILL ALL (REMOTE REACH)", "Sapak kahit malayo", function(state)
-    getgenv().KillAll = state
-    task.spawn(function()
-        while getgenv().KillAll do
-            local LP = game.Players.LocalPlayer
-            local punch = LP.Backpack:FindFirstChild("Punch") or LP.Character:FindFirstChild("Punch")
-            if punch then LP.Character.Humanoid:EquipTool(punch) end
-            for _, v in pairs(game.Players:GetPlayers()) do
-                if v ~= LP and v.Character then
-                    pcall(function() LP.muscleEvent:FireServer("punchClick", v.Character) end)
-                end
-            end
-            task.wait(0.1)
-        end
-    end)
-end)
-
--- ANTI-AFK TRIGGER
+-- AFK LOGIC
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
-    if getgenv().AntiAFK then
-        game:GetService("VirtualUser"):CaptureController()
-        game:GetService("VirtualUser"):ClickButton2(Vector2.new())
-    end
+    game:GetService("VirtualUser"):CaptureController()
+    game:GetService("VirtualUser"):ClickButton2(Vector2.new())
 end)
