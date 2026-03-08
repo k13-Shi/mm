@@ -2,8 +2,8 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "K13 MUSCLE MASTERS 🔥",
-   LoadingTitle = "FINAL FIX - NO CLICK",
-   LoadingSubtitle = "Direct Server Injection",
+   LoadingTitle = "K13 V12 - THE FINAL FIX",
+   LoadingSubtitle = "Direct Injection Mode",
    ConfigurationSaving = { Enabled = false }
 })
 
@@ -13,7 +13,7 @@ local Misc = Window:CreateTab("Settings", 4483362458)
 
 local RS = game:GetService("ReplicatedStorage")
 
-local function findRemote(name)
+local function getRemote(name)
     for _, v in pairs(RS:GetDescendants()) do
         if v.Name:lower():find(name:lower()) and (v:IsA("RemoteEvent") or v:IsA("RemoteFunction")) then
             return v
@@ -21,7 +21,7 @@ local function findRemote(name)
     end
 end
 
-Main:CreateSection("Turbo Training")
+Main:CreateSection("Training & Rebirth")
 
 Main:CreateToggle({
    Name = "Auto Lift (No Click)",
@@ -30,10 +30,10 @@ Main:CreateToggle({
    Callback = function(Value)
       getgenv().AutoFarm = Value
       task.spawn(function()
-         local rem = findRemote("rep")
+         local rem = getRemote("rep")
          while getgenv().AutoFarm do
             if rem then rem:FireServer("rep") end
-            task.wait(0.001)
+            task.wait()
          end
       end)
    end,
@@ -46,9 +46,11 @@ Main:CreateToggle({
    Callback = function(Value)
       getgenv().AutoRebirth = Value
       task.spawn(function()
-         local rem = findRemote("rebirth")
+         local rem = getRemote("rebirth")
          while getgenv().AutoRebirth do
-            pcall(function() rem:InvokeServer("rebirthRequest") end)
+            if rem then 
+                if rem:IsA("RemoteFunction") then rem:InvokeServer("rebirthRequest") else rem:FireServer("rebirthRequest") end
+            end
             task.wait(1)
          end
       end)
@@ -73,9 +75,11 @@ Eggs:CreateToggle({
    Callback = function(Value)
       getgenv().AutoHatch = Value
       task.spawn(function()
-         local rem = findRemote("egg")
+         local rem = getRemote("egg") or getRemote("open")
          while getgenv().AutoHatch do
-            pcall(function() rem:InvokeServer("openEgg", SelectedEgg) end)
+            if rem then
+                if rem:IsA("RemoteFunction") then rem:InvokeServer("openEgg", SelectedEgg) else rem:FireServer("openEgg", SelectedEgg) end
+            end
             task.wait(0.5)
          end
       end)
@@ -89,7 +93,7 @@ Eggs:CreateToggle({
    Callback = function(Value)
       getgenv().AutoSpin = Value
       task.spawn(function()
-         local rem = findRemote("wheel") or findRemote("spin")
+         local rem = getRemote("wheel") or getRemote("spin")
          while getgenv().AutoSpin do
             if rem then rem:FireServer("spinWheel") end
             task.wait(5)
@@ -99,6 +103,7 @@ Eggs:CreateToggle({
 })
 
 Misc:CreateSection("Safety")
+
 Misc:CreateToggle({
    Name = "Anti-AFK",
    CurrentValue = true,
