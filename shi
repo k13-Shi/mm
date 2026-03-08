@@ -2,8 +2,8 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "K13 MUSCLE MASTERS 🔥",
-   LoadingTitle = "REMOTE OVERDRIVE",
-   LoadingSubtitle = "No Clicks | Direct Server Fire",
+   LoadingTitle = "FINAL FIX - NO CLICK",
+   LoadingSubtitle = "Direct Server Injection",
    ConfigurationSaving = { Enabled = false }
 })
 
@@ -11,45 +11,51 @@ local Main = Window:CreateTab("Auto Farm", 4483362458)
 local Eggs = Window:CreateTab("Auto Hatch", 4483362458)
 local Misc = Window:CreateTab("Settings", 4483362458)
 
-local rEvents = game:GetService("ReplicatedStorage"):WaitForChild("rEvents")
+local RS = game:GetService("ReplicatedStorage")
 
-Main:CreateSection("Silent Training")
+local function findRemote(name)
+    for _, v in pairs(RS:GetDescendants()) do
+        if v.Name:lower():find(name:lower()) and (v:IsA("RemoteEvent") or v:IsA("RemoteFunction")) then
+            return v
+        end
+    end
+end
+
+Main:CreateSection("Turbo Training")
 
 Main:CreateToggle({
-   Name = "Silent Fast Farm (No Click)",
+   Name = "Auto Lift (No Click)",
    CurrentValue = false,
    Flag = "AutoFarm",
    Callback = function(Value)
       getgenv().AutoFarm = Value
       task.spawn(function()
+         local rem = findRemote("rep")
          while getgenv().AutoFarm do
-            pcall(function()
-               rEvents.repRemote:FireServer("rep")
-            end)
-            task.wait()
+            if rem then rem:FireServer("rep") end
+            task.wait(0.001)
          end
       end)
    end,
 })
 
 Main:CreateToggle({
-   Name = "Instant Rebirth",
+   Name = "Auto Rebirth",
    CurrentValue = false,
    Flag = "AutoRebirth",
    Callback = function(Value)
       getgenv().AutoRebirth = Value
       task.spawn(function()
+         local rem = findRemote("rebirth")
          while getgenv().AutoRebirth do
-            pcall(function()
-               rEvents.rebirthRemote:InvokeServer("rebirthRequest")
-            end)
-            task.wait(0.5)
+            pcall(function() rem:InvokeServer("rebirthRequest") end)
+            task.wait(1)
          end
       end)
    end,
 })
 
-Eggs:CreateSection("Direct Hatching")
+Eggs:CreateSection("Auto Hatch & Spin")
 
 local SelectedEgg = "Common"
 Eggs:CreateDropdown({
@@ -61,41 +67,38 @@ Eggs:CreateDropdown({
 })
 
 Eggs:CreateToggle({
-   Name = "Silent Hatch",
+   Name = "Auto Hatch",
    CurrentValue = false,
    Flag = "AutoHatch",
    Callback = function(Value)
       getgenv().AutoHatch = Value
       task.spawn(function()
+         local rem = findRemote("egg")
          while getgenv().AutoHatch do
-            pcall(function()
-               rEvents.eggRemote:InvokeServer("openEgg", SelectedEgg)
-            end)
-            task.wait(0.1)
+            pcall(function() rem:InvokeServer("openEgg", SelectedEgg) end)
+            task.wait(0.5)
          end
       end)
    end,
 })
 
 Eggs:CreateToggle({
-   Name = "Silent Spin",
+   Name = "Auto Spin Wheel",
    CurrentValue = false,
    Flag = "AutoSpin",
    Callback = function(Value)
       getgenv().AutoSpin = Value
       task.spawn(function()
+         local rem = findRemote("wheel") or findRemote("spin")
          while getgenv().AutoSpin do
-            pcall(function()
-               rEvents.wheelEvent:FireServer("spinWheel")
-            end)
+            if rem then rem:FireServer("spinWheel") end
             task.wait(5)
          end
       end)
    end,
 })
 
-Misc:CreateSection("Anti-DC")
-
+Misc:CreateSection("Safety")
 Misc:CreateToggle({
    Name = "Anti-AFK",
    CurrentValue = true,
