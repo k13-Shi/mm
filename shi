@@ -2,8 +2,8 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "K13 MUSCLE MASTERS 🔥",
-   LoadingTitle = "TURBO MODE ACTIVATED",
-   LoadingSubtitle = "by Gemini",
+   LoadingTitle = "REMOTE OVERDRIVE",
+   LoadingSubtitle = "No Clicks | Direct Server Fire",
    ConfigurationSaving = { Enabled = false }
 })
 
@@ -11,13 +11,12 @@ local Main = Window:CreateTab("Auto Farm", 4483362458)
 local Eggs = Window:CreateTab("Auto Hatch", 4483362458)
 local Misc = Window:CreateTab("Settings", 4483362458)
 
-local rStorage = game:GetService("ReplicatedStorage")
-local rEvents = rStorage:FindFirstChild("rEvents") or rStorage
+local rEvents = game:GetService("ReplicatedStorage"):WaitForChild("rEvents")
 
-Main:CreateSection("Turbo Training")
+Main:CreateSection("Silent Training")
 
 Main:CreateToggle({
-   Name = "Turbo Reps (Remote)",
+   Name = "Silent Fast Farm (No Click)",
    CurrentValue = false,
    Flag = "AutoFarm",
    Callback = function(Value)
@@ -44,13 +43,13 @@ Main:CreateToggle({
             pcall(function()
                rEvents.rebirthRemote:InvokeServer("rebirthRequest")
             end)
-            task.wait(0.1)
+            task.wait(0.5)
          end
       end)
    end,
 })
 
-Eggs:CreateSection("Auto Hatch & Spin")
+Eggs:CreateSection("Direct Hatching")
 
 local SelectedEgg = "Common"
 Eggs:CreateDropdown({
@@ -62,7 +61,7 @@ Eggs:CreateDropdown({
 })
 
 Eggs:CreateToggle({
-   Name = "Fast Auto Hatch",
+   Name = "Silent Hatch",
    CurrentValue = false,
    Flag = "AutoHatch",
    Callback = function(Value)
@@ -79,7 +78,7 @@ Eggs:CreateToggle({
 })
 
 Eggs:CreateToggle({
-   Name = "Fast Auto Spin",
+   Name = "Silent Spin",
    CurrentValue = false,
    Flag = "AutoSpin",
    Callback = function(Value)
@@ -89,13 +88,13 @@ Eggs:CreateToggle({
             pcall(function()
                rEvents.wheelEvent:FireServer("spinWheel")
             end)
-            task.wait(1)
+            task.wait(5)
          end
       end)
    end,
 })
 
-Misc:CreateSection("Safety")
+Misc:CreateSection("Anti-DC")
 
 Misc:CreateToggle({
    Name = "Anti-AFK",
