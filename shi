@@ -24,15 +24,19 @@ end
 Main:CreateSection("Training & Rebirth")
 
 Main:CreateToggle({
-   Name = "Fast Farm",
+   Name = "Fast Farm (Machine/Weights)",
    CurrentValue = false,
    Flag = "AutoFarm",
    Callback = function(Value)
       getgenv().AutoFarm = Value
       task.spawn(function()
-         local rem = getRemote("rep")
+         local repRem = getRemote("rep")
+         local interactRem = getRemote("interact") or getRemote("use")
          while getgenv().AutoFarm do
-            if rem then rem:FireServer("rep") end
+            pcall(function()
+               if repRem then repRem:FireServer("rep") end
+               if interactRem then interactRem:FireServer() end
+            end)
             task.wait(0.1)
          end
       end)
