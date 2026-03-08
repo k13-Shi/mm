@@ -2,24 +2,22 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "K13 MUSCLE MASTERS 🔥",
-   LoadingTitle = "K13 Premium Script",
+   LoadingTitle = "TURBO MODE ACTIVATED",
    LoadingSubtitle = "by Gemini",
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = "K13Config"
-   }
+   ConfigurationSaving = { Enabled = false }
 })
 
 local Main = Window:CreateTab("Auto Farm", 4483362458)
 local Eggs = Window:CreateTab("Auto Hatch", 4483362458)
 local Misc = Window:CreateTab("Settings", 4483362458)
 
-local VIM = game:GetService("VirtualInputManager")
+local rStorage = game:GetService("ReplicatedStorage")
+local rEvents = rStorage:FindFirstChild("rEvents") or rStorage
 
-Main:CreateSection("Training & Rebirth")
+Main:CreateSection("Turbo Training")
 
 Main:CreateToggle({
-   Name = "Auto Click/Lift (Physical)",
+   Name = "Turbo Reps (Remote)",
    CurrentValue = false,
    Flag = "AutoFarm",
    Callback = function(Value)
@@ -27,18 +25,16 @@ Main:CreateToggle({
       task.spawn(function()
          while getgenv().AutoFarm do
             pcall(function()
-               local viewportSize = workspace.CurrentCamera.ViewportSize
-               VIM:SendMouseButtonEvent(viewportSize.X / 2, viewportSize.Y / 2, 0, true, game, 0)
-               VIM:SendMouseButtonEvent(viewportSize.X / 2, viewportSize.Y / 2, 0, false, game, 0)
+               rEvents.repRemote:FireServer("rep")
             end)
-            task.wait(0.01)
+            task.wait()
          end
       end)
    end,
 })
 
 Main:CreateToggle({
-   Name = "Auto Rebirth",
+   Name = "Instant Rebirth",
    CurrentValue = false,
    Flag = "AutoRebirth",
    Callback = function(Value)
@@ -46,30 +42,27 @@ Main:CreateToggle({
       task.spawn(function()
          while getgenv().AutoRebirth do
             pcall(function()
-               game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+               rEvents.rebirthRemote:InvokeServer("rebirthRequest")
             end)
-            task.wait(2)
+            task.wait(0.1)
          end
       end)
    end,
 })
 
-Eggs:CreateSection("Egg Hatching")
+Eggs:CreateSection("Auto Hatch & Spin")
 
 local SelectedEgg = "Common"
 Eggs:CreateDropdown({
    Name = "Select Egg",
    Options = {"Common", "Rare", "Epic", "Legendary", "Mythic"},
    CurrentOption = {"Common"},
-   MultipleOptions = false,
    Flag = "EggRarity",
-   Callback = function(Option)
-      SelectedEgg = Option[1]
-   end,
+   Callback = function(Option) SelectedEgg = Option[1] end,
 })
 
 Eggs:CreateToggle({
-   Name = "Auto Hatch",
+   Name = "Fast Auto Hatch",
    CurrentValue = false,
    Flag = "AutoHatch",
    Callback = function(Value)
@@ -77,18 +70,16 @@ Eggs:CreateToggle({
       task.spawn(function()
          while getgenv().AutoHatch do
             pcall(function()
-               game:GetService("ReplicatedStorage").rEvents.eggRemote:InvokeServer("openEgg", SelectedEgg)
+               rEvents.eggRemote:InvokeServer("openEgg", SelectedEgg)
             end)
-            task.wait(1)
+            task.wait(0.1)
          end
       end)
    end,
 })
 
-Eggs:CreateSection("Spin Wheel")
-
 Eggs:CreateToggle({
-   Name = "Auto Spin Wheel",
+   Name = "Fast Auto Spin",
    CurrentValue = false,
    Flag = "AutoSpin",
    Callback = function(Value)
@@ -96,28 +87,26 @@ Eggs:CreateToggle({
       task.spawn(function()
          while getgenv().AutoSpin do
             pcall(function()
-               game:GetService("ReplicatedStorage").rEvents.wheelEvent:FireServer("spinWheel")
+               rEvents.wheelEvent:FireServer("spinWheel")
             end)
-            task.wait(5)
+            task.wait(1)
          end
       end)
    end,
 })
 
-Misc:CreateSection("Anti-Disconnect")
+Misc:CreateSection("Safety")
 
 Misc:CreateToggle({
    Name = "Anti-AFK",
    CurrentValue = true,
    Flag = "AntiAFK",
-   Callback = function(Value)
-      getgenv().AntiAFK = Value
-   end,
+   Callback = function(Value) getgenv().AntiAFK = Value end,
 })
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     if getgenv().AntiAFK then
-        VIM:CaptureController()
-        VIM:ClickButton2(Vector2.new())
+        game:GetService("VirtualUser"):CaptureController()
+        game:GetService("VirtualUser"):ClickButton2(Vector2.new())
     end
 end)
