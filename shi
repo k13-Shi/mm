@@ -14,13 +14,12 @@ local Main = Window:CreateTab("Auto Farm", 4483362458)
 local Eggs = Window:CreateTab("Auto Hatch", 4483362458)
 local Misc = Window:CreateTab("Settings", 4483362458)
 
-local LP = game:GetService("Players").LocalPlayer
 local VIM = game:GetService("VirtualInputManager")
 
 Main:CreateSection("Training & Rebirth")
 
 Main:CreateToggle({
-   Name = "Auto Use (Treadmill/Lift)",
+   Name = "Auto Click/Lift (Physical)",
    CurrentValue = false,
    Flag = "AutoFarm",
    Callback = function(Value)
@@ -28,18 +27,11 @@ Main:CreateToggle({
       task.spawn(function()
          while getgenv().AutoFarm do
             pcall(function()
-                VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                task.wait(0.05)
-                VIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                
-                local rEvents = game:GetService("ReplicatedStorage"):FindFirstChild("rEvents")
-                if rEvents then
-                    if rEvents:FindFirstChild("repRemote") then
-                        rEvents.repRemote:FireServer("rep")
-                    end
-                end
+               local viewportSize = workspace.CurrentCamera.ViewportSize
+               VIM:SendMouseButtonEvent(viewportSize.X / 2, viewportSize.Y / 2, 0, true, game, 0)
+               VIM:SendMouseButtonEvent(viewportSize.X / 2, viewportSize.Y / 2, 0, false, game, 0)
             end)
-            task.wait(0.1)
+            task.wait(0.01)
          end
       end)
    end,
@@ -54,10 +46,7 @@ Main:CreateToggle({
       task.spawn(function()
          while getgenv().AutoRebirth do
             pcall(function()
-                local rEvents = game:GetService("ReplicatedStorage"):FindFirstChild("rEvents")
-                if rEvents and rEvents:FindFirstChild("rebirthRemote") then
-                    rEvents.rebirthRemote:InvokeServer("rebirthRequest")
-                end
+               game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest")
             end)
             task.wait(2)
          end
@@ -88,16 +77,15 @@ Eggs:CreateToggle({
       task.spawn(function()
          while getgenv().AutoHatch do
             pcall(function()
-                local rEvents = game:GetService("ReplicatedStorage"):FindFirstChild("rEvents")
-                if rEvents and rEvents:FindFirstChild("eggRemote") then
-                    rEvents.eggRemote:InvokeServer("openEgg", SelectedEgg)
-                end
+               game:GetService("ReplicatedStorage").rEvents.eggRemote:InvokeServer("openEgg", SelectedEgg)
             end)
-            task.wait(1.5)
+            task.wait(1)
          end
       end)
    end,
 })
+
+Eggs:CreateSection("Spin Wheel")
 
 Eggs:CreateToggle({
    Name = "Auto Spin Wheel",
@@ -108,10 +96,7 @@ Eggs:CreateToggle({
       task.spawn(function()
          while getgenv().AutoSpin do
             pcall(function()
-                local rEvents = game:GetService("ReplicatedStorage"):FindFirstChild("rEvents")
-                if rEvents and rEvents:FindFirstChild("wheelEvent") then
-                    rEvents.wheelEvent:FireServer("spinWheel")
-                end
+               game:GetService("ReplicatedStorage").rEvents.wheelEvent:FireServer("spinWheel")
             end)
             task.wait(5)
          end
@@ -119,7 +104,7 @@ Eggs:CreateToggle({
    end,
 })
 
-Misc:CreateSection("Settings")
+Misc:CreateSection("Anti-Disconnect")
 
 Misc:CreateToggle({
    Name = "Anti-AFK",
@@ -132,7 +117,7 @@ Misc:CreateToggle({
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     if getgenv().AntiAFK then
-        game:GetService("VirtualUser"):CaptureController()
-        game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+        VIM:CaptureController()
+        VIM:ClickButton2(Vector2.new())
     end
 end)
