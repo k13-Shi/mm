@@ -10,11 +10,22 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
-local Main = Window:CreateTab("Auto Farm", 4483362458) -- Tab Icon
+local Main = Window:CreateTab("Auto Farm", 4483362458)
 local Eggs = Window:CreateTab("Auto Hatch", 4483362458)
 local Misc = Window:CreateTab("Settings", 4483362458)
 
--- [ AUTO FARM ]
+local function getRemote(name)
+    local rFolder = game:GetService("ReplicatedStorage"):FindFirstChild("rEvents")
+    if rFolder then
+        for _, v in pairs(rFolder:GetChildren()) do
+            if v.Name:lower():find(name:lower()) then
+                return v
+            end
+        end
+    end
+    return nil
+end
+
 Main:CreateSection("Training & Rebirth")
 
 Main:CreateToggle({
@@ -25,9 +36,9 @@ Main:CreateToggle({
       getgenv().AutoFarm = Value
       task.spawn(function()
          while getgenv().AutoFarm do
-            local Remote = game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote")
-            if Remote then
-               Remote:FireServer("rep")
+            local repRemote = getRemote("rep")
+            if repRemote then
+               repRemote:FireServer("rep")
             end
             task.wait(0.01)
          end
@@ -43,16 +54,16 @@ Main:CreateToggle({
       getgenv().AutoRebirth = Value
       task.spawn(function()
          while getgenv().AutoRebirth do
-            pcall(function() 
-               game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest") 
-            end)
+            local rebRemote = getRemote("rebirth")
+            if rebRemote then
+               rebRemote:InvokeServer("rebirthRequest")
+            end
             task.wait(1)
          end
       end)
    end,
 })
 
--- [ AUTO HATCH ]
 Eggs:CreateSection("Egg Hatching")
 
 local SelectedEgg = "Common"
@@ -75,9 +86,10 @@ Eggs:CreateToggle({
       getgenv().AutoHatch = Value
       task.spawn(function()
          while getgenv().AutoHatch do
-            pcall(function()
-               game:GetService("ReplicatedStorage").rEvents.eggRemote:InvokeServer("openEgg", SelectedEgg)
-            end)
+            local eggRemote = getRemote("egg")
+            if eggRemote then
+               eggRemote:InvokeServer("openEgg", SelectedEgg)
+            end
             task.wait(1.5)
          end
       end)
@@ -92,16 +104,16 @@ Eggs:CreateToggle({
       getgenv().AutoSpin = Value
       task.spawn(function()
          while getgenv().AutoSpin do
-            pcall(function() 
-               game:GetService("ReplicatedStorage").rEvents.wheelEvent:FireServer("spinWheel") 
-            end)
+            local wheelRemote = getRemote("wheel")
+            if wheelRemote then
+               wheelRemote:FireServer("spinWheel")
+            end
             task.wait(5)
          end
       end)
    end,
 })
 
--- [ SETTINGS ]
 Misc:CreateSection("Extra Features")
 
 Misc:CreateToggle({
@@ -113,7 +125,6 @@ Misc:CreateToggle({
    end,
 })
 
--- Anti-AFK Background Logic
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     if getgenv().AntiAFK then
         game:GetService("VirtualUser"):CaptureController()
@@ -122,8 +133,8 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
 end)
 
 Rayfield:Notify({
-   Title = "K13 LOADED!",
-   Content = "Ready to farm, Muscle Master!",
+   Title = "K13 FIX LOADED!",
+   Content = "Remotes updated. Try it now!",
    Duration = 5,
    Image = 4483362458,
 })
