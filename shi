@@ -15,48 +15,72 @@ local Settings = Window:NewTab("Settings")
 Main:NewSection("K13 PREMIUM")
 Main:NewSection("STATUS: ACTIVE")
 
-local FarmSection = Farm:NewSection("Farming")
+local FarmSection = Farm:NewSection("Farming & Rebirth")
 
-FarmSection:NewToggle("Fast Farm", "Pinakamabilis na Reps (Stay Mode)", function(state)
+-- [ AUTO FARM ]
+FarmSection:NewToggle("Fast Farm", "Auto Clicker/Reps", function(state)
     getgenv().AutoFarm = state
-    if state then
-        task.spawn(function()
-            while getgenv().AutoFarm do
-                local LP = game.Players.LocalPlayer
-                local Remote = LP:FindFirstChild("muscleEvent") or (game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote"))
-                if Remote then
-                    for i = 1, 15 do 
-                        pcall(function() Remote:FireServer("rep") end)
-                    end
-                end
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 0)
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 0)
-                task.wait(0.001)
-            end
-        end)
-    end
-end)
-
-FarmSection:NewToggle("Instant Rebirth", "Auto Rebirth", function(state)
-    getgenv().AutoRebirth = state
     task.spawn(function()
-        while getgenv().AutoRebirth do
-            pcall(function() game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest") end)
-            task.wait(0.1)
+        while getgenv().AutoFarm do
+            local Remote = game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote")
+            if Remote then
+                for i = 1, 10 do 
+                    Remote:FireServer("rep")
+                end
+            end
+            task.wait(0.01)
         end
     end)
 end)
 
-FarmSection:NewToggle("Auto Spin", "Awtomatikong Spin", function(state)
+-- [ FAST REBIRTH ]
+FarmSection:NewToggle("Fast Rebirth", "Auto Rebirth (Instant)", function(state)
+    getgenv().AutoRebirth = state
+    task.spawn(function()
+        while getgenv().AutoRebirth do
+            pcall(function() 
+                game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest") 
+            end)
+            task.wait(0.5)
+        end
+    end)
+end)
+
+local EggSection = Farm:NewSection("Auto Hatch & Spin")
+
+-- [ AUTO SPIN ]
+EggSection:NewToggle("Auto Spin", "Awtomatikong Spin sa Wheel", function(state)
     getgenv().AutoSpin = state
     task.spawn(function()
         while getgenv().AutoSpin do
-            pcall(function() game:GetService("ReplicatedStorage").rEvents.wheelEvent:FireServer("spinWheel") end)
+            pcall(function() 
+                game:GetService("ReplicatedStorage").rEvents.wheelEvent:FireServer("spinWheel") 
+            end)
             task.wait(5)
         end
     end)
 end)
 
+-- [ AUTO HATCH LOGIC ]
+local SelectedEgg = "Common" -- Default
+EggSection:NewDropdown("Select Egg Rarity", "Pili ka ng rarity na i-hahatch", {"Common", "Rare", "Epic", "Legendary", "Mythic"}, function(current)
+    SelectedEgg = current
+end)
+
+EggSection:NewToggle("Auto Hatch", "Auto Open Eggs", function(state)
+    getgenv().AutoHatch = state
+    task.spawn(function()
+        while getgenv().AutoHatch do
+            -- Tandaan: Siguraduhin na tama ang path ng 'openEgg' remote sa game na nilalaro mo.
+            pcall(function()
+                game:GetService("ReplicatedStorage").rEvents.eggRemote:InvokeServer("openEgg", SelectedEgg)
+            end)
+            task.wait(1)
+        end
+    end)
+end)
+
+-- [ ANTI-AFK & LOGO ]
 local CoreGui = game:GetService("CoreGui")
 if CoreGui:FindFirstChild("K13_Violet_Logo") then CoreGui:FindFirstChild("K13_Violet_Logo"):Destroy() end
 
@@ -66,57 +90,27 @@ ScreenGui.Name = "K13_Violet_Logo"
 local K13Button = Instance.new("ImageButton", ScreenGui)
 K13Button.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
 K13Button.Position = UDim2.new(0, 15, 0.5, 0)
-K13Button.Size = UDim2.new(0, 60, 0, 60)
+K13Button.Size = UDim2.new(0, 50, 0, 50)
 K13Button.Image = "rbxassetid://6031097225"
 K13Button.Draggable = true
 Instance.new("UICorner", K13Button).CornerRadius = UDim.new(0, 15)
 
-local TimerLabel = Instance.new("TextLabel", K13Button)
-TimerLabel.Size = UDim2.new(0, 100, 0, 20)
-TimerLabel.Position = UDim2.new(1, 10, 0.3, 0)
-TimerLabel.BackgroundTransparency = 1
-TimerLabel.TextColor3 = Color3.fromRGB(180, 100, 255)
-TimerLabel.Text = "AFK: 0s"
-TimerLabel.Font = Enum.Font.GothamBold
-TimerLabel.TextSize = 16
-TimerLabel.Visible = false
-
-local afkSec = 0
-task.spawn(function()
-    while task.wait(1) do
-        if getgenv().AntiAFK then
-            afkSec = afkSec + 1
-            TimerLabel.Text = "AFK: "..afkSec.."s"
-        else
-            afkSec = 0
-        end
-    end
-end)
-
 K13Button.MouseButton1Click:Connect(function() Library:ToggleUI() end)
 
-FarmSection:NewToggle("Anti-AFK + Timer", "Stay Online", function(state)
+local SettingsSection = Settings:NewSection("Anti-AFK & UI")
+
+SettingsSection:NewToggle("Anti-AFK", "Proteksyon sa DC", function(state)
     getgenv().AntiAFK = state
-    TimerLabel.Visible = state
 end)
 
-task.spawn(function()
-    while task.wait(0.5) do
-        for _, v in pairs(CoreGui:GetDescendants()) do
-            if v:IsA("ImageButton") and (v.Parent.Name == "Kavo-UI" or v.Name:find("Toggle")) then
-                v.Visible = false
-            end
-        end
-    end
-end)
-
-Settings:NewSection("Controls"):NewKeybind("Toggle UI", "RightControl", Enum.KeyCode.RightControl, function()
-    Library:ToggleUI()
-end)
-
+-- Anti-AFK Internal Connection
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     if getgenv().AntiAFK then
         game:GetService("VirtualUser"):CaptureController()
         game:GetService("VirtualUser"):ClickButton2(Vector2.new())
     end
+end)
+
+SettingsSection:NewKeybind("Toggle UI", "RightControl", Enum.KeyCode.RightControl, function()
+    Library:ToggleUI()
 end)
