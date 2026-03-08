@@ -1,55 +1,64 @@
+-- Wait for game to load
+if not game:IsLoaded() then game.Loaded:Wait() end
+
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 
-local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", {
-    main = Color3.fromRGB(138, 43, 226),
-    accent = Color3.fromRGB(138, 43, 226),
-    onhover = Color3.fromRGB(160, 60, 255),
-    topbar = Color3.fromRGB(138, 43, 226),
-    draggable = true
-})
+local Window = Library.CreateLib("K13 MUSCLE MASTERS 🔥", "VapeTheme") -- Gumamit ako ng preset theme para safe
 
-local Main = Window:NewTab("K13 Home")
-local Farm = Window:NewTab("Farm")
-local Settings = Window:NewTab("Settings")
+-- TABS
+local Main = Window:NewTab("Farming")
+local Eggs = Window:NewTab("Eggs & Spin")
+local Misc = Window:NewTab("Settings")
 
-Main:NewSection("K13 PREMIUM")
-Main:NewSection("STATUS: ACTIVE")
+-- FARMING SECTION
+local FarmSection = Main:NewSection("Auto Farm & Rebirth")
 
-local FarmSection = Farm:NewSection("Farming & Rebirth")
-
--- [ AUTO FARM ]
-FarmSection:NewToggle("Fast Farm", "Auto Clicker/Reps", function(state)
+FarmSection:NewToggle("Fast Farm (Reps)", "Auto Clicker/Reps", function(state)
     getgenv().AutoFarm = state
     task.spawn(function()
         while getgenv().AutoFarm do
             local Remote = game:GetService("ReplicatedStorage"):FindFirstChild("rEvents") and game:GetService("ReplicatedStorage").rEvents:FindFirstChild("repRemote")
             if Remote then
-                for i = 1, 10 do 
-                    Remote:FireServer("rep")
-                end
+                Remote:FireServer("rep")
             end
             task.wait(0.01)
         end
     end)
 end)
 
--- [ FAST REBIRTH ]
-FarmSection:NewToggle("Fast Rebirth", "Auto Rebirth (Instant)", function(state)
+FarmSection:NewToggle("Fast Rebirth", "Automatic Rebirth", function(state)
     getgenv().AutoRebirth = state
     task.spawn(function()
         while getgenv().AutoRebirth do
             pcall(function() 
                 game:GetService("ReplicatedStorage").rEvents.rebirthRemote:InvokeServer("rebirthRequest") 
             end)
-            task.wait(0.5)
+            task.wait(1)
         end
     end)
 end)
 
-local EggSection = Farm:NewSection("Auto Hatch & Spin")
+-- EGGS SECTION
+local EggSection = Eggs:NewSection("Auto Hatch & Spin")
 
--- [ AUTO SPIN ]
-EggSection:NewToggle("Auto Spin", "Awtomatikong Spin sa Wheel", function(state)
+local SelectedEgg = "Common"
+EggSection:NewDropdown("Select Rarity", "Pili ng Egg", {"Common", "Rare", "Epic", "Legendary", "Mythic"}, function(v)
+    SelectedEgg = v
+end)
+
+EggSection:NewToggle("Auto Hatch", "Dapat malapit ka sa Egg", function(state)
+    getgenv().AutoHatch = state
+    task.spawn(function()
+        while getgenv().AutoHatch do
+            pcall(function()
+                game:GetService("ReplicatedStorage").rEvents.eggRemote:InvokeServer("openEgg", SelectedEgg)
+            end)
+            task.wait(1.5)
+        end
+    end)
+end)
+
+EggSection:NewToggle("Auto Spin Wheel", "Spins every 5s", function(state)
     getgenv().AutoSpin = state
     task.spawn(function()
         while getgenv().AutoSpin do
@@ -61,56 +70,40 @@ EggSection:NewToggle("Auto Spin", "Awtomatikong Spin sa Wheel", function(state)
     end)
 end)
 
--- [ AUTO HATCH LOGIC ]
-local SelectedEgg = "Common" -- Default
-EggSection:NewDropdown("Select Egg Rarity", "Pili ka ng rarity na i-hahatch", {"Common", "Rare", "Epic", "Legendary", "Mythic"}, function(current)
-    SelectedEgg = current
-end)
+-- SETTINGS SECTION
+local SettingSection = Misc:NewSection("Anti-AFK & UI")
 
-EggSection:NewToggle("Auto Hatch", "Auto Open Eggs", function(state)
-    getgenv().AutoHatch = state
-    task.spawn(function()
-        while getgenv().AutoHatch do
-            -- Tandaan: Siguraduhin na tama ang path ng 'openEgg' remote sa game na nilalaro mo.
-            pcall(function()
-                game:GetService("ReplicatedStorage").rEvents.eggRemote:InvokeServer("openEgg", SelectedEgg)
-            end)
-            task.wait(1)
-        end
-    end)
-end)
-
--- [ ANTI-AFK & LOGO ]
-local CoreGui = game:GetService("CoreGui")
-if CoreGui:FindFirstChild("K13_Violet_Logo") then CoreGui:FindFirstChild("K13_Violet_Logo"):Destroy() end
-
-local ScreenGui = Instance.new("ScreenGui", CoreGui)
-ScreenGui.Name = "K13_Violet_Logo"
-
-local K13Button = Instance.new("ImageButton", ScreenGui)
-K13Button.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
-K13Button.Position = UDim2.new(0, 15, 0.5, 0)
-K13Button.Size = UDim2.new(0, 50, 0, 50)
-K13Button.Image = "rbxassetid://6031097225"
-K13Button.Draggable = true
-Instance.new("UICorner", K13Button).CornerRadius = UDim.new(0, 15)
-
-K13Button.MouseButton1Click:Connect(function() Library:ToggleUI() end)
-
-local SettingsSection = Settings:NewSection("Anti-AFK & UI")
-
-SettingsSection:NewToggle("Anti-AFK", "Proteksyon sa DC", function(state)
+SettingSection:NewToggle("Anti-AFK", "Prevent Disconnect", function(state)
     getgenv().AntiAFK = state
 end)
 
--- Anti-AFK Internal Connection
+SettingSection:NewKeybind("Toggle UI", "Press RightControl", Enum.KeyCode.RightControl, function()
+    Library:ToggleUI()
+end)
+
+-- ANTI-AFK LOGIC (Back-end)
+local VirtualUser = game:GetService("VirtualUser")
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     if getgenv().AntiAFK then
-        game:GetService("VirtualUser"):CaptureController()
-        game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
     end
 end)
 
-SettingsSection:NewKeybind("Toggle UI", "RightControl", Enum.KeyCode.RightControl, function()
+-- FLOATING BUTTON PARA SA MOBILE / TOGGLE
+local CoreGui = game:GetService("CoreGui")
+if CoreGui:FindFirstChild("K13_Logo") then CoreGui.K13_Logo:Destroy() end
+
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "K13_Logo"
+local btn = Instance.new("TextButton", ScreenGui)
+btn.Size = UDim2.new(0, 50, 0, 50)
+btn.Position = UDim2.new(0, 10, 0.5, 0)
+btn.Text = "K13"
+btn.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+btn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", btn)
+
+btn.MouseButton1Click:Connect(function()
     Library:ToggleUI()
 end)
