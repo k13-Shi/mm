@@ -2,8 +2,8 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "K13 MUSCLE MASTERS 🔥",
-   LoadingTitle = "K13 V12 - THE FINAL FIX",
-   LoadingSubtitle = "Direct Injection Mode",
+   LoadingTitle = "K13 V15 - STABLE FIX",
+   LoadingSubtitle = "No Mouse Click | 0.1 Speed",
    ConfigurationSaving = { Enabled = false }
 })
 
@@ -11,10 +11,10 @@ local Main = Window:CreateTab("Auto Farm", 4483362458)
 local Eggs = Window:CreateTab("Auto Hatch", 4483362458)
 local Misc = Window:CreateTab("Settings", 4483362458)
 
-local RS = game:GetService("ReplicatedStorage")
+local LP = game:GetService("Players").LocalPlayer
 
 local function getRemote(name)
-    for _, v in pairs(RS:GetDescendants()) do
+    for _, v in pairs(game:GetService("ReplicatedStorage"):GetDescendants()) do
         if v.Name:lower():find(name:lower()) and (v:IsA("RemoteEvent") or v:IsA("RemoteFunction")) then
             return v
         end
@@ -24,37 +24,45 @@ end
 Main:CreateSection("Training & Rebirth")
 
 Main:CreateToggle({
-   Name = "Fast Farm (Machine/Weights)",
+   Name = "Fast Farm",
    CurrentValue = false,
    Flag = "AutoFarm",
    Callback = function(Value)
       getgenv().AutoFarm = Value
       task.spawn(function()
          local repRem = getRemote("rep")
-         local interactRem = getRemote("interact") or getRemote("use")
          while getgenv().AutoFarm do
             pcall(function()
-               if repRem then repRem:FireServer("rep") end
-               if interactRem then interactRem:FireServer() end
+               local tool = LP.Character:FindFirstChildOfClass("Tool")
+               if tool then
+                  tool:Activate()
+               end
+               if repRem then
+                  repRem:FireServer("rep")
+               end
             end)
-            task.wait(0.1)
+            task.wait(1)
          end
       end)
    end,
 })
 
 Main:CreateToggle({
-   Name = "Auto Rebirth",
+   Name = "Auto Rebirth (0.1 Speed)",
    CurrentValue = false,
    Flag = "AutoRebirth",
    Callback = function(Value)
       getgenv().AutoRebirth = Value
       task.spawn(function()
-         local rem = getRemote("rebirth")
+         local rebRem = getRemote("rebirth")
          while getgenv().AutoRebirth do
-            if rem then 
-                if rem:IsA("RemoteFunction") then rem:InvokeServer("rebirthRequest") else rem:FireServer("rebirthRequest") end
-            end
+            pcall(function()
+               if rebRem:IsA("RemoteFunction") then
+                  rebRem:InvokeServer("rebirthRequest")
+               else
+                  rebRem:FireServer("rebirthRequest")
+               end
+            end)
             task.wait(1)
          end
       end)
@@ -79,27 +87,33 @@ Eggs:CreateToggle({
    Callback = function(Value)
       getgenv().AutoHatch = Value
       task.spawn(function()
-         local rem = getRemote("egg") or getRemote("open")
+         local eggRem = getRemote("egg") or getRemote("open")
          while getgenv().AutoHatch do
-            if rem then
-                if rem:IsA("RemoteFunction") then rem:InvokeServer("openEgg", SelectedEgg) else rem:FireServer("openEgg", SelectedEgg) end
-            end
-            task.wait(0.5)
+            pcall(function()
+               if eggRem:IsA("RemoteFunction") then
+                  eggRem:InvokeServer("openEgg", SelectedEgg)
+               else
+                  eggRem:FireServer("openEgg", SelectedEgg)
+               end
+            end)
+            task.wait(5)
          end
       end)
    end,
 })
 
 Eggs:CreateToggle({
-   Name = "Auto Spin Wheel",
+   Name = "Auto Spin",
    CurrentValue = false,
    Flag = "AutoSpin",
    Callback = function(Value)
       getgenv().AutoSpin = Value
       task.spawn(function()
-         local rem = getRemote("wheel") or getRemote("spin")
+         local spinRem = getRemote("wheel") or getRemote("spin")
          while getgenv().AutoSpin do
-            if rem then rem:FireServer("spinWheel") end
+            pcall(function()
+               spinRem:FireServer("spinWheel")
+            end)
             task.wait(5)
          end
       end)
