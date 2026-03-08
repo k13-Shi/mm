@@ -24,7 +24,7 @@ end
 Main:CreateSection("Training & Rebirth")
 
 Main:CreateToggle({
-   Name = "Auto Lift (No Click)",
+   Name = "Fast Farm",
    CurrentValue = false,
    Flag = "AutoFarm",
    Callback = function(Value)
@@ -33,7 +33,7 @@ Main:CreateToggle({
          local rem = getRemote("rep")
          while getgenv().AutoFarm do
             if rem then rem:FireServer("rep") end
-            task.wait()
+            task.wait(0.1)
          end
       end)
    end,
