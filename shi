@@ -1,169 +1,174 @@
 local Titan = Instance.new("ScreenGui")
 local TitanFrame = Instance.new("Frame")
+local MainCorner = Instance.new("UICorner")
 local UIStroke = Instance.new("UIStroke")
-local UICorner = Instance.new("UICorner")
 local Main = Instance.new("Frame")
 local UIListLayout = Instance.new("UIListLayout")
 local TextLabel = Instance.new("TextLabel")
 local minisizebutton = Instance.new("TextButton")
+local GlowLine = Instance.new("Frame")
 
-Titan.Name = "K13_Rainbow"
+-- GUI Settings
+Titan.Name = "K13_Shi | Muscle Masters"
 Titan.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 Titan.ResetOnSpawn = false
 
--- TitanFrame (Mananatiling Purple Glass)
+-- Main Frame (Deep Black & Purple)
 TitanFrame.Name = "TitanFrame"
 TitanFrame.Parent = Titan
 TitanFrame.Active = true
 TitanFrame.Draggable = true
 TitanFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-TitanFrame.BackgroundColor3 = Color3.fromRGB(20, 10, 30)
-TitanFrame.BackgroundTransparency = 0.15
+TitanFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 15) -- Halos itim
 TitanFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-TitanFrame.Size = UDim2.new(0.28, 0, 0.42, 0) 
+TitanFrame.Size = UDim2.new(0.25, 0, 0.35, 0)
 
-UICorner.CornerRadius = UDim.new(0, 12)
-UICorner.Parent = TitanFrame
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = TitanFrame
 
+-- Steady Purple Glow Border
 UIStroke.Parent = TitanFrame
 UIStroke.Thickness = 2
-UIStroke.Color = Color3.fromRGB(150, 0, 255)
+UIStroke.Color = Color3.fromRGB(170, 0, 255) -- Solid Purple
 UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
+-- Accent Line
+GlowLine.Parent = TitanFrame
+GlowLine.Size = UDim2.new(1, 0, 0, 2)
+GlowLine.Position = UDim2.new(0, 0, 0.12, 0)
+GlowLine.BackgroundColor3 = Color3.fromRGB(170, 0, 255)
+GlowLine.BorderSizePixel = 0
+
+-- Header Text
 TextLabel.Parent = TitanFrame
 TextLabel.AnchorPoint = Vector2.new(0.5, 0)
-TextLabel.BackgroundTransparency = 1.000
-TextLabel.Position = UDim2.new(0.45, 0, 0.03, 0)
-TextLabel.Size = UDim2.new(0.8, 0, 0.1, 0)
-TextLabel.Font = Enum.Font.GothamBold
-TextLabel.Text = "K13 | RAINBOW HUB"
-TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1
+TextLabel.Position = UDim2.new(0.4, 0, 0.02, 0)
+TextLabel.Size = UDim2.new(0.7, 0, 0.08, 0)
+TextLabel.Font = Enum.Font.Orbitron
+TextLabel.Text = "K13 V3 | PURPLE"
+TextLabel.TextColor3 = Color3.fromRGB(200, 100, 255) -- Light Purple Text
 TextLabel.TextScaled = true
 
--- RAINBOW GLOW EFFECT (HINDI KO BINAGO)
+-- "Breathing" Glow Effect (Purple Only)
 task.spawn(function()
     while task.wait() do
-        local hue = tick() % 4 / 4
-        TextLabel.TextColor3 = Color3.fromHSV(hue, 0.5, 1)
-        UIStroke.Color = Color3.fromHSV(hue, 0.8, 1)
+        for i = 0, 1, 0.02 do
+            local transparency = 0.3 + (i * 0.7)
+            UIStroke.Transparency = transparency
+            GlowLine.BackgroundTransparency = transparency
+            task.wait(0.05)
+        end
+        for i = 1, 0, -0.02 do
+            local transparency = 0.3 + (i * 0.7)
+            UIStroke.Transparency = transparency
+            GlowLine.BackgroundTransparency = transparency
+            task.wait(0.05)
+        end
     end
 end)
 
+-- Buttons Container
 Main.Name = "Main"
 Main.Parent = TitanFrame
 Main.BackgroundTransparency = 1
-Main.Position = UDim2.new(0.05, 0, 0.15, 0)
-Main.Size = UDim2.new(0.9, 0, 0.8, 0)
+Main.Position = UDim2.new(0.05, 0, 0.18, 0)
+Main.Size = UDim2.new(0.9, 0, 0.75, 0)
 
 UIListLayout.Parent = Main
-UIListLayout.Padding = UDim.new(0, 5)
+UIListLayout.Padding = UDim.new(0, 8)
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
--- Mini Button
+-- Mini Button (Close)
 minisizebutton.Name = "minisizebutton"
 minisizebutton.Parent = TitanFrame
-minisizebutton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-minisizebutton.Position = UDim2.new(0.92, 0, 0.05, 0)
-minisizebutton.Size = UDim2.new(0.05, 0, 0.05, 0)
+minisizebutton.BackgroundColor3 = Color3.fromRGB(170, 0, 255)
+minisizebutton.BackgroundTransparency = 0.5
+minisizebutton.Position = UDim2.new(0.94, 0, 0.05, 0)
+minisizebutton.Size = UDim2.new(0.04, 0, 0.04, 0)
 minisizebutton.Text = ""
 Instance.new("UICorner", minisizebutton).CornerRadius = UDim.new(1, 0)
 
+-- Function for Buttons
 local function NewButton(name, text)
     local f = Instance.new("Frame")
     f.Name = name.."_Frame"
     f.Parent = Main
-    f.Size = UDim2.new(1, 0, 0, 28)
-    f.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    f.BackgroundTransparency = 0.92
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 6)
+    f.Size = UDim2.new(1, 0, 0, 30)
+    f.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+    f.BorderSizePixel = 0
+    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 4)
     
+    local s = Instance.new("UIStroke", f)
+    s.Thickness = 1
+    s.Color = Color3.fromRGB(60, 60, 80)
+
     local t = Instance.new("TextLabel", f)
     t.Size = UDim2.new(0.8, 0, 1, 0)
     t.Position = UDim2.new(0.05, 0, 0, 0)
     t.BackgroundTransparency = 1
-    t.Text = text
-    t.TextColor3 = Color3.fromRGB(220, 220, 220)
-    t.Font = Enum.Font.GothamMedium
-    t.TextSize = 12
+    t.Text = text:upper()
+    t.TextColor3 = Color3.fromRGB(180, 180, 180)
+    t.Font = Enum.Font.Code
+    t.TextSize = 13
     t.TextXAlignment = Enum.TextXAlignment.Left
 
-    local toggle = Instance.new("Frame", f)
-    toggle.Size = UDim2.new(0, 18, 0, 18)
-    toggle.Position = UDim2.new(0.93, 0, 0.5, 0)
-    toggle.AnchorPoint = Vector2.new(0.5, 0.5)
-    toggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    Instance.new("UICorner", toggle).CornerRadius = UDim.new(0, 4)
-
-    local check = Instance.new("Frame", toggle)
-    check.Size = UDim2.new(0, 0, 0, 0)
-    check.Position = UDim2.new(0.5, 0, 0.5, 0)
-    check.AnchorPoint = Vector2.new(0.5, 0.5)
-    check.BackgroundColor3 = Color3.fromRGB(180, 50, 255)
-    Instance.new("UICorner", check).CornerRadius = UDim.new(0, 3)
+    local status = Instance.new("Frame", f)
+    status.Size = UDim2.new(0, 4, 0, 15)
+    status.Position = UDim2.new(0.95, 0, 0.5, 0)
+    status.AnchorPoint = Vector2.new(0.5, 0.5)
+    status.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    status.BorderSizePixel = 0
 
     local btn = Instance.new("TextButton", f)
     btn.Size = UDim2.new(1, 0, 1, 0)
     btn.BackgroundTransparency = 1
     btn.Text = ""
 
-    return btn, check
+    return btn, status, s
 end
 
 -- Create Buttons
-local AutoRebirthButton, succus = NewButton("Rebirth", "Auto Rebirth")
-local automuscleemp, succus_2 = NewButton("Farm", "Fast Auto Farm")
-local autospinbutton, succus_3 = NewButton("Spin", "Auto Spin")
-local autohatch_button, succus_hatch = NewButton("Hatch", "Auto Hatch Pets Lucky")
-local antiafk_button, antiafk_succus = NewButton("AntiAFK", "Anti AFK System")
-local extrascript_button, extrascript_succus = NewButton("Fly", "Active FLY Hack")
+local AutoRebirthButton, st1, str1 = NewButton("Rebirth", "Auto Rebirth")
+local automuscleemp, st2, str2 = NewButton("Farm", "Fast Auto Farm")
+local autospinbutton, st3, str3 = NewButton("Spin", "Auto Spin")
+local antiafk_button, st4, str4 = NewButton("AntiAFK", "Anti AFK System")
+local extrascript_button, st5, str5 = NewButton("Fly", "Active FLY Script")
 
--- Scripts Logic
-local isAuto, isAutolift, isapin, isHatch, antiAfkEnabled, extraScriptActive = false, false, false, false, false, false
+-- Logic
+local isAuto, isAutolift, isapin, antiAfkEnabled, extraScriptActive = false, false, false, false, false
 
-local function animate(check, var)
-    check:TweenSize(var and UDim2.new(0.7, 0, 0.7, 0) or UDim2.new(0, 0, 0, 0), "Out", "Back", 0.2)
+local function toggle(var, status, stroke)
+    var = not var
+    if var then
+        status.BackgroundColor3 = Color3.fromRGB(170, 0, 255)
+        stroke.Color = Color3.fromRGB(170, 0, 255)
+    else
+        status.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        stroke.Color = Color3.fromRGB(60, 60, 80)
+    end
+    return var
 end
 
-AutoRebirthButton.Activated:Connect(function() isAuto = not isAuto animate(succus, isAuto) end)
-automuscleemp.Activated:Connect(function() isAutolift = not isAutolift animate(succus_2, isAutolift) end)
-autospinbutton.Activated:Connect(function() isapin = not isapin animate(succus_3, isapin) end)
-autohatch_button.Activated:Connect(function() isHatch = not isHatch animate(succus_hatch, isHatch) end)
-
+AutoRebirthButton.Activated:Connect(function() isAuto = toggle(isAuto, st1, str1) end)
+automuscleemp.Activated:Connect(function() isAutolift = toggle(isAutolift, st2, str2) end)
+autospinbutton.Activated:Connect(function() isapin = toggle(isapin, st3, str3) end)
 antiafk_button.Activated:Connect(function() 
-    antiAfkEnabled = not antiAfkEnabled
-    animate(antiafk_succus, antiAfkEnabled)
+    antiAfkEnabled = toggle(antiAfkEnabled, st4, str4)
     if antiAfkEnabled then loadstring(game:HttpGet("https://pastebin.com/raw/r37Ct26d", true))() end
 end)
-
 extrascript_button.Activated:Connect(function() 
-    extraScriptActive = not extraScriptActive
-    animate(extrascript_succus, extraScriptActive)
+    extraScriptActive = toggle(extraScriptActive, st5, str5)
     if extraScriptActive then loadstring(game:HttpGet("https://pastebin.com/raw/92uVadU5"))() end
 end)
 
--- AUTO HATCH NEW LOGIC
+-- Main Loop
 task.spawn(function()
     local remotes = game:GetService("ReplicatedStorage").RemotesEvent
-    
-    -- Subukan natin ang iba't ibang posibleng Remote Names sa Muscle Masters
-    local hatchRemote = remotes:FindFirstChild("HatchCrystal") or remotes:FindFirstChild("OpenEgg") or remotes:FindFirstChild("HatchEgg") or remotes:FindFirstChild("HatchCrystalFunction")
-    
     while true do
-        task.wait(0.3) -- Bahagyang bagal para hindi ma-kick sa spam
-        
+        task.wait(0.1)
         if isAuto then remotes.RebirthEvent:FireServer() end
         if isapin then remotes.SpinFunction:InvokeServer() end
-        
-        -- Bagong Auto Hatch Logic para sa may Dropdown (Rarity)
-        if isHatch and hatchRemote then
-            -- Dahil may dropdown (Common to Mythic), susubukan natin ang default argument format
-            -- Format: (Pangalan ng Egg, Bilang ng Hatch, Rarity/Mode)
-            pcall(function()
-                hatchRemote:InvokeServer("Pets Lucky", 1) -- Basic Mode
-                hatchRemote:InvokeServer("Pets Lucky", "Common") -- Rarity Mode
-            end)
-        end
-        
         if isAutolift then
             local machineuse = game.Players.LocalPlayer:WaitForChild("Machineuse")
             if machineuse.Value == nil then
@@ -177,14 +182,15 @@ end)
 
 -- Open/Close
 local OpenButton = Instance.new("TextButton", Titan)
-OpenButton.Size = UDim2.new(0, 45, 0, 45)
-OpenButton.Position = UDim2.new(0, 10, 0.5, 0)
-OpenButton.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
+OpenButton.Size = UDim2.new(0, 40, 0, 40)
+OpenButton.Position = UDim2.new(0, 15, 0.5, 0)
+OpenButton.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 OpenButton.Text = "K13"
-OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+OpenButton.TextColor3 = Color3.fromRGB(170, 0, 255)
+OpenButton.Font = Enum.Font.Orbitron
 OpenButton.Visible = false
 Instance.new("UICorner", OpenButton).CornerRadius = UDim.new(1, 0)
-OpenButton.Draggable = true
+Instance.new("UIStroke", OpenButton).Color = Color3.fromRGB(170, 0, 255)
 
 minisizebutton.MouseButton1Click:Connect(function() TitanFrame.Visible = false OpenButton.Visible = true end)
 OpenButton.MouseButton1Click:Connect(function() TitanFrame.Visible = true OpenButton.Visible = false end)
