@@ -1,187 +1,144 @@
 local Titan = Instance.new("ScreenGui")
 local TitanFrame = Instance.new("Frame")
-local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
-local UIGradient = Instance.new("UIGradient")
-local shadowframe = Instance.new("Frame")
+local UIStroke = Instance.new("UIStroke") -- Border glow
+local UICorner = Instance.new("UICorner")
 local Main = Instance.new("Frame")
 local UIListLayout = Instance.new("UIListLayout")
-local autorebirths = Instance.new("Frame")
-local titlem = Instance.new("TextLabel")
-local UICorner1 = Instance.new("UICorner")
-local autorebirthFrame = Instance.new("Frame")
-local UICorner1_2 = Instance.new("UICorner")
-local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
-local succus = Instance.new("ImageLabel")
-local AutoRebirthButton = Instance.new("TextButton")
-local autoliftmuscleemp = Instance.new("Frame")
-local titlem_2 = Instance.new("TextLabel")
-local UICorner1_3 = Instance.new("UICorner")
-local muyscleemp = Instance.new("Frame")
-local UICorner1_4 = Instance.new("UICorner")
-local UIAspectRatioConstraint_3 = Instance.new("UIAspectRatioConstraint")
-local succus_2 = Instance.new("ImageLabel")
-local automuscleemp = Instance.new("TextButton")
-local autospin = Instance.new("Frame")
-local titlem_3 = Instance.new("TextLabel")
-local UICorner1_5 = Instance.new("UICorner")
-local autospin2 = Instance.new("Frame")
-local UICorner1_6 = Instance.new("UICorner")
-local UIAspectRatioConstraint_4 = Instance.new("UIAspectRatioConstraint")
-local succus_3 = Instance.new("ImageLabel")
-local autospinbutton = Instance.new("TextButton")
-local minisizebutton = Instance.new("TextButton")
-local UIAspectRatioConstraint_5 = Instance.new("UIAspectRatioConstraint")
 local TextLabel = Instance.new("TextLabel")
+local minisizebutton = Instance.new("TextButton")
 
--- Properties:
-Titan.Name = "K13_GUI"
+-- Main GUI Settings
+Titan.Name = "K13_Modern"
 Titan.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 Titan.ResetOnSpawn = false
 
+-- TitanFrame (Modern Glass Style)
 TitanFrame.Name = "TitanFrame"
 TitanFrame.Parent = Titan
 TitanFrame.Active = true
+TitanFrame.Draggable = true
 TitanFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-TitanFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-TitanFrame.BorderSizePixel = 0
+TitanFrame.BackgroundColor3 = Color3.fromRGB(20, 10, 30) -- Dark Purple Base
+TitanFrame.BackgroundTransparency = 0.15
 TitanFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-TitanFrame.Size = UDim2.new(0.3, 0, 0.35, 0) -- Maliit na size
+TitanFrame.Size = UDim2.new(0.28, 0, 0.38, 0) -- Compact size
 
-UIAspectRatioConstraint.Parent = TitanFrame
-UIAspectRatioConstraint.AspectRatio = 1.500
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = TitanFrame
 
--- Purple Theme Gradient
-UIGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(48, 0, 70)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(100, 0, 200))}
-UIGradient.Rotation = 40
-UIGradient.Parent = TitanFrame
+-- Glowing Border
+UIStroke.Parent = TitanFrame
+UIStroke.Thickness = 2
+UIStroke.Color = Color3.fromRGB(150, 0, 255) -- Purple Glow Border
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-shadowframe.Name = "shadowframe"
-shadowframe.Parent = TitanFrame
-shadowframe.AnchorPoint = Vector2.new(0.5, 0.5)
-shadowframe.BackgroundColor3 = Color3.fromRGB(15, 0, 30)
-shadowframe.BorderSizePixel = 0
-shadowframe.Position = UDim2.new(0.51, 0, 0.51, 0)
-shadowframe.Size = UDim2.new(1, 0, 1, 0)
-shadowframe.ZIndex = 0
-
-Main.Name = "Main"
-Main.Parent = TitanFrame
-Main.AnchorPoint = Vector2.new(0.5, 0.5)
-Main.BackgroundTransparency = 1.000
-Main.Position = UDim2.new(0.5, 0, 0.55, 0)
-Main.Size = UDim2.new(0.95, 0, 0.83, 0)
-Main.ZIndex = 2
-
-UIListLayout.Parent = Main
-UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0.02, 0)
-
--- Helper Function para sa Buttons para iwas error sa list
-local function CreateButtonFrame(name, text, parent)
-    local frame = Instance.new("Frame")
-    frame.Name = name
-    frame.Parent = parent
-    frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    frame.Size = UDim2.new(0.85, 0, 0.15, 0) -- Mas maliit na height
-    frame.ZIndex = 3
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0.2, 0)
-    corner.Parent = frame
-
-    local title = Instance.new("TextLabel")
-    title.Parent = frame
-    title.BackgroundTransparency = 1
-    title.Position = UDim2.new(0.4, 0, 0.5, 0)
-    title.Size = UDim2.new(0.7, 0, 0.8, 0)
-    title.AnchorPoint = Vector2.new(0.5, 0.5)
-    title.Font = Enum.Font.DenkOne
-    title.Text = text
-    title.TextColor3 = Color3.fromRGB(230, 230, 230)
-    title.TextScaled = true
-    title.ZIndex = 6
-
-    local toggleFrame = Instance.new("Frame")
-    toggleFrame.Parent = frame
-    toggleFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    toggleFrame.Position = UDim2.new(0.9, 0, 0.5, 0)
-    toggleFrame.Size = UDim2.new(0.18, 0, 0.8, 0)
-    toggleFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-    toggleFrame.ZIndex = 4
-    
-    local tCorner = Instance.new("UICorner")
-    tCorner.Parent = toggleFrame
-
-    local checkIcon = Instance.new("ImageLabel")
-    checkIcon.Parent = toggleFrame
-    checkIcon.BackgroundTransparency = 1
-    checkIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-    checkIcon.AnchorPoint = Vector2.new(0.5, 0.5)
-    checkIcon.Size = UDim2.new(0, 0, 0, 0) -- Hidden initially
-    checkIcon.Image = "rbxassetid://131708009919712"
-    checkIcon.ImageColor3 = Color3.fromRGB(180, 0, 255)
-    checkIcon.ZIndex = 5
-
-    local btn = Instance.new("TextButton")
-    btn.Parent = toggleFrame
-    btn.BackgroundTransparency = 1
-    btn.Size = UDim2.new(1, 0, 1, 0)
-    btn.Text = ""
-    btn.ZIndex = 20
-
-    return btn, checkIcon
-end
-
--- Create all buttons
-local AutoRebirthButton, succus = CreateButtonFrame("AutoRebirth", "Fast Auto Rebirth", Main)
-local automuscleemp, succus_2 = CreateButtonFrame("AutoFarm", "Fast Auto Farm", Main)
-local autospinbutton, succus_3 = CreateButtonFrame("AutoSpin", "Auto Spin", Main)
-local antiafk_button, antiafk_succus = CreateButtonFrame("AntiAFK", "Anti AFK", Main)
-local extrascript_button, extrascript_succus = CreateButtonFrame("ActiveFly", "Active FLY", Main)
-
--- Header / Glow Text
+-- Header Text (K13)
 TextLabel.Parent = TitanFrame
-TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+TextLabel.AnchorPoint = Vector2.new(0.5, 0)
 TextLabel.BackgroundTransparency = 1.000
-TextLabel.Position = UDim2.new(0.46, 0, 0.05, 0)
-TextLabel.Size = UDim2.new(0.9, 0, 0.1, 0)
-TextLabel.ZIndex = 2
-TextLabel.Font = Enum.Font.DenkOne
-TextLabel.Text = "K13 | Muscle Masters"
+TextLabel.Position = UDim2.new(0.45, 0, 0.03, 0)
+TextLabel.Size = UDim2.new(0.8, 0, 0.1, 0)
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.Text = "K13 | PREMIUM HUB"
 TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextLabel.TextScaled = true
 
 -- Glow Effect for K13 Text
 task.spawn(function()
     while task.wait() do
-        local hue = tick() % 5 / 5
-        TextLabel.TextColor3 = Color3.fromHSV(hue, 0.7, 1)
+        local hue = tick() % 4 / 4
+        TextLabel.TextColor3 = Color3.fromHSV(hue, 0.5, 1)
+        UIStroke.Color = Color3.fromHSV(hue, 0.8, 1)
     end
 end)
 
+-- Main Container
+Main.Name = "Main"
+Main.Parent = TitanFrame
+Main.BackgroundTransparency = 1
+Main.Position = UDim2.new(0.05, 0, 0.18, 0)
+Main.Size = UDim2.new(0.9, 0, 0.75, 0)
+
+UIListLayout.Parent = Main
+UIListLayout.Padding = UDim.new(0, 6)
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- Mini Button
 minisizebutton.Name = "minisizebutton"
 minisizebutton.Parent = TitanFrame
-minisizebutton.BackgroundColor3 = Color3.fromRGB(40, 0, 80)
-minisizebutton.Position = UDim2.new(0.96, 0, 0.05, 0)
-minisizebutton.Size = UDim2.new(0.08, 0, 0.08, 0)
-minisizebutton.AnchorPoint = Vector2.new(0.5, 0.5)
-minisizebutton.Text = "-"
-minisizebutton.TextColor3 = Color3.fromRGB(255, 255, 255)
-minisizebutton.TextScaled = true
+minisizebutton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+minisizebutton.BackgroundTransparency = 0.3
+minisizebutton.Position = UDim2.new(0.92, 0, 0.05, 0)
+minisizebutton.Size = UDim2.new(0.06, 0, 0.06, 0)
+minisizebutton.Text = ""
+Instance.new("UICorner", minisizebutton).CornerRadius = UDim.new(1, 0)
 
-local OpenButton = Instance.new("TextButton")
-local OpenCorner = Instance.new("UICorner")
-OpenButton.Parent = Titan
-OpenButton.BackgroundColor3 = Color3.fromRGB(60, 0, 120)
-OpenButton.Position = UDim2.new(0.1, 0, 0.5, 0)
-OpenButton.Size = UDim2.new(0, 45, 0, 45)
-OpenButton.Visible = false
+-- Function to create Modern Buttons
+local function NewButton(name, text)
+    local f = Instance.new("Frame")
+    f.Name = name.."_Frame"
+    f.Parent = Main
+    f.Size = UDim2.new(1, 0, 0, 32) -- Slimmer buttons
+    f.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    f.BackgroundTransparency = 0.92
+    
+    local c = Instance.new("UICorner", f)
+    c.CornerRadius = UDim.new(0, 6)
+    
+    local s = Instance.new("UIStroke", f)
+    s.Thickness = 1
+    s.Color = Color3.fromRGB(100, 100, 100)
+    s.Transparency = 0.5
+
+    local t = Instance.new("TextLabel", f)
+    t.Size = UDim2.new(0.8, 0, 1, 0)
+    t.Position = UDim2.new(0.05, 0, 0, 0)
+    t.BackgroundTransparency = 1
+    t.Text = text
+    t.TextColor3 = Color3.fromRGB(220, 220, 220)
+    t.Font = Enum.Font.GothamMedium
+    t.TextSize = 14
+    t.TextXAlignment = Enum.TextXAlignment.Left
+
+    local toggle = Instance.new("Frame", f)
+    toggle.Size = UDim2.new(0, 20, 0, 20)
+    toggle.Position = UDim2.new(0.93, 0, 0.5, 0)
+    toggle.AnchorPoint = Vector2.new(0.5, 0.5)
+    toggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Instance.new("UICorner", toggle).CornerRadius = UDim.new(0, 4)
+
+    local check = Instance.new("Frame", toggle)
+    check.Size = UDim2.new(0, 0, 0, 0)
+    check.Position = UDim2.new(0.5, 0, 0.5, 0)
+    check.AnchorPoint = Vector2.new(0.5, 0.5)
+    check.BackgroundColor3 = Color3.fromRGB(180, 50, 255) -- Purple Check
+    Instance.new("UICorner", check).CornerRadius = UDim.new(0, 3)
+
+    local btn = Instance.new("TextButton", f)
+    btn.Size = UDim2.new(1, 0, 1, 0)
+    btn.BackgroundTransparency = 1
+    btn.Text = ""
+
+    return btn, check
+end
+
+-- Create Buttons
+local AutoRebirthButton, succus = NewButton("Rebirth", "Auto Rebirth")
+local automuscleemp, succus_2 = NewButton("Farm", "Fast Auto Farm")
+local autospinbutton, succus_3 = NewButton("Spin", "Auto Spin")
+local antiafk_button, antiafk_succus = NewButton("AntiAFK", "Anti AFK System")
+local extrascript_button, extrascript_succus = NewButton("Fly", "Active FLY Hack")
+
+-- Open/Close Logic
+local OpenButton = Instance.new("TextButton", Titan)
+OpenButton.Size = UDim2.new(0, 50, 0, 50)
+OpenButton.Position = UDim2.new(0, 20, 0.5, 0)
+OpenButton.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 OpenButton.Text = "K13"
 OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-OpenButton.Font = Enum.Font.DenkOne
-OpenCorner.CornerRadius = UDim.new(1, 0)
-OpenCorner.Parent = OpenButton
+OpenButton.Visible = false
+Instance.new("UICorner", OpenButton).CornerRadius = UDim.new(1, 0)
+OpenButton.Draggable = true
 
 minisizebutton.MouseButton1Click:Connect(function()
     TitanFrame.Visible = false
@@ -193,59 +150,40 @@ OpenButton.MouseButton1Click:Connect(function()
     OpenButton.Visible = false
 end)
 
-TitanFrame.Active = true
-TitanFrame.Draggable = true
+-- SCRIPT LOGIC (Keep original functions)
+local isAuto, isAutolift, isapin, antiAfkEnabled, extraScriptActive = false, false, false, false, false
 
--- LOGIC --
-local isAuto = false
-local isAutolift = false
-local isapin = false
-local antiAfkEnabled = false
-local extraScriptActive = false
+local function toggle(btn, check, var)
+    var = not var
+    check:TweenSize(var and UDim2.new(0.7, 0, 0.7, 0) or UDim2.new(0, 0, 0, 0), "Out", "Back", 0.2)
+    return var
+end
 
-AutoRebirthButton.Activated:Connect(function()
-    isAuto = not isAuto
-    succus.Size = isAuto and UDim2.new(1,0,1,0) or UDim2.new(0,0,0,0)
-end)
+AutoRebirthButton.Activated:Connect(function() isAuto = toggle(AutoRebirthButton, succus, isAuto) end)
+automuscleemp.Activated:Connect(function() isAutolift = toggle(automuscleemp, succus_2, isAutolift) end)
+autospinbutton.Activated:Connect(function() isapin = toggle(autospinbutton, succus_3, isapin) end)
 
-automuscleemp.MouseButton1Click:Connect(function()
-    isAutolift = not isAutolift
-    succus_2.Size = isAutolift and UDim2.new(1,0,1,0) or UDim2.new(0,0,0,0)
-end)
-
-autospinbutton.Activated:Connect(function()
-    isapin = not isapin
-    succus_3.Size = isapin and UDim2.new(1,0,1,0) or UDim2.new(0,0,0,0)
-end)
-
-antiafk_button.Activated:Connect(function()
-    antiAfkEnabled = not antiAfkEnabled
-    antiafk_succus.Size = antiAfkEnabled and UDim2.new(1,0,1,0) or UDim2.new(0,0,0,0)
+antiafk_button.Activated:Connect(function() 
+    antiAfkEnabled = toggle(antiafk_button, antiafk_succus, antiAfkEnabled)
     if antiAfkEnabled then loadstring(game:HttpGet("https://pastebin.com/raw/r37Ct26d", true))() end
 end)
 
-extrascript_button.Activated:Connect(function()
-    extraScriptActive = not extraScriptActive
-    extrascript_succus.Size = extraScriptActive and UDim2.new(1,0,1,0) or UDim2.new(0,0,0,0)
+extrascript_button.Activated:Connect(function() 
+    extraScriptActive = toggle(extrascript_button, extrascript_succus, extraScriptActive)
     if extraScriptActive then loadstring(game:HttpGet("https://pastebin.com/raw/92uVadU5"))() end
 end)
 
--- Main Loop
 task.spawn(function()
-    local machineactive = game.ReplicatedStorage.RemotesEvent.MachineActiveFunction
-    local MachineActiveEvent = game.ReplicatedStorage.RemotesEvent.MachineActiveEvent
-    local machineuse = game.Players.LocalPlayer:WaitForChild("Machineuse")
-    local bechmemp = game.Workspace:WaitForChild("MachinesFolder"):WaitForChild("Bench Press Muscle Emperor")
-    
     while true do
         task.wait(0.1)
         if isapin then game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() end
         if isAuto then game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end
         if isAutolift then
+            local machineuse = game.Players.LocalPlayer:WaitForChild("Machineuse")
             if machineuse.Value == nil then
-                machineactive:InvokeServer(bechmemp, true)
+                game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(game.Workspace.MachinesFolder["Bench Press Muscle Emperor"], true)
             else
-                MachineActiveEvent:FireServer()
+                game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
             end
         end
     end
