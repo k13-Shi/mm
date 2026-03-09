@@ -7,11 +7,11 @@ local UIListLayout = Instance.new("UIListLayout")
 local TextLabel = Instance.new("TextLabel")
 local minisizebutton = Instance.new("TextButton")
 
-Titan.Name = "K13_Pets"
+Titan.Name = "K13_Rainbow"
 Titan.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 Titan.ResetOnSpawn = false
 
--- TitanFrame (Modern Glass Purple)
+-- TitanFrame (Mananatiling Purple Glass)
 TitanFrame.Name = "TitanFrame"
 TitanFrame.Parent = Titan
 TitanFrame.Active = true
@@ -36,11 +36,11 @@ TextLabel.BackgroundTransparency = 1.000
 TextLabel.Position = UDim2.new(0.45, 0, 0.03, 0)
 TextLabel.Size = UDim2.new(0.8, 0, 0.1, 0)
 TextLabel.Font = Enum.Font.GothamBold
-TextLabel.Text = "K13 | PETS LUCKY"
+TextLabel.Text = "K13 | RAINBOW HUB"
 TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextLabel.TextScaled = true
 
--- Glow Effect for K13
+-- RAINBOW GLOW EFFECT (HINDI KO BINAGO)
 task.spawn(function()
     while task.wait() do
         local hue = tick() % 4 / 4
@@ -141,21 +141,27 @@ extrascript_button.Activated:Connect(function()
     if extraScriptActive then loadstring(game:HttpGet("https://pastebin.com/raw/92uVadU5"))() end
 end)
 
--- Main Loop
+-- AUTO HATCH NEW LOGIC
 task.spawn(function()
     local remotes = game:GetService("ReplicatedStorage").RemotesEvent
     
-    -- Hanapin ang tamang remote para sa Hatching
-    local hatchRemote = remotes:FindFirstChild("HatchCrystal") or remotes:FindFirstChild("OpenEgg") or remotes:FindFirstChild("HatchEgg")
+    -- Subukan natin ang iba't ibang posibleng Remote Names sa Muscle Masters
+    local hatchRemote = remotes:FindFirstChild("HatchCrystal") or remotes:FindFirstChild("OpenEgg") or remotes:FindFirstChild("HatchEgg") or remotes:FindFirstChild("HatchCrystalFunction")
     
     while true do
-        task.wait(0.1)
+        task.wait(0.3) -- Bahagyang bagal para hindi ma-kick sa spam
+        
         if isAuto then remotes.RebirthEvent:FireServer() end
         if isapin then remotes.SpinFunction:InvokeServer() end
         
-        -- Auto Hatch Logic (Pets Lucky)
-        if isHatch and hatchRemote then 
-            hatchRemote:InvokeServer("Pets Lucky", 1) 
+        -- Bagong Auto Hatch Logic para sa may Dropdown (Rarity)
+        if isHatch and hatchRemote then
+            -- Dahil may dropdown (Common to Mythic), susubukan natin ang default argument format
+            -- Format: (Pangalan ng Egg, Bilang ng Hatch, Rarity/Mode)
+            pcall(function()
+                hatchRemote:InvokeServer("Pets Lucky", 1) -- Basic Mode
+                hatchRemote:InvokeServer("Pets Lucky", "Common") -- Rarity Mode
+            end)
         end
         
         if isAutolift then
