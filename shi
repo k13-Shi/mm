@@ -1,49 +1,46 @@
 local Titan = Instance.new("ScreenGui")
 local TitanFrame = Instance.new("Frame")
-local UIStroke = Instance.new("UIStroke") -- Border glow
+local UIStroke = Instance.new("UIStroke")
 local UICorner = Instance.new("UICorner")
 local Main = Instance.new("Frame")
 local UIListLayout = Instance.new("UIListLayout")
 local TextLabel = Instance.new("TextLabel")
 local minisizebutton = Instance.new("TextButton")
 
--- Main GUI Settings
-Titan.Name = "K13_Modern"
+Titan.Name = "K13_Pets"
 Titan.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 Titan.ResetOnSpawn = false
 
--- TitanFrame (Modern Glass Style)
+-- TitanFrame (Modern Glass Purple)
 TitanFrame.Name = "TitanFrame"
 TitanFrame.Parent = Titan
 TitanFrame.Active = true
 TitanFrame.Draggable = true
 TitanFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-TitanFrame.BackgroundColor3 = Color3.fromRGB(20, 10, 30) -- Dark Purple Base
+TitanFrame.BackgroundColor3 = Color3.fromRGB(20, 10, 30)
 TitanFrame.BackgroundTransparency = 0.15
 TitanFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-TitanFrame.Size = UDim2.new(0.28, 0, 0.38, 0) -- Compact size
+TitanFrame.Size = UDim2.new(0.28, 0, 0.42, 0) 
 
 UICorner.CornerRadius = UDim.new(0, 12)
 UICorner.Parent = TitanFrame
 
--- Glowing Border
 UIStroke.Parent = TitanFrame
 UIStroke.Thickness = 2
-UIStroke.Color = Color3.fromRGB(150, 0, 255) -- Purple Glow Border
+UIStroke.Color = Color3.fromRGB(150, 0, 255)
 UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
--- Header Text (K13)
 TextLabel.Parent = TitanFrame
 TextLabel.AnchorPoint = Vector2.new(0.5, 0)
 TextLabel.BackgroundTransparency = 1.000
 TextLabel.Position = UDim2.new(0.45, 0, 0.03, 0)
 TextLabel.Size = UDim2.new(0.8, 0, 0.1, 0)
 TextLabel.Font = Enum.Font.GothamBold
-TextLabel.Text = "K13 | PREMIUM HUB"
+TextLabel.Text = "K13 | PETS LUCKY"
 TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextLabel.TextScaled = true
 
--- Glow Effect for K13 Text
+-- Glow Effect for K13
 task.spawn(function()
     while task.wait() do
         local hue = tick() % 4 / 4
@@ -52,44 +49,34 @@ task.spawn(function()
     end
 end)
 
--- Main Container
 Main.Name = "Main"
 Main.Parent = TitanFrame
 Main.BackgroundTransparency = 1
-Main.Position = UDim2.new(0.05, 0, 0.18, 0)
-Main.Size = UDim2.new(0.9, 0, 0.75, 0)
+Main.Position = UDim2.new(0.05, 0, 0.15, 0)
+Main.Size = UDim2.new(0.9, 0, 0.8, 0)
 
 UIListLayout.Parent = Main
-UIListLayout.Padding = UDim.new(0, 6)
+UIListLayout.Padding = UDim.new(0, 5)
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
 -- Mini Button
 minisizebutton.Name = "minisizebutton"
 minisizebutton.Parent = TitanFrame
 minisizebutton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-minisizebutton.BackgroundTransparency = 0.3
 minisizebutton.Position = UDim2.new(0.92, 0, 0.05, 0)
-minisizebutton.Size = UDim2.new(0.06, 0, 0.06, 0)
+minisizebutton.Size = UDim2.new(0.05, 0, 0.05, 0)
 minisizebutton.Text = ""
 Instance.new("UICorner", minisizebutton).CornerRadius = UDim.new(1, 0)
 
--- Function to create Modern Buttons
 local function NewButton(name, text)
     local f = Instance.new("Frame")
     f.Name = name.."_Frame"
     f.Parent = Main
-    f.Size = UDim2.new(1, 0, 0, 32) -- Slimmer buttons
+    f.Size = UDim2.new(1, 0, 0, 28)
     f.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     f.BackgroundTransparency = 0.92
+    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 6)
     
-    local c = Instance.new("UICorner", f)
-    c.CornerRadius = UDim.new(0, 6)
-    
-    local s = Instance.new("UIStroke", f)
-    s.Thickness = 1
-    s.Color = Color3.fromRGB(100, 100, 100)
-    s.Transparency = 0.5
-
     local t = Instance.new("TextLabel", f)
     t.Size = UDim2.new(0.8, 0, 1, 0)
     t.Position = UDim2.new(0.05, 0, 0, 0)
@@ -97,11 +84,11 @@ local function NewButton(name, text)
     t.Text = text
     t.TextColor3 = Color3.fromRGB(220, 220, 220)
     t.Font = Enum.Font.GothamMedium
-    t.TextSize = 14
+    t.TextSize = 12
     t.TextXAlignment = Enum.TextXAlignment.Left
 
     local toggle = Instance.new("Frame", f)
-    toggle.Size = UDim2.new(0, 20, 0, 20)
+    toggle.Size = UDim2.new(0, 18, 0, 18)
     toggle.Position = UDim2.new(0.93, 0, 0.5, 0)
     toggle.AnchorPoint = Vector2.new(0.5, 0.5)
     toggle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -111,7 +98,7 @@ local function NewButton(name, text)
     check.Size = UDim2.new(0, 0, 0, 0)
     check.Position = UDim2.new(0.5, 0, 0.5, 0)
     check.AnchorPoint = Vector2.new(0.5, 0.5)
-    check.BackgroundColor3 = Color3.fromRGB(180, 50, 255) -- Purple Check
+    check.BackgroundColor3 = Color3.fromRGB(180, 50, 255)
     Instance.new("UICorner", check).CornerRadius = UDim.new(0, 3)
 
     local btn = Instance.new("TextButton", f)
@@ -126,13 +113,66 @@ end
 local AutoRebirthButton, succus = NewButton("Rebirth", "Auto Rebirth")
 local automuscleemp, succus_2 = NewButton("Farm", "Fast Auto Farm")
 local autospinbutton, succus_3 = NewButton("Spin", "Auto Spin")
+local autohatch_button, succus_hatch = NewButton("Hatch", "Auto Hatch Pets Lucky")
 local antiafk_button, antiafk_succus = NewButton("AntiAFK", "Anti AFK System")
 local extrascript_button, extrascript_succus = NewButton("Fly", "Active FLY Hack")
 
--- Open/Close Logic
+-- Scripts Logic
+local isAuto, isAutolift, isapin, isHatch, antiAfkEnabled, extraScriptActive = false, false, false, false, false, false
+
+local function animate(check, var)
+    check:TweenSize(var and UDim2.new(0.7, 0, 0.7, 0) or UDim2.new(0, 0, 0, 0), "Out", "Back", 0.2)
+end
+
+AutoRebirthButton.Activated:Connect(function() isAuto = not isAuto animate(succus, isAuto) end)
+automuscleemp.Activated:Connect(function() isAutolift = not isAutolift animate(succus_2, isAutolift) end)
+autospinbutton.Activated:Connect(function() isapin = not isapin animate(succus_3, isapin) end)
+autohatch_button.Activated:Connect(function() isHatch = not isHatch animate(succus_hatch, isHatch) end)
+
+antiafk_button.Activated:Connect(function() 
+    antiAfkEnabled = not antiAfkEnabled
+    animate(antiafk_succus, antiAfkEnabled)
+    if antiAfkEnabled then loadstring(game:HttpGet("https://pastebin.com/raw/r37Ct26d", true))() end
+end)
+
+extrascript_button.Activated:Connect(function() 
+    extraScriptActive = not extraScriptActive
+    animate(extrascript_succus, extraScriptActive)
+    if extraScriptActive then loadstring(game:HttpGet("https://pastebin.com/raw/92uVadU5"))() end
+end)
+
+-- Main Loop
+task.spawn(function()
+    local remotes = game:GetService("ReplicatedStorage").RemotesEvent
+    
+    -- Hanapin ang tamang remote para sa Hatching
+    local hatchRemote = remotes:FindFirstChild("HatchCrystal") or remotes:FindFirstChild("OpenEgg") or remotes:FindFirstChild("HatchEgg")
+    
+    while true do
+        task.wait(0.1)
+        if isAuto then remotes.RebirthEvent:FireServer() end
+        if isapin then remotes.SpinFunction:InvokeServer() end
+        
+        -- Auto Hatch Logic (Pets Lucky)
+        if isHatch and hatchRemote then 
+            hatchRemote:InvokeServer("Pets Lucky", 1) 
+        end
+        
+        if isAutolift then
+            local machineuse = game.Players.LocalPlayer:WaitForChild("Machineuse")
+            if machineuse.Value == nil then
+                remotes.MachineActiveFunction:InvokeServer(game.Workspace.MachinesFolder["Bench Press Muscle Emperor"], true)
+            else
+                remotes.MachineActiveEvent:FireServer()
+            end
+        end
+    end
+end)
+
+-- Open/Close
 local OpenButton = Instance.new("TextButton", Titan)
-OpenButton.Size = UDim2.new(0, 50, 0, 50)
-OpenButton.Position = UDim2.new(0, 20, 0.5, 0)
+OpenButton.Size = UDim2.new(0, 45, 0, 45)
+OpenButton.Position = UDim2.new(0, 10, 0.5, 0)
 OpenButton.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
 OpenButton.Text = "K13"
 OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -140,51 +180,5 @@ OpenButton.Visible = false
 Instance.new("UICorner", OpenButton).CornerRadius = UDim.new(1, 0)
 OpenButton.Draggable = true
 
-minisizebutton.MouseButton1Click:Connect(function()
-    TitanFrame.Visible = false
-    OpenButton.Visible = true
-end)
-
-OpenButton.MouseButton1Click:Connect(function()
-    TitanFrame.Visible = true
-    OpenButton.Visible = false
-end)
-
--- SCRIPT LOGIC (Keep original functions)
-local isAuto, isAutolift, isapin, antiAfkEnabled, extraScriptActive = false, false, false, false, false
-
-local function toggle(btn, check, var)
-    var = not var
-    check:TweenSize(var and UDim2.new(0.7, 0, 0.7, 0) or UDim2.new(0, 0, 0, 0), "Out", "Back", 0.2)
-    return var
-end
-
-AutoRebirthButton.Activated:Connect(function() isAuto = toggle(AutoRebirthButton, succus, isAuto) end)
-automuscleemp.Activated:Connect(function() isAutolift = toggle(automuscleemp, succus_2, isAutolift) end)
-autospinbutton.Activated:Connect(function() isapin = toggle(autospinbutton, succus_3, isapin) end)
-
-antiafk_button.Activated:Connect(function() 
-    antiAfkEnabled = toggle(antiafk_button, antiafk_succus, antiAfkEnabled)
-    if antiAfkEnabled then loadstring(game:HttpGet("https://pastebin.com/raw/r37Ct26d", true))() end
-end)
-
-extrascript_button.Activated:Connect(function() 
-    extraScriptActive = toggle(extrascript_button, extrascript_succus, extraScriptActive)
-    if extraScriptActive then loadstring(game:HttpGet("https://pastebin.com/raw/92uVadU5"))() end
-end)
-
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-        if isapin then game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() end
-        if isAuto then game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end
-        if isAutolift then
-            local machineuse = game.Players.LocalPlayer:WaitForChild("Machineuse")
-            if machineuse.Value == nil then
-                game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(game.Workspace.MachinesFolder["Bench Press Muscle Emperor"], true)
-            else
-                game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
-            end
-        end
-    end
-end)
+minisizebutton.MouseButton1Click:Connect(function() TitanFrame.Visible = false OpenButton.Visible = true end)
+OpenButton.MouseButton1Click:Connect(function() TitanFrame.Visible = true OpenButton.Visible = false end)
