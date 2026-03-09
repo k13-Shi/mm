@@ -9,19 +9,19 @@ local minisizebutton = Instance.new("TextButton")
 local GlowLine = Instance.new("Frame")
 
 -- GUI Settings
-Titan.Name = "K13_Shi | Muscle Masters"
+Titan.Name = "K13_RedPurple"
 Titan.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 Titan.ResetOnSpawn = false
 
--- Main Frame (Deep Black & Purple)
+-- Main Frame (Deep Black)
 TitanFrame.Name = "TitanFrame"
 TitanFrame.Parent = Titan
 TitanFrame.Active = true
 TitanFrame.Draggable = true
 TitanFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-TitanFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 15) -- Halos itim
+TitanFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
 TitanFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-TitanFrame.Size = UDim2.new(0.25, 0, 0.35, 0)
+TitanFrame.Size = UDim2.new(0.28, 0, 0.38, 0)
 
 MainCorner.CornerRadius = UDim.new(0, 10)
 MainCorner.Parent = TitanFrame
@@ -32,39 +32,30 @@ UIStroke.Thickness = 2
 UIStroke.Color = Color3.fromRGB(170, 0, 255) -- Solid Purple
 UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
--- Accent Line
+-- Accent Line (Purple)
 GlowLine.Parent = TitanFrame
 GlowLine.Size = UDim2.new(1, 0, 0, 2)
 GlowLine.Position = UDim2.new(0, 0, 0.12, 0)
-GlowLine.BackgroundColor3 = Color3.fromRGB(170, 0, 255)
+GlowLine.BackgroundColor3 = Color3.fromRGB(170, 0, 255) -- Solid Purple
 GlowLine.BorderSizePixel = 0
 
--- Header Text
+-- Header Text (RED FONT)
 TextLabel.Parent = TitanFrame
 TextLabel.AnchorPoint = Vector2.new(0.5, 0)
 TextLabel.BackgroundTransparency = 1
 TextLabel.Position = UDim2.new(0.4, 0, 0.02, 0)
 TextLabel.Size = UDim2.new(0.7, 0, 0.08, 0)
 TextLabel.Font = Enum.Font.Orbitron
-TextLabel.Text = "K13 V3 | PURPLE"
-TextLabel.TextColor3 = Color3.fromRGB(200, 100, 255) -- Light Purple Text
+TextLabel.Text = "K13 V3 | STEALTH"
+TextLabel.TextColor3 = Color3.fromRGB(255, 50, 50) -- RED Text
 TextLabel.TextScaled = true
 
--- "Breathing" Glow Effect (Purple Only)
+-- Smooth "Breathing" Glow Effect (Purple Only)
 task.spawn(function()
     while task.wait() do
-        for i = 0, 1, 0.02 do
-            local transparency = 0.3 + (i * 0.7)
-            UIStroke.Transparency = transparency
-            GlowLine.BackgroundTransparency = transparency
-            task.wait(0.05)
-        end
-        for i = 1, 0, -0.02 do
-            local transparency = 0.3 + (i * 0.7)
-            UIStroke.Transparency = transparency
-            GlowLine.BackgroundTransparency = transparency
-            task.wait(0.05)
-        end
+        local glow = 0.2 + (math.abs(math.sin(tick() * 2)) * 0.8)
+        UIStroke.Transparency = glow
+        GlowLine.BackgroundTransparency = glow
     end
 end)
 
@@ -73,7 +64,7 @@ Main.Name = "Main"
 Main.Parent = TitanFrame
 Main.BackgroundTransparency = 1
 Main.Position = UDim2.new(0.05, 0, 0.18, 0)
-Main.Size = UDim2.new(0.9, 0, 0.75, 0)
+Main.Size = UDim2.new(0.9, 0, 0.78, 0)
 
 UIListLayout.Parent = Main
 UIListLayout.Padding = UDim.new(0, 8)
@@ -82,7 +73,7 @@ UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 -- Mini Button (Close)
 minisizebutton.Name = "minisizebutton"
 minisizebutton.Parent = TitanFrame
-minisizebutton.BackgroundColor3 = Color3.fromRGB(170, 0, 255)
+minisizebutton.BackgroundColor3 = Color3.fromRGB(170, 0, 255) -- Purple Button
 minisizebutton.BackgroundTransparency = 0.5
 minisizebutton.Position = UDim2.new(0.94, 0, 0.05, 0)
 minisizebutton.Size = UDim2.new(0.04, 0, 0.04, 0)
@@ -94,7 +85,7 @@ local function NewButton(name, text)
     local f = Instance.new("Frame")
     f.Name = name.."_Frame"
     f.Parent = Main
-    f.Size = UDim2.new(1, 0, 0, 30)
+    f.Size = UDim2.new(1, 0, 0, 32)
     f.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
     f.BorderSizePixel = 0
     Instance.new("UICorner", f).CornerRadius = UDim.new(0, 4)
@@ -103,18 +94,19 @@ local function NewButton(name, text)
     s.Thickness = 1
     s.Color = Color3.fromRGB(60, 60, 80)
 
+    -- RED TEXT LABEL
     local t = Instance.new("TextLabel", f)
-    t.Size = UDim2.new(0.8, 0, 1, 0)
-    t.Position = UDim2.new(0.05, 0, 0, 0)
+    t.Size = UDim2.new(0.8, 0, 0.6, 0)
+    t.Position = UDim2.new(0.05, 0, 0.2, 0)
     t.BackgroundTransparency = 1
-    t.Text = text:upper()
-    t.TextColor3 = Color3.fromRGB(180, 180, 180)
-    t.Font = Enum.Font.Code
-    t.TextSize = 13
+    t.Text = text
+    t.TextColor3 = Color3.fromRGB(255, 50, 50) -- RED Text
+    t.Font = Enum.Font.GothamBold
+    t.TextScaled = true 
     t.TextXAlignment = Enum.TextXAlignment.Left
 
     local status = Instance.new("Frame", f)
-    status.Size = UDim2.new(0, 4, 0, 15)
+    status.Size = UDim2.new(0, 4, 0, 16)
     status.Position = UDim2.new(0.95, 0, 0.5, 0)
     status.AnchorPoint = Vector2.new(0.5, 0.5)
     status.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
@@ -128,21 +120,21 @@ local function NewButton(name, text)
     return btn, status, s
 end
 
--- Create Buttons
-local AutoRebirthButton, st1, str1 = NewButton("Rebirth", "Auto Rebirth")
+-- Create Exact Buttons
+local AutoRebirthButton, st1, str1 = NewButton("Rebirth", "Fast Auto Rebirth")
 local automuscleemp, st2, str2 = NewButton("Farm", "Fast Auto Farm")
 local autospinbutton, st3, str3 = NewButton("Spin", "Auto Spin")
-local antiafk_button, st4, str4 = NewButton("AntiAFK", "Anti AFK System")
-local extrascript_button, st5, str5 = NewButton("Fly", "Active FLY Script")
+local antiafk_button, st4, str4 = NewButton("AntiAFK", "Anti AFK")
+local extrascript_button, st5, str5 = NewButton("Fly", "Active Fly")
 
--- Logic
+-- Logic (Turns PURPLE when ON)
 local isAuto, isAutolift, isapin, antiAfkEnabled, extraScriptActive = false, false, false, false, false
 
 local function toggle(var, status, stroke)
     var = not var
     if var then
-        status.BackgroundColor3 = Color3.fromRGB(170, 0, 255)
-        stroke.Color = Color3.fromRGB(170, 0, 255)
+        status.BackgroundColor3 = Color3.fromRGB(170, 0, 255) -- Purple Indicator ON
+        stroke.Color = Color3.fromRGB(170, 0, 255) -- Purple Border ON
     else
         status.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
         stroke.Color = Color3.fromRGB(60, 60, 80)
@@ -180,17 +172,17 @@ task.spawn(function()
     end
 end)
 
--- Open/Close
+-- Open/Close Logic
 local OpenButton = Instance.new("TextButton", Titan)
 OpenButton.Size = UDim2.new(0, 40, 0, 40)
 OpenButton.Position = UDim2.new(0, 15, 0.5, 0)
 OpenButton.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 OpenButton.Text = "K13"
-OpenButton.TextColor3 = Color3.fromRGB(170, 0, 255)
+OpenButton.TextColor3 = Color3.fromRGB(255, 50, 50) -- RED Text
 OpenButton.Font = Enum.Font.Orbitron
 OpenButton.Visible = false
 Instance.new("UICorner", OpenButton).CornerRadius = UDim.new(1, 0)
-Instance.new("UIStroke", OpenButton).Color = Color3.fromRGB(170, 0, 255)
+Instance.new("UIStroke", OpenButton).Color = Color3.fromRGB(170, 0, 255) -- Purple Stroke
 
 minisizebutton.MouseButton1Click:Connect(function() TitanFrame.Visible = false OpenButton.Visible = true end)
 OpenButton.MouseButton1Click:Connect(function() TitanFrame.Visible = true OpenButton.Visible = false end)
