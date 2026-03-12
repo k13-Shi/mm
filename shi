@@ -1,6 +1,6 @@
 --[[
-    K13 PREMIUM HUB - PURPLE GLOW EDITION
-    Tabs: Main, Misc, Settings
+    K13 PREMIUM HUB - VERSION 3 (PURPLE GLOW)
+    Features: Anti-Kick Farm, Auto Hatch Pets, Auto Delete, Anti-AFK
 ]]
 
 local K13_UI = Instance.new("ScreenGui")
@@ -14,75 +14,60 @@ local K13_Tabs = {
 }
 
 -- Setup Root UI
-K13_UI.Name = "K13_Hub_Purple"
+K13_UI.Name = "K13_Hub_V3"
 K13_UI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
 -- Main Window Frame
 K13_MainFrame.Name = "K13_MainFrame"
 K13_MainFrame.Parent = K13_UI
-K13_MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 12) -- Ultra Dark Black-Blue
+K13_MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
 K13_MainFrame.Position = UDim2.new(0.5, -225, 0.5, -140)
-K13_MainFrame.Size = UDim2.new(0, 460, 0, 290)
+K13_MainFrame.Size = UDim2.new(0, 480, 0, 320)
 K13_MainFrame.Active = true
 K13_MainFrame.Draggable = true
+Instance.new("UICorner", K13_MainFrame).CornerRadius = UDim.new(0, 10)
 
-local MainCorner = Instance.new("UICorner", K13_MainFrame)
-MainCorner.CornerRadius = UDim.new(0, 10)
-
--- GLOW EFFECT (Border)
+-- Glowing Border
 local MainGlow = Instance.new("UIStroke", K13_MainFrame)
 MainGlow.Thickness = 2
-MainGlow.Color = Color3.fromRGB(150, 0, 255) -- Purple Glow
+MainGlow.Color = Color3.fromRGB(150, 0, 255)
 MainGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
--- Pulsing Glow Animation
-task.spawn(function()
-    while task.wait(0.05) do
-        local sine = math.abs(math.sin(tick() * 2))
-        MainGlow.Transparency = 0.2 + (sine * 0.4)
-    end
-end)
-
--- Sidebar (Left side)
+-- Sidebar
 K13_Sidebar.Name = "K13_Sidebar"
 K13_Sidebar.Parent = K13_MainFrame
 K13_Sidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 K13_Sidebar.Size = UDim2.new(0, 130, 1, 0)
 Instance.new("UICorner", K13_Sidebar).CornerRadius = UDim.new(0, 10)
 
--- Logo / Title
 local K13_Logo = Instance.new("TextLabel", K13_Sidebar)
-K13_Logo.Text = "K13 HUB"
+K13_Logo.Text = "K13 HUB V3"
 K13_Logo.Size = UDim2.new(1, 0, 0, 50)
 K13_Logo.BackgroundTransparency = 1
-K13_Logo.TextColor3 = Color3.fromRGB(180, 50, 255) -- Purple Text
+K13_Logo.TextColor3 = Color3.fromRGB(180, 50, 255)
 K13_Logo.Font = Enum.Font.GothamBold
 K13_Logo.TextSize = 18
 
--- Content Area (Right side)
+-- Content Area
 K13_Content.Name = "K13_Content"
 K13_Content.Parent = K13_MainFrame
 K13_Content.Position = UDim2.new(0, 140, 0, 10)
 K13_Content.Size = UDim2.new(1, -150, 1, -20)
 K13_Content.BackgroundTransparency = 1
 
--- Tab Setup Logic
 for name, frame in pairs(K13_Tabs) do
-    frame.Name = name.."_Tab"
     frame.Parent = K13_Content
     frame.Size = UDim2.new(1, 0, 1, 0)
     frame.BackgroundTransparency = 1
     frame.Visible = (name == "Main")
-    
     local layout = Instance.new("UIListLayout", frame)
     layout.Padding = UDim.new(0, 8)
 end
 
--- Function to Create Tabs Buttons
+-- Tab Buttons Creator
 local function NewTabButton(name, pos, targetTab)
     local btn = Instance.new("TextButton", K13_Sidebar)
-    btn.Name = name.."_Btn"
     btn.Size = UDim2.new(0.85, 0, 0, 35)
     btn.Position = UDim2.new(0.07, 0, 0, pos)
     btn.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
@@ -91,12 +76,6 @@ local function NewTabButton(name, pos, targetTab)
     btn.Font = Enum.Font.GothamMedium
     btn.TextSize = 14
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-    
-    local stroke = Instance.new("UIStroke", btn)
-    stroke.Thickness = 1
-    stroke.Color = Color3.fromRGB(150, 0, 255)
-    stroke.Transparency = 0.6
-
     btn.MouseButton1Click:Connect(function()
         for _, t in pairs(K13_Tabs) do t.Visible = false end
         targetTab.Visible = true
@@ -107,10 +86,10 @@ NewTabButton("Main", 60, K13_Tabs.Main)
 NewTabButton("Misc", 100, K13_Tabs.Misc)
 NewTabButton("Settings", 140, K13_Tabs.Settings)
 
--- Function to Create K13 Toggles
+-- Toggle Creator
 local function NewToggle(parent, text, callback)
     local frame = Instance.new("Frame", parent)
-    frame.Size = UDim2.new(1, 0, 0, 48)
+    frame.Size = UDim2.new(1, 0, 0, 45)
     frame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
 
@@ -120,70 +99,86 @@ local function NewToggle(parent, text, callback)
     btn.Text = "  " .. text
     btn.TextColor3 = Color3.fromRGB(220, 220, 220)
     btn.Font = Enum.Font.GothamSemibold
-    btn.TextSize = 14
+    btn.TextSize = 13
     btn.TextXAlignment = Enum.TextXAlignment.Left
 
-    local box = Instance.new("Frame", frame)
-    box.Size = UDim2.new(0, 22, 0, 22)
-    box.Position = UDim2.new(0.9, -10, 0.5, -11)
-    box.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 5)
-
-    local boxStroke = Instance.new("UIStroke", box)
-    boxStroke.Color = Color3.fromRGB(150, 0, 255)
-    boxStroke.Thickness = 1
-
-    local inner = Instance.new("Frame", box)
+    local inner = Instance.new("Frame", frame)
     inner.Size = UDim2.new(0, 0, 0, 0)
-    inner.Position = UDim2.new(0.5, 0, 0.5, 0)
+    inner.Position = UDim2.new(0.9, -5, 0.5, 0)
     inner.AnchorPoint = Vector2.new(0.5, 0.5)
-    inner.BackgroundColor3 = Color3.fromRGB(180, 50, 255) -- Purple Accent
+    inner.BackgroundColor3 = Color3.fromRGB(180, 50, 255)
     Instance.new("UICorner", inner).CornerRadius = UDim.new(0, 4)
 
     local state = false
     btn.MouseButton1Click:Connect(function()
         state = not state
-        inner:TweenSize(state and UDim2.new(0.7, 0, 0.7, 0) or UDim2.new(0, 0, 0, 0), "Out", "Back", 0.15)
+        inner:TweenSize(state and UDim2.new(0, 15, 0, 15) or UDim2.new(0, 0, 0, 0), "Out", "Back", 0.1)
         callback(state)
     end)
 end
 
--- Variables para sa logic
-local active = { Farm = false, Rebirth = false, Spin = false }
+-- Logic Variables
+local active = { Farm = false, Rebirth = false, Spin = false, AFK = false, Hatch = false, Delete = false }
 
 --- [ MAIN TAB ] ---
-NewToggle(K13_Tabs.Main, "Auto Strength", function(v) active.Farm = v end)
+NewToggle(K13_Tabs.Main, "Anti-Kick Auto Farm", function(v) active.Farm = v end)
 NewToggle(K13_Tabs.Main, "Auto Rebirth", function(v) active.Rebirth = v end)
 
 --- [ MISC TAB ] ---
-NewToggle(K13_Tabs.Misc, "Auto Spin", function(v) active.Spin = v end)
+NewToggle(K13_Tabs.Misc, "Auto Hatch Mythic", function(v) active.Hatch = v end)
+NewToggle(K13_Tabs.Misc, "Auto Delete (Except Space Dragon)", function(v) active.Delete = v end)
+NewToggle(K13_Tabs.Misc, "Auto Spin Wheels", function(v) active.Spin = v end)
 NewToggle(K13_Tabs.Misc, "Anti-AFK System", function(v) 
+    active.AFK = v
     if v then loadstring(game:HttpGet("https://pastebin.com/raw/r37Ct26d", true))() end
 end)
 
---- [ SETTINGS TAB ] ---
-local DestroyBtn = Instance.new("TextButton", K13_Tabs.Settings)
-DestroyBtn.Size = UDim2.new(1, 0, 0, 40)
-DestroyBtn.BackgroundColor3 = Color3.fromRGB(60, 20, 80) -- Dark Purple
-DestroyBtn.Text = "Close K13 Hub"
-DestroyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", DestroyBtn).CornerRadius = UDim.new(0, 6)
-DestroyBtn.MouseButton1Click:Connect(function() K13_UI:Destroy() end)
-
--- Main Execution Loop
+--- [ LOOP LOGIC ] ---
 task.spawn(function()
-    while task.wait(0.1) do
-        if active.Spin then pcall(function() game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() end) end
-        if active.Rebirth then pcall(function() game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end) end
+    while task.wait(0.2) do -- Dynamic Delay para iwas Kick
         if active.Farm then
             pcall(function()
-                local machineuse = game.Players.LocalPlayer:WaitForChild("Machineuse")
-                if machineuse.Value == nil then
-                    game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(game.Workspace.MachinesFolder["Bench Press Muscle Emperor"], true)
-                else
-                    game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
+                local machine = game.Workspace.MachinesFolder["Bench Press Muscle Emperor"]
+                game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(machine, true)
+                task.wait(0.1) -- Extra delay para sa safety
+                game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
+            end)
+        end
+        if active.Rebirth then 
+            game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() 
+        end
+        if active.Spin then 
+            game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() 
+        end
+    end
+end)
+
+-- Pet Hatching & Deleting Logic
+task.spawn(function()
+    local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
+    while task.wait(0.5) do
+        if active.Hatch then
+            pcall(function() game.ReplicatedStorage.RemotesEvent.OpenPetEvent:FireServer("mythic") end)
+        end
+        if active.Delete then
+            pcall(function()
+                for _, obj in pairs(game.Players.LocalPlayer:GetDescendants()) do
+                    for _, petName in pairs(petKeywords) do
+                        if obj.Name == petName and obj.Name ~= "Space Dragon" then
+                            game.ReplicatedStorage.RemotesEvent.SellPetEvent:FireServer(obj)
+                        end
+                    end
                 end
             end)
         end
     end
 end)
+
+--- [ SETTINGS TAB ] ---
+local CloseBtn = Instance.new("TextButton", K13_Tabs.Settings)
+CloseBtn.Size = UDim2.new(1, 0, 0, 40)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 20, 80)
+CloseBtn.Text = "Destroy K13 UI"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
+CloseBtn.MouseButton1Click:Connect(function() K13_UI:Destroy() end)
