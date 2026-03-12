@@ -1,168 +1,132 @@
-local Titan = Instance.new("ScreenGui")
-local TitanFrame = Instance.new("Frame")
+local NoLimitUI = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local Sidebar = Instance.new("Frame")
+local Container = Instance.new("Frame")
 local UIStroke = Instance.new("UIStroke")
 local UICorner = Instance.new("UICorner")
-local Main = Instance.new("ScrollingFrame") -- Ginawang Scrolling para kasya lahat
-local UIListLayout = Instance.new("UIListLayout")
-local TextLabel = Instance.new("TextLabel")
-local CloseBtn = Instance.new("TextButton")
 
--- GUI Setup
-Titan.Name = "K13_Modern_V2"
-Titan.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-Titan.ResetOnSpawn = false
+-- Setup
+NoLimitUI.Name = "K13 Hubs"
+NoLimitUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Main Frame (Dark Glass Style gaya ng screenshot)
-TitanFrame.Name = "TitanFrame"
-TitanFrame.Parent = Titan
-TitanFrame.Active = true
-TitanFrame.Draggable = true
-TitanFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-TitanFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Deep Black
-TitanFrame.BackgroundTransparency = 0.1
-TitanFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-TitanFrame.Size = UDim2.new(0, 350, 0, 250) -- Sakto lang ang laki
+-- Main Window (Kamukha nung Screenshot)
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = NoLimitUI
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -125)
+MainFrame.Size = UDim2.new(0, 450, 0, 280)
+MainFrame.Active = true
+MainFrame.Draggable = true
 
-UICorner.CornerRadius = UDim.new(0, 10)
-UICorner.Parent = TitanFrame
+local MainCorner = Instance.new("UICorner", MainFrame)
+MainCorner.CornerRadius = UDim.new(0, 8)
 
--- Glowing Border (Purple)
-UIStroke.Parent = TitanFrame
-UIStroke.Thickness = 1.5
-UIStroke.Color = Color3.fromRGB(150, 0, 255)
-UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+-- Sidebar (Left Side)
+Sidebar.Name = "Sidebar"
+Sidebar.Parent = MainFrame
+Sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Sidebar.Size = UDim2.new(0, 120, 1, 0)
 
--- Title
-TextLabel.Parent = TitanFrame
-TextLabel.BackgroundTransparency = 1
-TextLabel.Position = UDim2.new(0.05, 0, 0, 0)
-TextLabel.Size = UDim2.new(0.7, 0, 0.15, 0)
-TextLabel.Font = Enum.Font.GothamBold
-TextLabel.Text = "💪 NOLIMIT | K13 PREMIUM"
-TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextLabel.TextSize = 16
-TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+local SideCorner = Instance.new("UICorner", Sidebar)
+SideCorner.CornerRadius = UDim.new(0, 8)
 
--- Close Button
-CloseBtn.Name = "CloseBtn"
-CloseBtn.Parent = TitanFrame
-CloseBtn.BackgroundTransparency = 1
-CloseBtn.Position = UDim2.new(0.88, 0, 0.02, 0)
-CloseBtn.Size = UDim2.new(0, 30, 0, 30)
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.Text = "X"
-CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
-CloseBtn.TextSize = 18
+-- Header Title
+local Title = Instance.new("TextLabel", Sidebar)
+Title.Text = "💪 NOLIMIT | v2.1"
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
 
--- Scrolling Container para sa Buttons
-Main.Name = "Main"
-Main.Parent = TitanFrame
-Main.BackgroundTransparency = 1
-Main.Position = UDim2.new(0.05, 0, 0.2, 0)
-Main.Size = UDim2.new(0.9, 0, 0.75, 0)
-Main.ScrollBarThickness = 2
-Main.CanvasSize = UDim2.new(0, 0, 1.2, 0)
+-- Button Container (Right Side)
+Container.Name = "Container"
+Container.Parent = MainFrame
+Container.Position = UDim2.new(0, 130, 0, 10)
+Container.Size = UDim2.new(1, -140, 1, -20)
+Container.BackgroundTransparency = 1
 
-UIListLayout.Parent = Main
-UIListLayout.Padding = UDim.new(0, 8)
-UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+local Layout = Instance.new("UIListLayout", Container)
+Layout.Padding = UDim.new(0, 10)
 
--- Function to create Modern Toggle Buttons
-local function NewToggle(name, text)
-    local f = Instance.new("Frame")
-    f.Name = name.."_Frame"
-    f.Parent = Main
-    f.Size = UDim2.new(0.95, 0, 0, 40)
-    f.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    
-    local c = Instance.new("UICorner", f)
-    c.CornerRadius = UDim.new(0, 6)
+-- Function para sa "NoLimit" Style Button/Toggle
+local function CreateToggle(parent, text, defaultVar)
+    local frame = Instance.new("Frame")
+    local btn = Instance.new("TextButton")
+    local check = Instance.new("Frame")
 
-    local t = Instance.new("TextLabel", f)
-    t.Size = UDim2.new(0.7, 0, 1, 0)
-    t.Position = UDim2.new(0.05, 0, 0, 0)
-    t.BackgroundTransparency = 1
-    t.Text = text
-    t.TextColor3 = Color3.fromRGB(230, 230, 230)
-    t.Font = Enum.Font.GothamMedium
-    t.TextSize = 14
-    t.TextXAlignment = Enum.TextXAlignment.Left
+    frame.Size = UDim2.new(1, 0, 0, 45)
+    frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    frame.Parent = parent
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
 
-    local toggleBG = Instance.new("Frame", f)
-    toggleBG.Size = UDim2.new(0, 35, 0, 18)
-    toggleBG.Position = UDim2.new(0.85, 0, 0.5, 0)
-    toggleBG.AnchorPoint = Vector2.new(0.5, 0.5)
-    toggleBG.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    Instance.new("UICorner", toggleBG).CornerRadius = UDim.new(1, 0)
-
-    local dot = Instance.new("Frame", toggleBG)
-    dot.Size = UDim2.new(0, 14, 0, 14)
-    dot.Position = UDim2.new(0.1, 0, 0.5, 0)
-    dot.AnchorPoint = Vector2.new(0, 0.5)
-    dot.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-    Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
-
-    local btn = Instance.new("TextButton", f)
     btn.Size = UDim2.new(1, 0, 1, 0)
     btn.BackgroundTransparency = 1
-    btn.Text = ""
+    btn.Text = "  " .. text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamMedium
+    btn.TextSize = 14
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.Parent = frame
 
-    return btn, dot, toggleBG
+    check.Size = UDim2.new(0, 20, 0, 20)
+    check.Position = UDim2.new(0.9, -10, 0.5, -10)
+    check.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    check.Parent = frame
+    Instance.new("UICorner", check).CornerRadius = UDim.new(0, 4)
+
+    local inner = Instance.new("Frame", check)
+    inner.Size = UDim2.new(0, 0, 0, 0)
+    inner.Position = UDim2.new(0.5, 0, 0.5, 0)
+    inner.AnchorPoint = Vector2.new(0.5, 0.5)
+    inner.BackgroundColor3 = Color3.fromRGB(255, 170, 0) -- Gold/Orange gaya ng NoLimit
+    Instance.new("UICorner", inner).CornerRadius = UDim.new(0, 3)
+
+    return btn, inner
 end
 
--- Create Buttons (Sunod-sunod gaya ng gusto mo)
-local btnFarm, dotFarm, bgFarm = NewToggle("Farm", "Auto Strength (Farm)")
-local btnRebirth, dotRebirth, bgRebirth = NewToggle("Rebirth", "Auto Rebirth")
-local btnFly, dotFly, bgFly = NewToggle("Fly", "Active FLY Hack")
-local btnSpin, dotSpin, bgSpin = NewToggle("Spin", "Auto Spin (Misc)")
-local btnAFK, dotAFK, bgAFK = NewToggle("AFK", "Anti-AFK System (Misc)")
+-- Create the Toggles (Sunod-sunod gaya ng request mo)
+local btnFarm, dotFarm = CreateToggle(Container, "Auto Strength (Farm)")
+local btnRebirth, dotRebirth = CreateToggle(Container, "Auto Rebirth")
+local btnSpin, dotSpin = CreateToggle(Container, "Auto Spin (Misc)")
+local btnAFK, dotAFK = CreateToggle(Container, "Anti-AFK System (Misc)")
 
--- State Variables
-local states = { Farm = false, Rebirth = false, Spin = false, AFK = false, Fly = false }
+-- Logic Variables
+local flags = { Farm = false, Rebirth = false, Spin = false, AFK = false }
 
--- Toggle Animation & Logic
-local function handleToggle(varName, dot, bg)
-    states[varName] = not states[varName]
-    if states[varName] then
-        dot:TweenPosition(UDim2.new(0.55, 0, 0.5, 0), "Out", "Quart", 0.2)
-        bg.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
-    else
-        dot:TweenPosition(UDim2.new(0.1, 0, 0.5, 0), "Out", "Quart", 0.2)
-        bg.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    end
+local function toggleUI(dot, bool)
+    dot:TweenSize(bool and UDim2.new(0.7, 0, 0.7, 0) or UDim2.new(0, 0, 0, 0), "Out", "Back", 0.15)
 end
 
--- Button Events
-btnFarm.Activated:Connect(function() handleToggle("Farm", dotFarm, bgFarm) end)
-btnRebirth.Activated:Connect(function() handleToggle("Rebirth", dotRebirth, bgRebirth) end)
-btnFly.Activated:Connect(function() 
-    handleToggle("Fly", dotFly, bgFly)
-    if states.Fly then loadstring(game:HttpGet("https://pastebin.com/raw/92uVadU5"))() end
-end)
-btnSpin.Activated:Connect(function() handleToggle("Spin", dotSpin, bgSpin) end)
-btnAFK.Activated:Connect(function() 
-    handleToggle("AFK", dotAFK, bgAFK)
-    if states.AFK then loadstring(game:HttpGet("https://pastebin.com/raw/r37Ct26d", true))() end
+-- Button Connections
+btnFarm.MouseButton1Click:Connect(function()
+    flags.Farm = not flags.Farm
+    toggleUI(dotFarm, flags.Farm)
 end)
 
--- Minimize/Close Logic
-CloseBtn.MouseButton1Click:Connect(function() Titan:Destroy() end)
-
--- Rainbow Title Effect
-task.spawn(function()
-    while task.wait() do
-        local hue = tick() % 5 / 5
-        UIStroke.Color = Color3.fromHSV(hue, 0.8, 1)
-    end
+btnRebirth.MouseButton1Click:Connect(function()
+    flags.Rebirth = not flags.Rebirth
+    toggleUI(dotRebirth, flags.Rebirth)
 end)
 
--- Main Loop (Logic)
+btnSpin.MouseButton1Click:Connect(function()
+    flags.Spin = not flags.Spin
+    toggleUI(dotSpin, flags.Spin)
+end)
+
+btnAFK.MouseButton1Click:Connect(function()
+    flags.AFK = not flags.AFK
+    toggleUI(dotAFK, flags.AFK)
+    if flags.AFK then loadstring(game:HttpGet("https://pastebin.com/raw/r37Ct26d", true))() end
+end)
+
+-- Main Loop para sa Farm at Rebirth
 task.spawn(function()
     while true do
         task.wait(0.1)
-        if states.Spin then game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() end
-        if states.Rebirth then game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end
-        if states.Farm then
+        if flags.Spin then game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() end
+        if flags.Rebirth then game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end
+        if flags.Farm then
             local machineuse = game.Players.LocalPlayer:WaitForChild("Machineuse")
             if machineuse.Value == nil then
                 game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(game.Workspace.MachinesFolder["Bench Press Muscle Emperor"], true)
@@ -172,3 +136,12 @@ task.spawn(function()
         end
     end
 end)
+
+-- Close Button (Top Right)
+local Close = Instance.new("TextButton", MainFrame)
+Close.Size = UDim2.new(0, 30, 0, 30)
+Close.Position = UDim2.new(1, -35, 0, 5)
+Close.Text = "X"
+Close.TextColor3 = Color3.fromRGB(150, 150, 150)
+Close.BackgroundTransparency = 1
+Close.MouseButton1Click:Connect(function() NoLimitUI:Destroy() end)
