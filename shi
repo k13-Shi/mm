@@ -1,5 +1,5 @@
 --[[
-    K13 PREMIUM HUB - OFFICIAL UI
+    K13 PREMIUM HUB - PURPLE GLOW EDITION
     Tabs: Main, Misc, Settings
 ]]
 
@@ -14,14 +14,14 @@ local K13_Tabs = {
 }
 
 -- Setup Root UI
-K13_UI.Name = "K13_Hub"
+K13_UI.Name = "K13_Hub_Purple"
 K13_UI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
 -- Main Window Frame
 K13_MainFrame.Name = "K13_MainFrame"
 K13_MainFrame.Parent = K13_UI
-K13_MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Mas madilim na black
+K13_MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 12) -- Ultra Dark Black-Blue
 K13_MainFrame.Position = UDim2.new(0.5, -225, 0.5, -140)
 K13_MainFrame.Size = UDim2.new(0, 460, 0, 290)
 K13_MainFrame.Active = true
@@ -30,10 +30,24 @@ K13_MainFrame.Draggable = true
 local MainCorner = Instance.new("UICorner", K13_MainFrame)
 MainCorner.CornerRadius = UDim.new(0, 10)
 
+-- GLOW EFFECT (Border)
+local MainGlow = Instance.new("UIStroke", K13_MainFrame)
+MainGlow.Thickness = 2
+MainGlow.Color = Color3.fromRGB(150, 0, 255) -- Purple Glow
+MainGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- Pulsing Glow Animation
+task.spawn(function()
+    while task.wait(0.05) do
+        local sine = math.abs(math.sin(tick() * 2))
+        MainGlow.Transparency = 0.2 + (sine * 0.4)
+    end
+end)
+
 -- Sidebar (Left side)
 K13_Sidebar.Name = "K13_Sidebar"
 K13_Sidebar.Parent = K13_MainFrame
-K13_Sidebar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+K13_Sidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 K13_Sidebar.Size = UDim2.new(0, 130, 1, 0)
 Instance.new("UICorner", K13_Sidebar).CornerRadius = UDim.new(0, 10)
 
@@ -42,7 +56,7 @@ local K13_Logo = Instance.new("TextLabel", K13_Sidebar)
 K13_Logo.Text = "K13 HUB"
 K13_Logo.Size = UDim2.new(1, 0, 0, 50)
 K13_Logo.BackgroundTransparency = 1
-K13_Logo.TextColor3 = Color3.fromRGB(255, 180, 0) -- Gold accent
+K13_Logo.TextColor3 = Color3.fromRGB(180, 50, 255) -- Purple Text
 K13_Logo.Font = Enum.Font.GothamBold
 K13_Logo.TextSize = 18
 
@@ -59,7 +73,7 @@ for name, frame in pairs(K13_Tabs) do
     frame.Parent = K13_Content
     frame.Size = UDim2.new(1, 0, 1, 0)
     frame.BackgroundTransparency = 1
-    frame.Visible = (name == "Main") -- Main lang ang visible sa simula
+    frame.Visible = (name == "Main")
     
     local layout = Instance.new("UIListLayout", frame)
     layout.Padding = UDim.new(0, 8)
@@ -71,13 +85,18 @@ local function NewTabButton(name, pos, targetTab)
     btn.Name = name.."_Btn"
     btn.Size = UDim2.new(0.85, 0, 0, 35)
     btn.Position = UDim2.new(0.07, 0, 0, pos)
-    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
     btn.Text = name
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Font = Enum.Font.GothamMedium
     btn.TextSize = 14
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
     
+    local stroke = Instance.new("UIStroke", btn)
+    stroke.Thickness = 1
+    stroke.Color = Color3.fromRGB(150, 0, 255)
+    stroke.Transparency = 0.6
+
     btn.MouseButton1Click:Connect(function()
         for _, t in pairs(K13_Tabs) do t.Visible = false end
         targetTab.Visible = true
@@ -92,7 +111,7 @@ NewTabButton("Settings", 140, K13_Tabs.Settings)
 local function NewToggle(parent, text, callback)
     local frame = Instance.new("Frame", parent)
     frame.Size = UDim2.new(1, 0, 0, 48)
-    frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    frame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
 
     local btn = Instance.new("TextButton", frame)
@@ -107,14 +126,18 @@ local function NewToggle(parent, text, callback)
     local box = Instance.new("Frame", frame)
     box.Size = UDim2.new(0, 22, 0, 22)
     box.Position = UDim2.new(0.9, -10, 0.5, -11)
-    box.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    box.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 5)
+
+    local boxStroke = Instance.new("UIStroke", box)
+    boxStroke.Color = Color3.fromRGB(150, 0, 255)
+    boxStroke.Thickness = 1
 
     local inner = Instance.new("Frame", box)
     inner.Size = UDim2.new(0, 0, 0, 0)
     inner.Position = UDim2.new(0.5, 0, 0.5, 0)
     inner.AnchorPoint = Vector2.new(0.5, 0.5)
-    inner.BackgroundColor3 = Color3.fromRGB(255, 170, 0) -- K13 Gold
+    inner.BackgroundColor3 = Color3.fromRGB(180, 50, 255) -- Purple Accent
     Instance.new("UICorner", inner).CornerRadius = UDim.new(0, 4)
 
     local state = false
@@ -141,7 +164,7 @@ end)
 --- [ SETTINGS TAB ] ---
 local DestroyBtn = Instance.new("TextButton", K13_Tabs.Settings)
 DestroyBtn.Size = UDim2.new(1, 0, 0, 40)
-DestroyBtn.BackgroundColor3 = Color3.fromRGB(80, 20, 20)
+DestroyBtn.BackgroundColor3 = Color3.fromRGB(60, 20, 80) -- Dark Purple
 DestroyBtn.Text = "Close K13 Hub"
 DestroyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 Instance.new("UICorner", DestroyBtn).CornerRadius = UDim.new(0, 6)
