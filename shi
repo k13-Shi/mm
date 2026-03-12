@@ -1,6 +1,6 @@
 --[[
-    K13 PREMIUM HUB - VERSION 3 (PURPLE GLOW MOD)
-    Added: Square Glowing Image GUI
+    K13 PREMIUM HUB - VERSION 3 (PURPLE GLOW)
+    Features: Anti-Kick Farm, Auto Hatch Pets, Auto Delete, Anti-AFK
 ]]
 
 local K13_UI = Instance.new("ScreenGui")
@@ -12,11 +12,6 @@ local K13_Tabs = {
     Misc = Instance.new("Frame"),
     Settings = Instance.new("Frame")
 }
-
--- [ ADDED: SQUARE IMAGE GUI ]
-local K13_SideGUI = Instance.new("Frame")
-local SideGlow = Instance.new("UIStroke")
-local SideImage = Instance.new("ImageLabel")
 
 -- Setup Root UI
 K13_UI.Name = "K13_Hub_V3"
@@ -33,46 +28,11 @@ K13_MainFrame.Active = true
 K13_MainFrame.Draggable = true
 Instance.new("UICorner", K13_MainFrame).CornerRadius = UDim.new(0, 10)
 
--- Glowing Border for Main
+-- Glowing Border
 local MainGlow = Instance.new("UIStroke", K13_MainFrame)
 MainGlow.Thickness = 2
 MainGlow.Color = Color3.fromRGB(150, 0, 255)
 MainGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
--- =====================================================
--- [ GUI ADDED: SQUARE GLOWING IMAGE ]
--- =====================================================
-K13_SideGUI.Name = "K13_SideGUI"
-K13_SideGUI.Parent = K13_UI
-K13_SideGUI.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
-K13_SideGUI.Position = UDim2.new(0.5, -360, 0.5, -140) -- Sa kaliwa ng main frame
-K13_SideGUI.Size = UDim2.new(0, 120, 0, 120) -- Square size
-K13_SideGUI.Active = true
-K13_SideGUI.Draggable = true
-Instance.new("UICorner", K13_SideGUI).CornerRadius = UDim.new(0, 10)
-
-SideGlow.Parent = K13_SideGUI
-SideGlow.Thickness = 3
-SideGlow.Color = Color3.fromRGB(150, 0, 255)
-SideGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-SideImage.Parent = K13_SideGUI
-SideImage.Size = UDim2.new(1, -20, 1, -20)
-SideImage.Position = UDim2.new(0, 10, 0, 10)
-SideImage.BackgroundTransparency = 1
-SideImage.Image = "rbxassetid://13576022378" -- Ilagay mo rito ang Image ID mo
-Instance.new("UICorner", SideImage).CornerRadius = UDim.new(0, 8)
-
--- Animation para sa sabay na glow (Pulsing)
-task.spawn(function()
-    while task.wait(0.05) do
-        local sine = math.abs(math.sin(tick() * 2))
-        local transparency = 0.2 + (sine * 0.5)
-        MainGlow.Transparency = transparency
-        SideGlow.Transparency = transparency
-    end
-end)
--- =====================================================
 
 -- Sidebar
 K13_Sidebar.Name = "K13_Sidebar"
@@ -157,7 +117,7 @@ local function NewToggle(parent, text, callback)
     end)
 end
 
--- Logic Variables (Hindi ginalaw)
+-- Logic Variables
 local active = { Farm = false, Rebirth = false, Spin = false, AFK = false, Hatch = false, Delete = false }
 
 --- [ MAIN TAB ] ---
@@ -175,24 +135,31 @@ end)
 
 --- [ LOOP LOGIC ] ---
 task.spawn(function()
-    while task.wait(0.2) do
+    while task.wait(0.2) do -- Dynamic Delay para iwas Kick
         if active.Farm then
             pcall(function()
                 local machine = game.Workspace.MachinesFolder["Bench Press Muscle Emperor"]
                 game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(machine, true)
-                task.wait(0.1)
+                task.wait(0.1) -- Extra delay para sa safety
                 game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
             end)
         end
-        if active.Rebirth then game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end
-        if active.Spin then game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() end
+        if active.Rebirth then 
+            game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() 
+        end
+        if active.Spin then 
+            game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() 
+        end
     end
 end)
 
+-- Pet Hatching & Deleting Logic
 task.spawn(function()
     local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
     while task.wait(0.5) do
-        if active.Hatch then pcall(function() game.ReplicatedStorage.RemotesEvent.OpenPetEvent:FireServer("mythic") end) end
+        if active.Hatch then
+            pcall(function() game.ReplicatedStorage.RemotesEvent.OpenPetEvent:FireServer("mythic") end)
+        end
         if active.Delete then
             pcall(function()
                 for _, obj in pairs(game.Players.LocalPlayer:GetDescendants()) do
