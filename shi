@@ -2,64 +2,105 @@ local NoLimitUI = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
 local Sidebar = Instance.new("Frame")
 local Container = Instance.new("Frame")
-local UIStroke = Instance.new("UIStroke")
-local UICorner = Instance.new("UICorner")
+local UIListLayout = Instance.new("UIListLayout")
 
 -- Setup
-NoLimitUI.Name = "K13 Hubs"
+NoLimitUI.Name = "NoLimit_V2_Tabbed"
 NoLimitUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+NoLimitUI.ResetOnSpawn = false
 
--- Main Window (Kamukha nung Screenshot)
+-- Main Window
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = NoLimitUI
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -125)
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+MainFrame.Position = UDim2.new(0.5, -225, 0.5, -140)
 MainFrame.Size = UDim2.new(0, 450, 0, 280)
 MainFrame.Active = true
 MainFrame.Draggable = true
 
-local MainCorner = Instance.new("UICorner", MainFrame)
-MainCorner.CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 
--- Sidebar (Left Side)
+-- Sidebar
 Sidebar.Name = "Sidebar"
 Sidebar.Parent = MainFrame
 Sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 Sidebar.Size = UDim2.new(0, 120, 1, 0)
+Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 10)
 
-local SideCorner = Instance.new("UICorner", Sidebar)
-SideCorner.CornerRadius = UDim.new(0, 8)
-
--- Header Title
+-- Sidebar Title
 local Title = Instance.new("TextLabel", Sidebar)
-Title.Text = "💪 NOLIMIT | v2.1"
-Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Text = "💪 NOLIMIT"
+Title.Size = UDim2.new(1, 0, 0, 50)
 Title.BackgroundTransparency = 1
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextColor3 = Color3.fromRGB(255, 170, 0)
 Title.Font = Enum.Font.GothamBold
-Title.TextSize = 14
+Title.TextSize = 16
 
--- Button Container (Right Side)
+-- Tab Container (Right Side)
 Container.Name = "Container"
 Container.Parent = MainFrame
-Container.Position = UDim2.new(0, 130, 0, 10)
-Container.Size = UDim2.new(1, -140, 1, -20)
+Container.Position = UDim2.new(0, 130, 0, 15)
+Container.Size = UDim2.new(1, -145, 1, -30)
 Container.BackgroundTransparency = 1
 
-local Layout = Instance.new("UIListLayout", Container)
-Layout.Padding = UDim.new(0, 10)
+UIListLayout.Parent = Container
+UIListLayout.Padding = UDim.new(0, 8)
 
--- Function para sa "NoLimit" Style Button/Toggle
-local function CreateToggle(parent, text, defaultVar)
-    local frame = Instance.new("Frame")
-    local btn = Instance.new("TextButton")
-    local check = Instance.new("Frame")
+-- Groups (Para sa pag-hide/show ng tabs)
+local MainTab = Instance.new("Frame", Container)
+MainTab.Size = UDim2.new(1, 0, 1, 0)
+MainTab.BackgroundTransparency = 1
 
+local MiscTab = Instance.new("Frame", Container)
+MiscTab.Size = UDim2.new(1, 0, 1, 0)
+MiscTab.BackgroundTransparency = 1
+MiscTab.Visible = false
+
+local SettingTab = Instance.new("Frame", Container)
+SettingTab.Size = UDim2.new(1, 0, 1, 0)
+SettingTab.BackgroundTransparency = 1
+SettingTab.Visible = false
+
+Instance.new("UIListLayout", MainTab).Padding = UDim.new(0, 8)
+Instance.new("UIListLayout", MiscTab).Padding = UDim.new(0, 8)
+Instance.new("UIListLayout", SettingTab).Padding = UDim.new(0, 8)
+
+-- Tab Logic Function
+local function ShowTab(tabToShow)
+    MainTab.Visible = false
+    MiscTab.Visible = false
+    SettingTab.Visible = false
+    tabToShow.Visible = true
+end
+
+-- Sidebar Buttons Creator
+local function CreateTabBtn(name, pos, callback)
+    local btn = Instance.new("TextButton", Sidebar)
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Position = UDim2.new(0.05, 0, 0, pos)
+    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextSize = 13
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    btn.MouseButton1Click:Connect(callback)
+    return btn
+end
+
+-- Sidebar Buttons
+CreateTabBtn("Main", 60, function() ShowTab(MainTab) end)
+CreateTabBtn("Misc", 100, function() ShowTab(MiscTab) end)
+CreateTabBtn("Settings", 140, function() ShowTab(SettingTab) end)
+
+-- Toggle Creator
+local function CreateToggle(parent, text)
+    local frame = Instance.new("Frame", parent)
     frame.Size = UDim2.new(1, 0, 0, 45)
     frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    frame.Parent = parent
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
 
+    local btn = Instance.new("TextButton", frame)
     btn.Size = UDim2.new(1, 0, 1, 0)
     btn.BackgroundTransparency = 1
     btn.Text = "  " .. text
@@ -67,60 +108,47 @@ local function CreateToggle(parent, text, defaultVar)
     btn.Font = Enum.Font.GothamMedium
     btn.TextSize = 14
     btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.Parent = frame
 
+    local check = Instance.new("Frame", frame)
     check.Size = UDim2.new(0, 20, 0, 20)
-    check.Position = UDim2.new(0.9, -10, 0.5, -10)
+    check.Position = UDim2.new(0.95, -25, 0.5, -10)
     check.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    check.Parent = frame
     Instance.new("UICorner", check).CornerRadius = UDim.new(0, 4)
 
     local inner = Instance.new("Frame", check)
     inner.Size = UDim2.new(0, 0, 0, 0)
     inner.Position = UDim2.new(0.5, 0, 0.5, 0)
     inner.AnchorPoint = Vector2.new(0.5, 0.5)
-    inner.BackgroundColor3 = Color3.fromRGB(255, 170, 0) -- Gold/Orange gaya ng NoLimit
+    inner.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
     Instance.new("UICorner", inner).CornerRadius = UDim.new(0, 3)
 
     return btn, inner
 end
 
--- Create the Toggles (Sunod-sunod gaya ng request mo)
-local btnFarm, dotFarm = CreateToggle(Container, "Auto Strength (Farm)")
-local btnRebirth, dotRebirth = CreateToggle(Container, "Auto Rebirth")
-local btnSpin, dotSpin = CreateToggle(Container, "Auto Spin (Misc)")
-local btnAFK, dotAFK = CreateToggle(Container, "Anti-AFK System (Misc)")
+-- Create Toggles
+local btnFarm, dotFarm = CreateToggle(MainTab, "Auto Strength")
+local btnRebirth, dotRebirth = CreateToggle(MainTab, "Auto Rebirth")
 
--- Logic Variables
+local btnSpin, dotSpin = CreateToggle(MiscTab, "Auto Spin")
+local btnAFK, dotAFK = CreateToggle(MiscTab, "Anti-AFK")
+
+-- Logic Flags
 local flags = { Farm = false, Rebirth = false, Spin = false, AFK = false }
 
-local function toggleUI(dot, bool)
-    dot:TweenSize(bool and UDim2.new(0.7, 0, 0.7, 0) or UDim2.new(0, 0, 0, 0), "Out", "Back", 0.15)
+local function toggleAnim(dot, bool)
+    dot:TweenSize(bool and UDim2.new(0.7, 0, 0.7, 0) or UDim2.new(0, 0, 0, 0), "Out", "Back", 0.1)
 end
 
--- Button Connections
-btnFarm.MouseButton1Click:Connect(function()
-    flags.Farm = not flags.Farm
-    toggleUI(dotFarm, flags.Farm)
-end)
-
-btnRebirth.MouseButton1Click:Connect(function()
-    flags.Rebirth = not flags.Rebirth
-    toggleUI(dotRebirth, flags.Rebirth)
-end)
-
-btnSpin.MouseButton1Click:Connect(function()
-    flags.Spin = not flags.Spin
-    toggleUI(dotSpin, flags.Spin)
-end)
-
-btnAFK.MouseButton1Click:Connect(function()
-    flags.AFK = not flags.AFK
-    toggleUI(dotAFK, flags.AFK)
+-- Connections
+btnFarm.MouseButton1Click:Connect(function() flags.Farm = not flags.Farm; toggleAnim(dotFarm, flags.Farm) end)
+btnRebirth.MouseButton1Click:Connect(function() flags.Rebirth = not flags.Rebirth; toggleAnim(dotRebirth, flags.Rebirth) end)
+btnSpin.MouseButton1Click:Connect(function() flags.Spin = not flags.Spin; toggleAnim(dotSpin, flags.Spin) end)
+btnAFK.MouseButton1Click:Connect(function() 
+    flags.AFK = not flags.AFK; toggleAnim(dotAFK, flags.AFK)
     if flags.AFK then loadstring(game:HttpGet("https://pastebin.com/raw/r37Ct26d", true))() end
 end)
 
--- Main Loop para sa Farm at Rebirth
+-- Main Loop Logic
 task.spawn(function()
     while true do
         task.wait(0.1)
@@ -137,11 +165,11 @@ task.spawn(function()
     end
 end)
 
--- Close Button (Top Right)
-local Close = Instance.new("TextButton", MainFrame)
-Close.Size = UDim2.new(0, 30, 0, 30)
-Close.Position = UDim2.new(1, -35, 0, 5)
-Close.Text = "X"
-Close.TextColor3 = Color3.fromRGB(150, 150, 150)
-Close.BackgroundTransparency = 1
-Close.MouseButton1Click:Connect(function() NoLimitUI:Destroy() end)
+-- Settings: Close UI Button
+local closeUIBtn = Instance.new("TextButton", SettingTab)
+closeUIBtn.Size = UDim2.new(1, 0, 0, 40)
+closeUIBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+closeUIBtn.Text = "Destroy UI"
+closeUIBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", closeUIBtn).CornerRadius = UDim.new(0, 6)
+closeUIBtn.MouseButton1Click:Connect(function() NoLimitUI:Destroy() end)
