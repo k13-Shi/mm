@@ -8,7 +8,7 @@ local K13_Tabs = {
     Settings = Instance.new("Frame")
 }
 
-K13_UI.Name = "K13_Hub_V3"
+K13_UI.Name = "K13 | By Shi"
 K13_UI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -27,10 +27,8 @@ ToggleButton.Font = Enum.Font.GothamBold
 ToggleButton.TextSize = 16
 ToggleButton.Active = true
 ToggleButton.Draggable = true
-
 ButtonCorner.CornerRadius = UDim.new(1, 0)
 ButtonCorner.Parent = ToggleButton
-
 ButtonGlow.Parent = ToggleButton
 ButtonGlow.Thickness = 2.5
 ButtonGlow.Color = Color3.fromRGB(150, 0, 255)
@@ -92,7 +90,6 @@ local function NewTabButton(name, pos, targetTab)
     btn.Font = Enum.Font.GothamMedium
     btn.TextSize = 14
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-    
     btn.MouseButton1Click:Connect(function()
         for _, t in pairs(K13_Tabs) do t.Visible = false end
         targetTab.Visible = true
@@ -114,17 +111,20 @@ local function NewToggle(parent, text, callback)
     btn.TextSize = 13
     btn.TextXAlignment = Enum.TextXAlignment.Left
 
-    local inner = Instance.new("Frame", frame)
-    inner.Size = UDim2.new(0, 0, 0, 0)
-    inner.Position = UDim2.new(0.9, -5, 0.5, 0)
-    inner.AnchorPoint = Vector2.new(0.5, 0.5)
-    inner.BackgroundColor3 = Color3.fromRGB(180, 50, 255)
-    Instance.new("UICorner", inner).CornerRadius = UDim.new(0, 4)
+    local statusLab = Instance.new("TextLabel", frame)
+    statusLab.Size = UDim2.new(0, 50, 1, 0)
+    statusLab.Position = UDim2.new(1, -60, 0, 0)
+    statusLab.BackgroundTransparency = 1
+    statusLab.Text = "OFF"
+    statusLab.TextColor3 = Color3.fromRGB(255, 0, 0)
+    statusLab.Font = Enum.Font.GothamBold
+    statusLab.TextSize = 12
 
     local state = false
     btn.MouseButton1Click:Connect(function()
         state = not state
-        inner:TweenSize(state and UDim2.new(0, 15, 0, 15) or UDim2.new(0, 0, 0, 0), "Out", "Back", 0.1)
+        statusLab.Text = state and "ON" or "OFF"
+        statusLab.TextColor3 = state and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
         callback(state)
     end)
 end
@@ -135,12 +135,12 @@ NewTabButton("Settings", 140, K13_Tabs.Settings)
 
 local active = { Farm = false, Rebirth = false, Spin = false, AFK = false, Hatch = false, Delete = false }
 
-NewToggle(K13_Tabs.Main, "Anti-Kick Auto Farm", function(v) active.Farm = v end)
+NewToggle(K13_Tabs.Main, "Emperor King Auto Farm", function(v) active.Farm = v end)
 NewToggle(K13_Tabs.Main, "Auto Rebirth", function(v) active.Rebirth = v end)
 NewToggle(K13_Tabs.Misc, "Auto Hatch Mythic", function(v) active.Hatch = v end)
 NewToggle(K13_Tabs.Misc, "Auto Delete Pets", function(v) active.Delete = v end)
 NewToggle(K13_Tabs.Misc, "Auto Spin Wheels", function(v) active.Spin = v end)
-NewToggle(K13_Tabs.Misc, "K13 Glowing Anti-AFK", function(v) active.AFK = v end)
+NewToggle(K13_Tabs.Misc, "K13 Anti-AFK", function(v) active.AFK = v end)
 
 local VirtualUser = game:GetService("VirtualUser")
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -151,13 +151,18 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
 end)
 
 task.spawn(function()
-    while task.wait(0.2) do
+    while task.wait(0.5) do
         if active.Farm then
             pcall(function()
+                local player = game.Players.LocalPlayer
                 local machine = game.Workspace.MachinesFolder["Bench Press Muscle Emperor"]
-                game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(machine, true)
-                task.wait(0.1)
-                game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
+                if machine and machine:FindFirstChild("TouchPart") then
+                    -- Safe TP to Machine
+                    player.Character.HumanoidRootPart.CFrame = machine.TouchPart.CFrame * CFrame.new(0, 3, 0)
+                    task.wait(0.2)
+                    game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(machine, true)
+                    game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
+                end
             end)
         end
         if active.Rebirth then game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end
@@ -167,7 +172,7 @@ end)
 
 task.spawn(function()
     local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
-    while task.wait(0.5) do
+    while task.wait(0.8) do
         if active.Hatch then
             pcall(function() game.ReplicatedStorage.RemotesEvent.OpenPetEvent:FireServer("mythic") end)
         end
