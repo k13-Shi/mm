@@ -12,26 +12,20 @@ local K13_Tabs = {
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 local LP = Players.LocalPlayer
-
-if ReplicatedStorage:FindFirstChild("Assests") and ReplicatedStorage.Assests:FindFirstChild("Devices") then
-    local pcAsset = ReplicatedStorage.Assests.Devices:FindFirstChild("PC")
-    if pcAsset then pcAsset:Clone().Parent = LP end
-end
-
-local oldNamecall
-oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-    local method = getnamecallmethod()
-    if (self == ReplicatedStorage:FindFirstChild("kickRemote") or self == ReplicatedStorage:FindFirstChild("globalMessage")) and method == "FireServer" then
-        return nil 
-    end
-    return oldNamecall(self, ...)
-end)
 
 K13_UI.Name = "K13_Hub_V3"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
+
+K13_MainFrame.Name = "K13_MainFrame"
+K13_MainFrame.Parent = K13_UI
+K13_MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
+K13_MainFrame.Position = UDim2.new(0.5, -225, 0.5, -140)
+K13_MainFrame.Size = UDim2.new(0, 480, 0, 320)
+K13_MainFrame.Active = true
+K13_MainFrame.Draggable = true
+Instance.new("UICorner", K13_MainFrame).CornerRadius = UDim.new(0, 10)
 
 local ToggleButton = Instance.new("TextButton", K13_UI)
 ToggleButton.Size = UDim2.new(0, 55, 0, 55)
@@ -40,19 +34,7 @@ ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 ToggleButton.Text = "K13"
 ToggleButton.TextColor3 = Color3.fromRGB(180, 50, 255)
 ToggleButton.Font = Enum.Font.GothamBold
-ToggleButton.Active = true
-ToggleButton.Draggable = true
 Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(1, 0)
-
-K13_MainFrame.Name = "K13_MainFrame"
-K13_MainFrame.Parent = K13_UI
-K13_MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
-K13_MainFrame.Position = UDim2.new(0.5, -225, 0.5, -140)
-K13_MainFrame.Size = UDim2.new(0, 480, 0, 320)
-K13_MainFrame.Visible = true
-K13_MainFrame.Active = true
-K13_MainFrame.Draggable = true
-Instance.new("UICorner", K13_MainFrame).CornerRadius = UDim.new(0, 10)
 
 ToggleButton.MouseButton1Click:Connect(function()
     K13_MainFrame.Visible = not K13_MainFrame.Visible
@@ -70,18 +52,6 @@ K13_Content.Position = UDim2.new(0, 140, 0, 10)
 K13_Content.Size = UDim2.new(1, -150, 1, -20)
 K13_Content.BackgroundTransparency = 1
 
-local tabOrder = {"Main", "Kills", "Misc", "Settings"}
-for _, name in pairs(tabOrder) do
-    local frame = K13_Tabs[name]
-    frame.Parent = K13_Content
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundTransparency = 1
-    frame.Visible = (name == "Main")
-    local l = Instance.new("UIListLayout", frame)
-    l.Padding = UDim.new(0, 8)
-    l.HorizontalAlignment = Enum.HorizontalAlignment.Center
-end
-
 local function NewTabButton(name, pos, targetTab)
     local btn = Instance.new("TextButton", K13_Sidebar)
     btn.Size = UDim2.new(0.85, 0, 0, 35)
@@ -95,6 +65,16 @@ local function NewTabButton(name, pos, targetTab)
         for _, t in pairs(K13_Tabs) do t.Visible = false end
         targetTab.Visible = true
     end)
+end
+
+for name, frame in pairs(K13_Tabs) do
+    frame.Parent = K13_Content
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundTransparency = 1
+    frame.Visible = (name == "Main")
+    local l = Instance.new("UIListLayout", frame)
+    l.Padding = UDim.new(0, 8)
+    l.HorizontalAlignment = Enum.HorizontalAlignment.Center
 end
 
 local function NewToggle(parent, text, callback)
@@ -150,7 +130,7 @@ local function NewDropdown(parent, text, callback)
                 local pBtn = Instance.new("TextButton", scroller)
                 pBtn.Size = UDim2.new(1, 0, 0, 25)
                 pBtn.Text = p.Name
-                pBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+                pBtn.BackgroundTransparency = 1
                 pBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
                 pBtn.ZIndex = 11
                 pBtn.MouseButton1Click:Connect(function()
@@ -220,24 +200,41 @@ NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) active.AFK = v end)
 NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) active.InfJump = v end)
 NewSlider(K13_Tabs.Settings, "WalkSpeed", 16, 250, function(v) if LP.Character:FindFirstChild("Humanoid") then LP.Character.Humanoid.WalkSpeed = v end end)
 
-RunService.RenderStepped:Connect(function()
-    if active.View and viewTarget and viewTarget.Character and viewTarget.Character:FindFirstChild("Humanoid") then
-        workspace.CurrentCamera.CameraSubject = viewTarget.Character.Humanoid
-    elseif LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        workspace.CurrentCamera.CameraSubject = LP.Character.Humanoid
-    end
-    if active.KillAll then
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                if (LP.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude < 25 then
+local CloseBtn = Instance.new("TextButton", K13_Tabs.Settings)
+CloseBtn.Size = UDim2.new(1, 0, 0, 40)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 20, 80)
+CloseBtn.Text = "Destroy K13 UI"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.Font = Enum.Font.GothamBold
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
+CloseBtn.MouseButton1Click:Connect(function() K13_UI:Destroy() end)
+
+task.spawn(function()
+    while task.wait(0.1) do
+        if active.KillAll then
+            pcall(function()
+                for _, p in pairs(Players:GetPlayers()) do
+                    if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                        if (LP.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude < 25 then
+                            ReplicatedStorage.RemotesEvent.PunchEvent:FireServer()
+                        end
+                    end
+                end
+            end)
+        end
+        if active.TargetKill and targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            pcall(function()
+                if (LP.Character.HumanoidRootPart.Position - targetPlayer.Character.HumanoidRootPart.Position).Magnitude < 25 then
                     ReplicatedStorage.RemotesEvent.PunchEvent:FireServer()
                 end
-            end
+            end)
         end
-    end
-    if active.TargetKill and targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        if (LP.Character.HumanoidRootPart.Position - targetPlayer.Character.HumanoidRootPart.Position).Magnitude < 25 then
-            ReplicatedStorage.RemotesEvent.PunchEvent:FireServer()
+        if active.View and viewTarget and viewTarget.Character and viewTarget.Character:FindFirstChild("Humanoid") then
+            workspace.CurrentCamera.CameraSubject = viewTarget.Character.Humanoid
+        else
+            if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+                workspace.CurrentCamera.CameraSubject = LP.Character.Humanoid
+            end
         end
     end
 end)
@@ -271,18 +268,9 @@ UIS.JumpRequest:Connect(function()
     end
 end)
 
-local VU = game:GetService("VirtualUser")
 LP.Idled:Connect(function()
     if active.AFK then
-        VU:CaptureController()
-        VU:ClickButton2(Vector2.new())
+        game:GetService("VirtualUser"):CaptureController()
+        game:GetService("VirtualUser"):ClickButton2(Vector2.new())
     end
 end)
-
-local CloseBtn = Instance.new("TextButton", K13_Tabs.Settings)
-CloseBtn.Size = UDim2.new(1, 0, 0, 40)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 20, 80)
-CloseBtn.Text = "Destroy K13 UI"
-CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
-CloseBtn.MouseButton1Click:Connect(function() K13_UI:Destroy() end)
