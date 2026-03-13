@@ -135,12 +135,12 @@ NewTabButton("Settings", 140, K13_Tabs.Settings)
 
 local active = { Farm = false, Rebirth = false, Spin = false, AFK = false, Hatch = false, Delete = false }
 
-NewToggle(K13_Tabs.Main, "Emperor King Auto Farm", function(v) active.Farm = v end)
-NewToggle(K13_Tabs.Main, "Auto Rebirth", function(v) active.Rebirth = v end)
+NewToggle(K13_Tabs.Main, "Fast Farm", function(v) active.Farm = v end)
+NewToggle(K13_Tabs.Main, "Fast Rebirth", function(v) active.Rebirth = v end)
 NewToggle(K13_Tabs.Misc, "Auto Hatch Mythic", function(v) active.Hatch = v end)
 NewToggle(K13_Tabs.Misc, "Auto Delete Pets", function(v) active.Delete = v end)
-NewToggle(K13_Tabs.Misc, "Auto Spin Wheels", function(v) active.Spin = v end)
-NewToggle(K13_Tabs.Misc, "K13 Anti-AFK", function(v) active.AFK = v end)
+NewToggle(K13_Tabs.Misc, "Auto Spin", function(v) active.Spin = v end)
+NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) active.AFK = v end)
 
 local VirtualUser = game:GetService("VirtualUser")
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -150,34 +150,21 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
     end
 end)
 
--- Fixed Auto Farm Logic
 task.spawn(function()
-    while true do
-        task.wait(0.8) -- Slow down para iwas kick
+    while task.wait(1) do
         if active.Farm then
             pcall(function()
                 local player = game.Players.LocalPlayer
                 local machine = game.Workspace.MachinesFolder["Bench Press Muscle Emperor"]
-                
-                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    -- Isa lang na TP para hindi mag-lag ang server detection
-                    if (player.Character.HumanoidRootPart.Position - machine.TouchPart.Position).Magnitude > 10 then
-                        player.Character.HumanoidRootPart.CFrame = machine.TouchPart.CFrame * CFrame.new(0, 3, 0)
-                        task.wait(0.5) -- Wait bago mag-click
-                    end
-                    
-                    -- Remote Call
+                if machine and machine:FindFirstChild("TouchPart") then
+                    -- Safe TP to Machine
+                    player.Character.HumanoidRootPart.CFrame = machine.TouchPart.CFrame * CFrame.new(0, 3, 0)
+                    task.wait(0.5)
                     game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(machine, true)
-                    task.wait(0.1)
                     game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
                 end
             end)
         end
-    end
-end)
-
-task.spawn(function()
-    while task.wait(0.5) do
         if active.Rebirth then game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end
         if active.Spin then game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() end
     end
@@ -185,7 +172,7 @@ end)
 
 task.spawn(function()
     local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
-    while task.wait(1.5) do
+    while task.wait(0.8) do
         if active.Hatch then
             pcall(function() game.ReplicatedStorage.RemotesEvent.OpenPetEvent:FireServer("mythic") end)
         end
