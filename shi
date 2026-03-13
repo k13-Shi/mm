@@ -49,7 +49,7 @@ mt.__namecall = newcclosure(function(self, ...)
 end)
 setreadonly(mt, true)
 
-K13_UI.Name = "K13_Hub_Ishi_V9"
+K13_UI.Name = "K13_Hub_Ishi_V10"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -164,7 +164,7 @@ NewTabBtn("Eggs", 45, K13_Tabs.Eggs)
 NewTabBtn("Misc", 80, K13_Tabs.Misc)
 NewTabBtn("Settings", 115, K13_Tabs.Settings)
 
-NewToggle(K13_Tabs.Main, "Fast Farm (All Machines)", function(v) flg.Farm = v end, 1)
+NewToggle(K13_Tabs.Main, "Fast Farm (Auto-TP Machines)", function(v) flg.Farm = v end, 1)
 NewToggle(K13_Tabs.Main, "Fast Rebirth (0.1s)", function(v) flg.Reb = v end, 2)
 NewToggle(K13_Tabs.Main, "Fast Glitch (Rock/Bench)", function(v) flg.Glitch = v end, 3)
 
@@ -172,7 +172,7 @@ NewInput(K13_Tabs.Eggs, "mythic", function(v) flg.EggNm = v end, 1)
 NewToggle(K13_Tabs.Eggs, "Auto Hatch (Skip Anim)", function(v) flg.Hatch = v end, 2)
 NewToggle(K13_Tabs.Eggs, "Auto Sell (Ishi Logic)", function(v) flg.DelAll = v end, 3)
 
-NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate", function(v) flg.Choc = v end, 1)
+NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate (Per Sec)", function(v) flg.Choc = v end, 1)
 NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) flg.AFK = v end, 2)
 
 NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) flg.Jump = v end, 1)
@@ -205,9 +205,10 @@ task.spawn(function()
         if flg.Glitch then
             pcall(function()
                 local r = workspace.MachinesFolder:FindFirstChild("Rock Squat Muscle Emperor") or workspace.MachinesFolder:FindFirstChild("Bench Press Muscle Emperor")
-                if r then
+                if r and LP.Character:FindFirstChild("HumanoidRootPart") then
+                    LP.Character.HumanoidRootPart.CFrame = r.InteractionPart.CFrame
                     RemotesEvent.MachineActiveFunction:InvokeServer(r, true)
-                    for i = 1, 10 do RemotesEvent.MachineActiveEvent:FireServer() end
+                    for i = 1, 15 do RemotesEvent.MachineActiveEvent:FireServer() end
                 end
             end)
         end
@@ -238,7 +239,9 @@ task.spawn(function()
         if flg.Choc then
             pcall(function()
                 local g = LP.PlayerGui:FindFirstChild("chocolateframe")
-                if g then firesignal(g.Chocolate.upground.clickbutton.MouseButton1Click) end
+                if g then 
+                    firesignal(g.Chocolate.upground.clickbutton.MouseButton1Click) 
+                end
             end)
         end
     end
