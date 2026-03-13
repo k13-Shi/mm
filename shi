@@ -20,9 +20,14 @@ local RemotesEvent = ReplicatedStorage:WaitForChild("RemotesEvent")
 local OpenPetEvent = RemotesEvent:WaitForChild("OpenPetEvent")
 local SellPetEvent = RemotesEvent:WaitForChild("SellPetEvent")
 
-local flg = { Farm = false, Reb = false, Choc = false, AFK = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false }
+local flg = { Farm = false, Reb = false, Choc = false, AFK = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false, Glitch = false }
 local KEEP_PET = "Space Dragon"
 local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
+local machines = {
+    "Bench Press Muscle Emperor", "Squat Muscle Emperor", "Pull Ups Muscle Emperor", 
+    "Treadmill Muscle Emperor", "Rock Squat Muscle Emperor", "Push Ups Muscle Emperor",
+    "Bench Press", "Squat", "Pull Ups", "Treadmill", "Push Ups", "Chin Ups", "Stone Squat"
+}
 
 local mt = getrawmetatable(game)
 local oldNamecall = mt.__namecall
@@ -44,7 +49,7 @@ mt.__namecall = newcclosure(function(self, ...)
 end)
 setreadonly(mt, true)
 
-K13_UI.Name = "K13_Hub_Ishi_V7"
+K13_UI.Name = "K13_Hub_Ishi_V9"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -159,12 +164,13 @@ NewTabBtn("Eggs", 45, K13_Tabs.Eggs)
 NewTabBtn("Misc", 80, K13_Tabs.Misc)
 NewTabBtn("Settings", 115, K13_Tabs.Settings)
 
-NewToggle(K13_Tabs.Main, "Fast Farm (Emperor King)", function(v) flg.Farm = v end, 1)
+NewToggle(K13_Tabs.Main, "Fast Farm (All Machines)", function(v) flg.Farm = v end, 1)
 NewToggle(K13_Tabs.Main, "Fast Rebirth (0.1s)", function(v) flg.Reb = v end, 2)
+NewToggle(K13_Tabs.Main, "Fast Glitch (Rock/Bench)", function(v) flg.Glitch = v end, 3)
 
 NewInput(K13_Tabs.Eggs, "mythic", function(v) flg.EggNm = v end, 1)
 NewToggle(K13_Tabs.Eggs, "Auto Hatch (Skip Anim)", function(v) flg.Hatch = v end, 2)
-NewToggle(K13_Tabs.Eggs, "Auto Sell All Pets", function(v) flg.DelAll = v end, 3)
+NewToggle(K13_Tabs.Eggs, "Auto Sell (Ishi Logic)", function(v) flg.DelAll = v end, 3)
 
 NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate", function(v) flg.Choc = v end, 1)
 NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) flg.AFK = v end, 2)
@@ -177,6 +183,7 @@ CloseBtn.Size = UDim2.new(1, 0, 0, 35)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(110, 25, 160)
 CloseBtn.Text = "Destroy UI"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.LayoutOrder = 999
 Instance.new("UICorner", CloseBtn)
 CloseBtn.MouseButton1Click:Connect(function() K13_UI:Destroy() end)
@@ -185,11 +192,22 @@ task.spawn(function()
     while task.wait() do
         if flg.Farm then
             pcall(function()
-                local m = workspace.MachinesFolder:FindFirstChild("Bench Press Muscle Emperor")
-                if m then
-                    LP.Character.HumanoidRootPart.CFrame = m.InteractionPart.CFrame
-                    ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(m, true)
-                    ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
+                for _, name in pairs(machines) do
+                    local m = workspace.MachinesFolder:FindFirstChild(name)
+                    if m and LP.Character:FindFirstChild("HumanoidRootPart") then
+                        LP.Character.HumanoidRootPart.CFrame = m.InteractionPart.CFrame
+                        RemotesEvent.MachineActiveFunction:InvokeServer(m, true)
+                        RemotesEvent.MachineActiveEvent:FireServer()
+                    end
+                end
+            end)
+        end
+        if flg.Glitch then
+            pcall(function()
+                local r = workspace.MachinesFolder:FindFirstChild("Rock Squat Muscle Emperor") or workspace.MachinesFolder:FindFirstChild("Bench Press Muscle Emperor")
+                if r then
+                    RemotesEvent.MachineActiveFunction:InvokeServer(r, true)
+                    for i = 1, 10 do RemotesEvent.MachineActiveEvent:FireServer() end
                 end
             end)
         end
@@ -199,12 +217,11 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-    while task.wait(0.2) do
+    while task.wait(0.3) do
         if flg.Hatch then pcall(function() OpenPetEvent:FireServer(flg.EggNm) end) end
         if flg.DelAll then
             pcall(function()
-                local char = LP.Character or LP.CharacterAdded:Wait()
-                for _, obj in pairs(char:GetDescendants()) do
+                for _, obj in pairs(LP.Character:GetDescendants()) do
                     for _, petName in pairs(petKeywords) do
                         if obj.Name == petName and obj.Name ~= KEEP_PET then
                             SellPetEvent:FireServer(obj)
