@@ -13,14 +13,41 @@ local K13_Tabs = {
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 local LP = Players.LocalPlayer
 
-K13_UI.Name = "K13_Hub_Ishi_Final_V4"
+local RemotesEvent = ReplicatedStorage:WaitForChild("RemotesEvent")
+local OpenPetEvent = RemotesEvent:WaitForChild("OpenPetEvent")
+local SellPetEvent = RemotesEvent:WaitForChild("SellPetEvent")
+
+local flg = { Farm = false, Reb = false, Choc = false, AFK = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false }
+local KEEP_PET = "Space Dragon"
+local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
+
+local mt = getrawmetatable(game)
+local oldNamecall = mt.__namecall
+setreadonly(mt, false)
+mt.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    if method == "Create" and self == TweenService then
+        local args = {...}
+        local obj = args[1]
+        if obj then
+            local ok, name = pcall(function() return obj.Name:lower() end)
+            if ok and (name:find("pet") or name:find("open") or name:find("reveal")) then
+                local be = Instance.new("BindableEvent")
+                return {Play = function() be:Fire() end, Cancel = function() end, Pause = function() end, Completed = be.Event}
+            end
+        end
+    end
+    return oldNamecall(self, ...)
+end)
+setreadonly(mt, true)
+
+K13_UI.Name = "K13_Hub_Ishi_V7"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
--- Main Frame
-K13_MainFrame.Name = "K13_MainFrame"
 K13_MainFrame.Parent = K13_UI
 K13_MainFrame.BackgroundColor3 = Color3.fromRGB(12, 6, 22)
 K13_MainFrame.Position = UDim2.new(0.5, -225, 0.5, -140)
@@ -32,7 +59,6 @@ local MainGlow = Instance.new("UIStroke", K13_MainFrame)
 MainGlow.Color = Color3.fromRGB(180, 50, 255)
 MainGlow.Thickness = 3
 
--- Title
 K13_Title.Parent = K13_MainFrame
 K13_Title.Size = UDim2.new(1, 0, 0, 45)
 K13_Title.BackgroundTransparency = 1
@@ -41,7 +67,6 @@ K13_Title.TextColor3 = Color3.fromRGB(220, 100, 255)
 K13_Title.Font = Enum.Font.GothamBold
 K13_Title.TextSize = 18
 
--- Floating Toggle
 local ToggleButton = Instance.new("TextButton", K13_UI)
 ToggleButton.Size = UDim2.new(0, 60, 0, 60)
 ToggleButton.Position = UDim2.new(0, 20, 0.5, -30)
@@ -56,7 +81,6 @@ ToggleButton.MouseButton1Click:Connect(function()
     K13_MainFrame.Visible = not K13_MainFrame.Visible
 end)
 
--- Sidebar
 K13_Sidebar.Parent = K13_MainFrame
 K13_Sidebar.BackgroundColor3 = Color3.fromRGB(20, 10, 40)
 K13_Sidebar.Position = UDim2.new(0, 12, 0, 55)
@@ -64,7 +88,6 @@ K13_Sidebar.Size = UDim2.new(0, 125, 1, -70)
 Instance.new("UICorner", K13_Sidebar)
 Instance.new("UIStroke", K13_Sidebar).Color = Color3.fromRGB(180, 50, 255)
 
--- Content
 K13_Content.Parent = K13_MainFrame
 K13_Content.Position = UDim2.new(0, 145, 0, 55)
 K13_Content.Size = UDim2.new(1, -160, 1, -70)
@@ -91,13 +114,13 @@ for name, frame in pairs(K13_Tabs) do
     frame.BackgroundTransparency = 1
     frame.Visible = (name == "Main")
     local l = Instance.new("UIListLayout", frame)
-    l.Padding = UDim.new(0, 8)
-    l.SortOrder = Enum.SortOrder.LayoutOrder -- Para sunod-sunod
+    l.Padding = UDim.new(0, 5)
+    l.SortOrder = Enum.SortOrder.LayoutOrder
 end
 
 local function NewToggle(p, t, c, lo)
     local f = Instance.new("Frame", p)
-    f.Size = UDim2.new(1, 0, 0, 35)
+    f.Size = UDim2.new(1, 0, 0, 30)
     f.BackgroundColor3 = Color3.fromRGB(30, 15, 55)
     f.LayoutOrder = lo or 0
     Instance.new("UICorner", f)
@@ -111,14 +134,14 @@ local function NewToggle(p, t, c, lo)
     local on = false
     b.MouseButton1Click:Connect(function()
         on = not on
-        f.BackgroundColor3 = on and Color3.fromRGB(70, 30, 120) or Color3.fromRGB(30, 15, 55)
+        f.BackgroundColor3 = on and Color3.fromRGB(80, 40, 150) or Color3.fromRGB(30, 15, 55)
         c(on)
     end)
 end
 
 local function NewInput(p, t, c, lo)
     local f = Instance.new("Frame", p)
-    f.Size = UDim2.new(1, 0, 0, 35)
+    f.Size = UDim2.new(1, 0, 0, 30)
     f.BackgroundColor3 = Color3.fromRGB(30, 15, 55)
     f.LayoutOrder = lo or 0
     Instance.new("UICorner", f)
@@ -128,79 +151,77 @@ local function NewInput(p, t, c, lo)
     i.BackgroundTransparency = 1
     i.Text = t
     i.TextColor3 = Color3.fromRGB(255, 255, 255)
-    i.PlaceholderText = "Enter Value..."
     i.FocusLost:Connect(function() c(i.Text) end)
 end
 
-local flg = { Farm = false, Reb = false, Choc = false, AFK = false, Jump = false, Hatch = false, Del = false, Speed = 16, EggNm = "Common Egg" }
-
--- Tabs
 NewTabBtn("Main", 10, K13_Tabs.Main)
 NewTabBtn("Eggs", 45, K13_Tabs.Eggs)
 NewTabBtn("Misc", 80, K13_Tabs.Misc)
 NewTabBtn("Settings", 115, K13_Tabs.Settings)
 
--- Main Tab
 NewToggle(K13_Tabs.Main, "Fast Farm (Emperor King)", function(v) flg.Farm = v end, 1)
 NewToggle(K13_Tabs.Main, "Fast Rebirth (0.1s)", function(v) flg.Reb = v end, 2)
 
--- Eggs Tab
-NewInput(K13_Tabs.Eggs, "Egg Name", function(v) flg.EggNm = v end, 1)
-NewToggle(K13_Tabs.Eggs, "Auto Hatch", function(v) flg.Hatch = v end, 2)
-NewToggle(K13_Tabs.Eggs, "Auto Delete Pets", function(v) flg.Del = v end, 3)
+NewInput(K13_Tabs.Eggs, "mythic", function(v) flg.EggNm = v end, 1)
+NewToggle(K13_Tabs.Eggs, "Auto Hatch (Skip Anim)", function(v) flg.Hatch = v end, 2)
+NewToggle(K13_Tabs.Eggs, "Auto Sell All Pets", function(v) flg.DelAll = v end, 3)
 
--- Misc Tab
 NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate", function(v) flg.Choc = v end, 1)
 NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) flg.AFK = v end, 2)
 
--- Settings Tab
 NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) flg.Jump = v end, 1)
 NewInput(K13_Tabs.Settings, "WalkSpeed", function(v) flg.Speed = tonumber(v) or 16 end, 2)
 
--- DESTROY UI (FORCE TO BOTTOM)
 local CloseBtn = Instance.new("TextButton", K13_Tabs.Settings)
 CloseBtn.Size = UDim2.new(1, 0, 0, 35)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(110, 25, 160)
 CloseBtn.Text = "Destroy UI"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.LayoutOrder = 999 -- Siguradong nasa dulo
+CloseBtn.LayoutOrder = 999
 Instance.new("UICorner", CloseBtn)
 CloseBtn.MouseButton1Click:Connect(function() K13_UI:Destroy() end)
 
--- LOOPS
 task.spawn(function()
-    while task.wait(0.1) do
+    while task.wait() do
         if flg.Farm then
             pcall(function()
                 local m = workspace.MachinesFolder:FindFirstChild("Bench Press Muscle Emperor")
-                if m and LP.Character:FindFirstChild("HumanoidRootPart") then
+                if m then
                     LP.Character.HumanoidRootPart.CFrame = m.InteractionPart.CFrame
                     ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(m, true)
                     ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
                 end
             end)
         end
-        if flg.Reb then pcall(function() ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end) end
-        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-            LP.Character.Humanoid.WalkSpeed = flg.Speed
+        if flg.Reb then task.wait(0.1) pcall(function() RemotesEvent.RebirthEvent:FireServer() end) end
+        if LP.Character and LP.Character:FindFirstChild("Humanoid") then LP.Character.Humanoid.WalkSpeed = flg.Speed end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(0.2) do
+        if flg.Hatch then pcall(function() OpenPetEvent:FireServer(flg.EggNm) end) end
+        if flg.DelAll then
+            pcall(function()
+                local char = LP.Character or LP.CharacterAdded:Wait()
+                for _, obj in pairs(char:GetDescendants()) do
+                    for _, petName in pairs(petKeywords) do
+                        if obj.Name == petName and obj.Name ~= KEEP_PET then
+                            SellPetEvent:FireServer(obj)
+                        end
+                    end
+                end
+            end)
         end
     end
 end)
 
 task.spawn(function()
-    while task.wait(0.5) do
-        if flg.Hatch then pcall(function() ReplicatedStorage.RemotesEvent.EggFunction:InvokeServer(flg.EggNm, "Single") end) end
-        if flg.Del then pcall(function() ReplicatedStorage.RemotesEvent.DeletePetEvent:FireServer("All") end) end
-    end
-end)
-
-task.spawn(function()
-    while task.wait(60) do
+    while task.wait(1) do
         if flg.Choc then
             pcall(function()
-                local cf = LP.PlayerGui:FindFirstChild("chocolateframe")
-                if cf then firesignal(cf.Chocolate.upground.clickbutton.MouseButton1Click) end
+                local g = LP.PlayerGui:FindFirstChild("chocolateframe")
+                if g then firesignal(g.Chocolate.upground.clickbutton.MouseButton1Click) end
             end)
         end
     end
@@ -213,8 +234,5 @@ UIS.JumpRequest:Connect(function()
 end)
 
 LP.Idled:Connect(function()
-    if flg.AFK then
-        game:GetService("VirtualUser"):CaptureController()
-        game:GetService("VirtualUser"):ClickButton2(Vector2.new())
-    end
+    if flg.AFK then game:GetService("VirtualUser"):CaptureController() game:GetService("VirtualUser"):ClickButton2(Vector2.new()) end
 end)
