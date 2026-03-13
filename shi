@@ -37,25 +37,26 @@ local ToggleButton = Instance.new("TextButton", K13_UI)
 ToggleButton.Size = UDim2.new(0, 55, 0, 55)
 ToggleButton.Position = UDim2.new(0, 20, 0.5, -27)
 ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-ToggleButton.Text = "K13🗼"
+ToggleButton.Text = "K13"
 ToggleButton.TextColor3 = Color3.fromRGB(180, 50, 255)
 ToggleButton.Font = Enum.Font.GothamBold
 ToggleButton.Active = true
 ToggleButton.Draggable = true
 Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(1, 0)
 
-ToggleButton.MouseButton1Click:Connect(function()
-    K13_MainFrame.Visible = not K13_MainFrame.Visible
-end)
-
 K13_MainFrame.Name = "K13_MainFrame"
 K13_MainFrame.Parent = K13_UI
 K13_MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
 K13_MainFrame.Position = UDim2.new(0.5, -225, 0.5, -140)
 K13_MainFrame.Size = UDim2.new(0, 480, 0, 320)
+K13_MainFrame.Visible = true
 K13_MainFrame.Active = true
 K13_MainFrame.Draggable = true
 Instance.new("UICorner", K13_MainFrame).CornerRadius = UDim.new(0, 10)
+
+ToggleButton.MouseButton1Click:Connect(function()
+    K13_MainFrame.Visible = not K13_MainFrame.Visible
+end)
 
 K13_Sidebar.Name = "K13_Sidebar"
 K13_Sidebar.Parent = K13_MainFrame
@@ -69,7 +70,9 @@ K13_Content.Position = UDim2.new(0, 140, 0, 10)
 K13_Content.Size = UDim2.new(1, -150, 1, -20)
 K13_Content.BackgroundTransparency = 1
 
-for name, frame in pairs(K13_Tabs) do
+local tabOrder = {"Main", "Kills", "Misc", "Settings"}
+for _, name in pairs(tabOrder) do
+    local frame = K13_Tabs[name]
     frame.Parent = K13_Content
     frame.Size = UDim2.new(1, 0, 1, 0)
     frame.BackgroundTransparency = 1
@@ -136,6 +139,7 @@ local function NewDropdown(parent, text, callback)
     scroller.Visible = false
     scroller.Size = UDim2.new(0, 150, 0, 150)
     scroller.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+    scroller.ZIndex = 10
     Instance.new("UIListLayout", scroller)
     btn.MouseButton1Click:Connect(function()
         scroller.Visible = not scroller.Visible
@@ -148,6 +152,7 @@ local function NewDropdown(parent, text, callback)
                 pBtn.Text = p.Name
                 pBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
                 pBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                pBtn.ZIndex = 11
                 pBtn.MouseButton1Click:Connect(function()
                     btn.Text = "  " .. p.Name
                     callback(p)
@@ -203,16 +208,14 @@ local viewTarget = nil
 NewToggle(K13_Tabs.Main, "Fast Farm", function(v) active.Farm = v end)
 NewToggle(K13_Tabs.Main, "Fast Rebirth", function(v) active.Rebirth = v end)
 
-NewToggle(K13_Tabs.Kills, "Kill ALL", function(v) active.KillAll = v end)
+NewToggle(K13_Tabs.Kills, "Kill Aura (All)", function(v) active.KillAll = v end)
 NewToggle(K13_Tabs.Kills, "Kill Target", function(v) active.TargetKill = v end)
 NewDropdown(K13_Tabs.Kills, "Player", function(p) targetPlayer = p end)
 NewToggle(K13_Tabs.Kills, "View Player", function(v) active.View = v end)
-NewDropdown(K13_Tabs.Kills, "View", function(p) viewTarget = p end)
+NewDropdown(K13_Tabs.Kills, "View Target", function(p) viewTarget = p end)
 
-NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate", function(v) active.Chocolate = v end)
-NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) active.AFK = v 
-    if v then print("K13: Anti-AFK Enabled") else print("K13: Anti-AFK Disabled") end
-end)
+NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate (5m)", function(v) active.Chocolate = v end)
+NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) active.AFK = v end)
 
 NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) active.InfJump = v end)
 NewSlider(K13_Tabs.Settings, "WalkSpeed", 16, 250, function(v) if LP.Character:FindFirstChild("Humanoid") then LP.Character.Humanoid.WalkSpeed = v end end)
@@ -220,10 +223,8 @@ NewSlider(K13_Tabs.Settings, "WalkSpeed", 16, 250, function(v) if LP.Character:F
 RunService.RenderStepped:Connect(function()
     if active.View and viewTarget and viewTarget.Character and viewTarget.Character:FindFirstChild("Humanoid") then
         workspace.CurrentCamera.CameraSubject = viewTarget.Character.Humanoid
-    else
-        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-            workspace.CurrentCamera.CameraSubject = LP.Character.Humanoid
-        end
+    elseif LP.Character and LP.Character:FindFirstChild("Humanoid") then
+        workspace.CurrentCamera.CameraSubject = LP.Character.Humanoid
     end
     if active.KillAll then
         for _, p in pairs(Players:GetPlayers()) do
@@ -275,7 +276,6 @@ LP.Idled:Connect(function()
     if active.AFK then
         VU:CaptureController()
         VU:ClickButton2(Vector2.new())
-        print("K13: Anti-AFK Active at " .. os.date("%X"))
     end
 end)
 
