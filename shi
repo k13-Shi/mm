@@ -5,6 +5,7 @@ local K13_Content = Instance.new("Frame")
 local K13_Title = Instance.new("TextLabel")
 local K13_Tabs = {
     Main = Instance.new("Frame"),
+    Eggs = Instance.new("Frame"),
     Misc = Instance.new("Frame"),
     Settings = Instance.new("Frame")
 }
@@ -14,32 +15,33 @@ local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local LP = Players.LocalPlayer
 
-K13_UI.Name = "K13_Hub_Neon"
+K13_UI.Name = "K13_Hub_Ishi_Final_V4"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
+-- Main Frame
 K13_MainFrame.Name = "K13_MainFrame"
 K13_MainFrame.Parent = K13_UI
-K13_MainFrame.BackgroundColor3 = Color3.fromRGB(10, 5, 20)
+K13_MainFrame.BackgroundColor3 = Color3.fromRGB(12, 6, 22)
 K13_MainFrame.Position = UDim2.new(0.5, -225, 0.5, -140)
 K13_MainFrame.Size = UDim2.new(0, 480, 0, 320)
 K13_MainFrame.Active = true
 K13_MainFrame.Draggable = true
 Instance.new("UICorner", K13_MainFrame).CornerRadius = UDim.new(0, 15)
-
 local MainGlow = Instance.new("UIStroke", K13_MainFrame)
 MainGlow.Color = Color3.fromRGB(180, 50, 255)
 MainGlow.Thickness = 3
-MainGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
+-- Title
 K13_Title.Parent = K13_MainFrame
-K13_Title.Size = UDim2.new(1, 0, 0, 40)
+K13_Title.Size = UDim2.new(1, 0, 0, 45)
 K13_Title.BackgroundTransparency = 1
 K13_Title.Text = "K13 Hub | By Ishi"
 K13_Title.TextColor3 = Color3.fromRGB(220, 100, 255)
 K13_Title.Font = Enum.Font.GothamBold
 K13_Title.TextSize = 18
 
+-- Floating Toggle
 local ToggleButton = Instance.new("TextButton", K13_UI)
 ToggleButton.Size = UDim2.new(0, 60, 0, 60)
 ToggleButton.Position = UDim2.new(0, 20, 0.5, -30)
@@ -48,46 +50,38 @@ ToggleButton.Text = "K13"
 ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleButton.Font = Enum.Font.GothamBold
 Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(1, 0)
-local BtnGlow = Instance.new("UIStroke", ToggleButton)
-BtnGlow.Color = Color3.fromRGB(180, 50, 255)
-BtnGlow.Thickness = 2
+Instance.new("UIStroke", ToggleButton).Color = Color3.fromRGB(180, 50, 255)
 
 ToggleButton.MouseButton1Click:Connect(function()
     K13_MainFrame.Visible = not K13_MainFrame.Visible
 end)
 
-K13_Sidebar.Name = "K13_Sidebar"
+-- Sidebar
 K13_Sidebar.Parent = K13_MainFrame
 K13_Sidebar.BackgroundColor3 = Color3.fromRGB(20, 10, 40)
-K13_Sidebar.Position = UDim2.new(0, 12, 0, 50)
-K13_Sidebar.Size = UDim2.new(0, 125, 1, -65)
-Instance.new("UICorner", K13_Sidebar).CornerRadius = UDim.new(0, 10)
-local SideGlow = Instance.new("UIStroke", K13_Sidebar)
-SideGlow.Color = Color3.fromRGB(180, 50, 255)
-SideGlow.Thickness = 1
-SideGlow.Transparency = 0.4
+K13_Sidebar.Position = UDim2.new(0, 12, 0, 55)
+K13_Sidebar.Size = UDim2.new(0, 125, 1, -70)
+Instance.new("UICorner", K13_Sidebar)
+Instance.new("UIStroke", K13_Sidebar).Color = Color3.fromRGB(180, 50, 255)
 
-K13_Content.Name = "K13_Content"
+-- Content
 K13_Content.Parent = K13_MainFrame
-K13_Content.Position = UDim2.new(0, 145, 0, 50)
-K13_Content.Size = UDim2.new(1, -160, 1, -65)
+K13_Content.Position = UDim2.new(0, 145, 0, 55)
+K13_Content.Size = UDim2.new(1, -160, 1, -70)
 K13_Content.BackgroundTransparency = 1
 
-local function NewTabButton(name, pos, targetTab)
-    local btn = Instance.new("TextButton", K13_Sidebar)
-    btn.Size = UDim2.new(0.9, 0, 0, 35)
-    btn.Position = UDim2.new(0.05, 0, 0, pos)
-    btn.BackgroundColor3 = Color3.fromRGB(45, 20, 80)
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Font = Enum.Font.GothamMedium
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-    local g = Instance.new("UIStroke", btn)
-    g.Color = Color3.fromRGB(200, 100, 255)
-    g.Thickness = 1.5
-    btn.MouseButton1Click:Connect(function()
-        for _, t in pairs(K13_Tabs) do t.Visible = false end
-        targetTab.Visible = true
+local function NewTabBtn(n, p, t)
+    local b = Instance.new("TextButton", K13_Sidebar)
+    b.Size = UDim2.new(0.9, 0, 0, 30)
+    b.Position = UDim2.new(0.05, 0, 0, p)
+    b.BackgroundColor3 = Color3.fromRGB(45, 20, 80)
+    b.Text = n
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.Font = Enum.Font.GothamMedium
+    Instance.new("UICorner", b)
+    b.MouseButton1Click:Connect(function()
+        for _, f in pairs(K13_Tabs) do f.Visible = false end
+        t.Visible = true
     end)
 end
 
@@ -97,151 +91,129 @@ for name, frame in pairs(K13_Tabs) do
     frame.BackgroundTransparency = 1
     frame.Visible = (name == "Main")
     local l = Instance.new("UIListLayout", frame)
-    l.Padding = UDim.new(0, 10)
-    l.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    l.Padding = UDim.new(0, 8)
+    l.SortOrder = Enum.SortOrder.LayoutOrder -- Para sunod-sunod
 end
 
-local function NewToggle(parent, text, callback)
-    local frame = Instance.new("Frame", parent)
-    frame.Size = UDim2.new(1, 0, 0, 45)
-    frame.BackgroundColor3 = Color3.fromRGB(30, 15, 50)
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
-    local stroke = Instance.new("UIStroke", frame)
-    stroke.Color = Color3.fromRGB(180, 50, 255)
-    stroke.Thickness = 1.2
-    
-    local btn = Instance.new("TextButton", frame)
-    btn.Size = UDim2.new(1, 0, 1, 0)
-    btn.BackgroundTransparency = 1
-    btn.Text = "  " .. text
-    btn.TextColor3 = Color3.fromRGB(230, 200, 255)
-    btn.Font = Enum.Font.GothamSemibold
-    btn.TextXAlignment = Enum.TextXAlignment.Left
-    
-    local inner = Instance.new("Frame", frame)
-    inner.Size = UDim2.new(0, 0, 0, 0)
-    inner.Position = UDim2.new(0.9, -8, 0.5, 0)
-    inner.AnchorPoint = Vector2.new(0.5, 0.5)
-    inner.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
-    Instance.new("UICorner", inner).CornerRadius = UDim.new(1, 0)
-    local glow = Instance.new("UIStroke", inner)
-    glow.Color = Color3.fromRGB(255, 255, 255)
-    glow.Thickness = 1.5
-    
-    local state = false
-    btn.MouseButton1Click:Connect(function()
-        state = not state
-        inner:TweenSize(state and UDim2.new(0, 18, 0, 18) or UDim2.new(0, 0, 0, 0), "Out", "Back", 0.15)
-        callback(state)
+local function NewToggle(p, t, c, lo)
+    local f = Instance.new("Frame", p)
+    f.Size = UDim2.new(1, 0, 0, 35)
+    f.BackgroundColor3 = Color3.fromRGB(30, 15, 55)
+    f.LayoutOrder = lo or 0
+    Instance.new("UICorner", f)
+    Instance.new("UIStroke", f).Color = Color3.fromRGB(180, 50, 255)
+    local b = Instance.new("TextButton", f)
+    b.Size = UDim2.new(1, 0, 1, 0)
+    b.BackgroundTransparency = 1
+    b.Text = "  " .. t
+    b.TextColor3 = Color3.fromRGB(230, 200, 255)
+    b.TextXAlignment = Enum.TextXAlignment.Left
+    local on = false
+    b.MouseButton1Click:Connect(function()
+        on = not on
+        f.BackgroundColor3 = on and Color3.fromRGB(70, 30, 120) or Color3.fromRGB(30, 15, 55)
+        c(on)
     end)
 end
 
-local function NewSlider(parent, text, min, max, callback)
-    local frame = Instance.new("Frame", parent)
-    frame.Size = UDim2.new(1, 0, 0, 55)
-    frame.BackgroundColor3 = Color3.fromRGB(30, 15, 50)
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
-    Instance.new("UIStroke", frame).Color = Color3.fromRGB(180, 50, 255)
-    
-    local label = Instance.new("TextLabel", frame)
-    label.Size = UDim2.new(1, 0, 0, 25)
-    label.BackgroundTransparency = 1
-    label.Text = "  " .. text
-    label.TextColor3 = Color3.fromRGB(220, 180, 255)
-    label.Font = Enum.Font.GothamSemibold
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    
-    local sliderBg = Instance.new("Frame", frame)
-    sliderBg.Size = UDim2.new(0.9, 0, 0, 8)
-    sliderBg.Position = UDim2.new(0.05, 0, 0.75, 0)
-    sliderBg.BackgroundColor3 = Color3.fromRGB(50, 30, 80)
-    Instance.new("UICorner", sliderBg)
-    
-    local fill = Instance.new("Frame", sliderBg)
-    fill.Size = UDim2.new(0.5, 0, 1, 0)
-    fill.BackgroundColor3 = Color3.fromRGB(200, 100, 255)
-    Instance.new("UICorner", fill)
-    
-    sliderBg.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local move; move = UIS.InputChanged:Connect(function(i)
-                if i.UserInputType == Enum.UserInputType.MouseMovement then
-                    local p = math.clamp((i.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
-                    fill.Size = UDim2.new(p, 0, 1, 0)
-                    callback(math.floor(min + (max - min) * p))
-                end
-            end)
-            UIS.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then move:Disconnect() end end)
-        end
-    end)
+local function NewInput(p, t, c, lo)
+    local f = Instance.new("Frame", p)
+    f.Size = UDim2.new(1, 0, 0, 35)
+    f.BackgroundColor3 = Color3.fromRGB(30, 15, 55)
+    f.LayoutOrder = lo or 0
+    Instance.new("UICorner", f)
+    Instance.new("UIStroke", f).Color = Color3.fromRGB(180, 50, 255)
+    local i = Instance.new("TextBox", f)
+    i.Size = UDim2.new(1, 0, 1, 0)
+    i.BackgroundTransparency = 1
+    i.Text = t
+    i.TextColor3 = Color3.fromRGB(255, 255, 255)
+    i.PlaceholderText = "Enter Value..."
+    i.FocusLost:Connect(function() c(i.Text) end)
 end
 
-NewTabButton("Main", 10, K13_Tabs.Main)
-NewTabButton("Misc", 55, K13_Tabs.Misc)
-NewTabButton("Settings", 100, K13_Tabs.Settings)
+local flg = { Farm = false, Reb = false, Choc = false, AFK = false, Jump = false, Hatch = false, Del = false, Speed = 16, EggNm = "Common Egg" }
 
-local active = { Farm = false, Rebirth = false, Chocolate = false, AFK = false, InfJump = false }
+-- Tabs
+NewTabBtn("Main", 10, K13_Tabs.Main)
+NewTabBtn("Eggs", 45, K13_Tabs.Eggs)
+NewTabBtn("Misc", 80, K13_Tabs.Misc)
+NewTabBtn("Settings", 115, K13_Tabs.Settings)
 
-NewToggle(K13_Tabs.Main, "Fast Farm (Emperor)", function(v) active.Farm = v end)
-NewToggle(K13_Tabs.Main, "Fast Rebirth (0.1s)", function(v) active.Rebirth = v end)
-NewToggle(K13_Tabs.Misc, "Auto Chocolate", function(v) active.Chocolate = v end)
-NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) active.AFK = v end)
-NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) active.InfJump = v end)
-NewSlider(K13_Tabs.Settings, "WalkSpeed", 16, 250, function(v) if LP.Character:FindFirstChild("Humanoid") then LP.Character.Humanoid.WalkSpeed = v end end)
+-- Main Tab
+NewToggle(K13_Tabs.Main, "Fast Farm (Emperor King)", function(v) flg.Farm = v end, 1)
+NewToggle(K13_Tabs.Main, "Fast Rebirth (0.1s)", function(v) flg.Reb = v end, 2)
 
+-- Eggs Tab
+NewInput(K13_Tabs.Eggs, "Egg Name", function(v) flg.EggNm = v end, 1)
+NewToggle(K13_Tabs.Eggs, "Auto Hatch", function(v) flg.Hatch = v end, 2)
+NewToggle(K13_Tabs.Eggs, "Auto Delete Pets", function(v) flg.Del = v end, 3)
+
+-- Misc Tab
+NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate", function(v) flg.Choc = v end, 1)
+NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) flg.AFK = v end, 2)
+
+-- Settings Tab
+NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) flg.Jump = v end, 1)
+NewInput(K13_Tabs.Settings, "WalkSpeed", function(v) flg.Speed = tonumber(v) or 16 end, 2)
+
+-- DESTROY UI (FORCE TO BOTTOM)
 local CloseBtn = Instance.new("TextButton", K13_Tabs.Settings)
-CloseBtn.Size = UDim2.new(1, 0, 0, 40)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(100, 20, 150)
-CloseBtn.Text = "Destroy K13 UI"
+CloseBtn.Size = UDim2.new(1, 0, 0, 35)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(110, 25, 160)
+CloseBtn.Text = "Destroy UI"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseBtn.Font = Enum.Font.GothamBold
-Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 8)
-Instance.new("UIStroke", CloseBtn).Color = Color3.fromRGB(255, 255, 255)
+CloseBtn.LayoutOrder = 999 -- Siguradong nasa dulo
+Instance.new("UICorner", CloseBtn)
 CloseBtn.MouseButton1Click:Connect(function() K13_UI:Destroy() end)
 
+-- LOOPS
 task.spawn(function()
-    while true do
-        task.wait(0.5)
-        if active.Farm then
+    while task.wait(0.1) do
+        if flg.Farm then
             pcall(function()
-                local machine = workspace.MachinesFolder:FindFirstChild("Bench Press Muscle Emperor")
-                if machine and LP.Character:FindFirstChild("HumanoidRootPart") then
-                    LP.Character.HumanoidRootPart.CFrame = machine:FindFirstChild("InteractionPart").CFrame
-                    ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(machine, true)
-                    task.wait(0.1)
+                local m = workspace.MachinesFolder:FindFirstChild("Bench Press Muscle Emperor")
+                if m and LP.Character:FindFirstChild("HumanoidRootPart") then
+                    LP.Character.HumanoidRootPart.CFrame = m.InteractionPart.CFrame
+                    ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(m, true)
                     ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
                 end
             end)
         end
-    end
-end)
-
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-        if active.Rebirth then 
-            pcall(function() ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end)
+        if flg.Reb then pcall(function() ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end) end
+        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+            LP.Character.Humanoid.WalkSpeed = flg.Speed
         end
     end
 end)
 
 task.spawn(function()
-    while true do
-        task.wait(300)
-        if active.Chocolate then
-            pcall(function() firesignal(ReplicatedStorage.chocolateframe.Chocolate.upground.clickbutton.MouseButton1Click) end)
+    while task.wait(0.5) do
+        if flg.Hatch then pcall(function() ReplicatedStorage.RemotesEvent.EggFunction:InvokeServer(flg.EggNm, "Single") end) end
+        if flg.Del then pcall(function() ReplicatedStorage.RemotesEvent.DeletePetEvent:FireServer("All") end) end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(60) do
+        if flg.Choc then
+            pcall(function()
+                local cf = LP.PlayerGui:FindFirstChild("chocolateframe")
+                if cf then firesignal(cf.Chocolate.upground.clickbutton.MouseButton1Click) end
+            end)
         end
     end
 end)
 
 UIS.JumpRequest:Connect(function()
-    if active.InfJump and LP.Character:FindFirstChild("Humanoid") then
+    if flg.Jump and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         LP.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
     end
 end)
 
 LP.Idled:Connect(function()
-    if active.AFK then
+    if flg.AFK then
         game:GetService("VirtualUser"):CaptureController()
         game:GetService("VirtualUser"):ClickButton2(Vector2.new())
     end
