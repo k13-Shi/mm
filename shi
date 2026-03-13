@@ -142,6 +142,7 @@ NewToggle(K13_Tabs.Misc, "Auto Delete Pets", function(v) active.Delete = v end)
 NewToggle(K13_Tabs.Misc, "Auto Spin", function(v) active.Spin = v end)
 NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) active.AFK = v end)
 
+-- Anti-AFK Logic
 local VirtualUser = game:GetService("VirtualUser")
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     if active.AFK then
@@ -150,35 +151,54 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
     end
 end)
 
+-- Auto Farm Loop (Optimized for Emperor King)
 task.spawn(function()
-    while task.wait(1) do
+    while true do
+        task.wait(0.5)
         if active.Farm then
             pcall(function()
                 local player = game.Players.LocalPlayer
                 local machine = game.Workspace.MachinesFolder["Bench Press Muscle Emperor"]
                 if machine and machine:FindFirstChild("TouchPart") then
-                    -- Safe TP to Machine
-                    player.Character.HumanoidRootPart.CFrame = machine.TouchPart.CFrame * CFrame.new(0, 3, 0)
-                    task.wait(0.5)
-                    game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(machine, true)
-                    game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
+                    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                        player.Character.HumanoidRootPart.CFrame = machine.TouchPart.CFrame * CFrame.new(0, 3, 0)
+                        task.wait(0.1)
+                        game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(machine, true)
+                        game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
+                    end
                 end
             end)
         end
-        if active.Rebirth then game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end
-        if active.Spin then game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() end
     end
 end)
 
+-- Rebirth and Spin Loop
+task.spawn(function()
+    while true do
+        task.wait(1)
+        if active.Rebirth then 
+            game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() 
+        end
+        if active.Spin then 
+            game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() 
+        end
+    end
+end)
+
+-- Hatch and Delete Loop
 task.spawn(function()
     local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
-    while task.wait(0.8) do
+    while true do
+        task.wait(1.5)
         if active.Hatch then
-            pcall(function() game.ReplicatedStorage.RemotesEvent.OpenPetEvent:FireServer("mythic") end)
+            pcall(function() 
+                game.ReplicatedStorage.RemotesEvent.OpenPetEvent:FireServer("mythic") 
+            end)
         end
         if active.Delete then
             pcall(function()
-                for _, obj in pairs(game.Players.LocalPlayer:GetDescendants()) do
+                local pets = game:GetService("Players").LocalPlayer.Pets -- Adjust this path based on the game's pet folder
+                for _, obj in pairs(pets:GetChildren()) do
                     for _, petName in pairs(petKeywords) do
                         if obj.Name == petName and obj.Name ~= "Space Dragon" then
                             game.ReplicatedStorage.RemotesEvent.SellPetEvent:FireServer(obj)
