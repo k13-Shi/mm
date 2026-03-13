@@ -8,7 +8,7 @@ local K13_Tabs = {
     Settings = Instance.new("Frame")
 }
 
-K13_UI.Name = "K13 | By Shi"
+K13_UI.Name = "K13_Hub_V3"
 K13_UI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -150,21 +150,34 @@ game:GetService("Players").LocalPlayer.Idled:Connect(function()
     end
 end)
 
+-- Fixed Auto Farm Logic
 task.spawn(function()
-    while task.wait(0.5) do
+    while true do
+        task.wait(0.8) -- Slow down para iwas kick
         if active.Farm then
             pcall(function()
                 local player = game.Players.LocalPlayer
                 local machine = game.Workspace.MachinesFolder["Bench Press Muscle Emperor"]
-                if machine and machine:FindFirstChild("TouchPart") then
-                    -- Safe TP to Machine
-                    player.Character.HumanoidRootPart.CFrame = machine.TouchPart.CFrame * CFrame.new(0, 3, 0)
-                    task.wait(0.2)
+                
+                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    -- Isa lang na TP para hindi mag-lag ang server detection
+                    if (player.Character.HumanoidRootPart.Position - machine.TouchPart.Position).Magnitude > 10 then
+                        player.Character.HumanoidRootPart.CFrame = machine.TouchPart.CFrame * CFrame.new(0, 3, 0)
+                        task.wait(0.5) -- Wait bago mag-click
+                    end
+                    
+                    -- Remote Call
                     game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(machine, true)
+                    task.wait(0.1)
                     game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
                 end
             end)
         end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(0.5) do
         if active.Rebirth then game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end
         if active.Spin then game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() end
     end
@@ -172,7 +185,7 @@ end)
 
 task.spawn(function()
     local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
-    while task.wait(0.8) do
+    while task.wait(1.5) do
         if active.Hatch then
             pcall(function() game.ReplicatedStorage.RemotesEvent.OpenPetEvent:FireServer("mythic") end)
         end
