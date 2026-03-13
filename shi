@@ -60,7 +60,7 @@ K13_Sidebar.Size = UDim2.new(0, 130, 1, 0)
 Instance.new("UICorner", K13_Sidebar).CornerRadius = UDim.new(0, 10)
 
 local K13_Logo = Instance.new("TextLabel", K13_Sidebar)
-K13_Logo.Text = "K13 HUB V3"
+K13_Logo.Text = "K13 Hub | By Shi"
 K13_Logo.Size = UDim2.new(1, 0, 0, 50)
 K13_Logo.BackgroundTransparency = 1
 K13_Logo.TextColor3 = Color3.fromRGB(180, 50, 255)
@@ -135,16 +135,17 @@ NewTabButton("Settings", 140, K13_Tabs.Settings)
 
 local active = { Farm = false, Rebirth = false, Spin = false, AFK = false, Hatch = false, Delete = false }
 
-NewToggle(K13_Tabs.Main, "Anti-Kick Auto Farm", function(v) active.Farm = v end)
-NewToggle(K13_Tabs.Main, "Auto Rebirth", function(v) active.Rebirth = v end)
-NewToggle(K13_Tabs.Misc, "Auto Hatch Mythic", function(v) active.Hatch = v end)
-NewToggle(K13_Tabs.Misc, "Auto Delete Pets", function(v) active.Delete = v end)
-NewToggle(K13_Tabs.Misc, "Auto Spin Wheels", function(v) active.Spin = v end)
-NewToggle(K13_Tabs.Misc, "K13 Glowing Anti-AFK", function(v) active.AFK = v end)
+NewToggle(K13_Tabs.Main, "Fast Farm", function(v) active.Farm = v end)
+NewToggle(K13_Tabs.Main, "Fast Rebirth", function(v) active.Rebirth = v end)
+NewToggle(K13_Tabs.Misc, "Auto Hatch", function(v) active.Hatch = v end)
+NewToggle(K13_Tabs.Misc, "Auto Delete", function(v) active.Delete = v end)
+NewToggle(K13_Tabs.Misc, "Auto Spin", function(v) active.Spin = v end)
+NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) active.AFK = v end)
 
 local VirtualUser = game:GetService("VirtualUser")
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     if active.AFK then
+        print("K13 Hub: Anti-AFK Active!")
         VirtualUser:CaptureController()
         VirtualUser:ClickButton2(Vector2.new())
     end
