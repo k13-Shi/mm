@@ -103,46 +103,6 @@ local function NewToggle(parent, text, callback)
     end)
 end
 
-local function NewDropdown(parent, text, callback)
-    local frame = Instance.new("Frame", parent)
-    frame.Size = UDim2.new(1, 0, 0, 40)
-    frame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
-    local btn = Instance.new("TextButton", frame)
-    btn.Size = UDim2.new(1, 0, 1, 0)
-    btn.BackgroundTransparency = 1
-    btn.Text = "  Select " .. text
-    btn.TextColor3 = Color3.fromRGB(180, 50, 255)
-    btn.Font = Enum.Font.GothamSemibold
-    btn.TextXAlignment = Enum.TextXAlignment.Left
-    local scroller = Instance.new("ScrollingFrame", K13_UI)
-    scroller.Visible = false
-    scroller.Size = UDim2.new(0, 150, 0, 150)
-    scroller.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
-    scroller.ZIndex = 10
-    Instance.new("UIListLayout", scroller)
-    btn.MouseButton1Click:Connect(function()
-        scroller.Visible = not scroller.Visible
-        scroller.Position = UDim2.new(0, btn.AbsolutePosition.X, 0, btn.AbsolutePosition.Y + 45)
-        for _, v in pairs(scroller:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= LP then
-                local pBtn = Instance.new("TextButton", scroller)
-                pBtn.Size = UDim2.new(1, 0, 0, 25)
-                pBtn.Text = p.Name
-                pBtn.BackgroundTransparency = 1
-                pBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-                pBtn.ZIndex = 11
-                pBtn.MouseButton1Click:Connect(function()
-                    btn.Text = "  " .. p.Name
-                    callback(p)
-                    scroller.Visible = false
-                end)
-            end
-        end
-    end)
-end
-
 local function NewSlider(parent, text, min, max, callback)
     local frame = Instance.new("Frame", parent)
     frame.Size = UDim2.new(1, 0, 0, 50)
@@ -177,26 +137,15 @@ local function NewSlider(parent, text, min, max, callback)
 end
 
 NewTabButton("Main", 60, K13_Tabs.Main)
-NewTabButton("Kills", 100, K13_Tabs.Kills)
-NewTabButton("Misc", 140, K13_Tabs.Misc)
-NewTabButton("Settings", 180, K13_Tabs.Settings)
+NewTabButton("Misc", 100, K13_Tabs.Misc)
+NewTabButton("Settings", 140, K13_Tabs.Settings)
 
-local active = { Farm = false, Rebirth = false, Chocolate = false, KillAll = false, TargetKill = false, View = false, AFK = false, InfJump = false }
-local targetPlayer = nil
-local viewTarget = nil
+local active = { Farm = false, Rebirth = false, Chocolate = false, AFK = false, InfJump = false }
 
 NewToggle(K13_Tabs.Main, "Fast Farm", function(v) active.Farm = v end)
 NewToggle(K13_Tabs.Main, "Fast Rebirth", function(v) active.Rebirth = v end)
-
-NewToggle(K13_Tabs.Kills, "Kill Aura (All)", function(v) active.KillAll = v end)
-NewToggle(K13_Tabs.Kills, "Kill Target", function(v) active.TargetKill = v end)
-NewDropdown(K13_Tabs.Kills, "Player", function(p) targetPlayer = p end)
-NewToggle(K13_Tabs.Kills, "View Player", function(v) active.View = v end)
-NewDropdown(K13_Tabs.Kills, "View Target", function(p) viewTarget = p end)
-
 NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate (5m)", function(v) active.Chocolate = v end)
 NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) active.AFK = v end)
-
 NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) active.InfJump = v end)
 NewSlider(K13_Tabs.Settings, "WalkSpeed", 16, 250, function(v) if LP.Character:FindFirstChild("Humanoid") then LP.Character.Humanoid.WalkSpeed = v end end)
 
@@ -210,42 +159,11 @@ Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
 CloseBtn.MouseButton1Click:Connect(function() K13_UI:Destroy() end)
 
 task.spawn(function()
-    while task.wait(0.1) do
-        if active.KillAll then
-            pcall(function()
-                for _, p in pairs(Players:GetPlayers()) do
-                    if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                        if (LP.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude < 25 then
-                            ReplicatedStorage.RemotesEvent.PunchEvent:FireServer()
-                        end
-                    end
-                end
-            end)
-        end
-        if active.TargetKill and targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            pcall(function()
-                if (LP.Character.HumanoidRootPart.Position - targetPlayer.Character.HumanoidRootPart.Position).Magnitude < 25 then
-                    ReplicatedStorage.RemotesEvent.PunchEvent:FireServer()
-                end
-            end)
-        end
-        if active.View and viewTarget and viewTarget.Character and viewTarget.Character:FindFirstChild("Humanoid") then
-            workspace.CurrentCamera.CameraSubject = viewTarget.Character.Humanoid
-        else
-            if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-                workspace.CurrentCamera.CameraSubject = LP.Character.Humanoid
-            end
-        end
-    end
-end)
-
-task.spawn(function()
-    while task.wait(0.2) do
+    while task.wait(0.3) do
         if active.Farm then
             pcall(function()
                 local m = workspace.MachinesFolder["Bench Press Muscle Emperor"]
                 ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(m, true)
-                task.wait(0.1)
                 ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
             end)
         end
