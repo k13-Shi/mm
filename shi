@@ -4,37 +4,45 @@ local K13_Sidebar = Instance.new("Frame")
 local K13_Content = Instance.new("Frame")
 local K13_Tabs = {
     Main = Instance.new("Frame"),
+    Kills = Instance.new("Frame"),
     Misc = Instance.new("Frame"),
     Settings = Instance.new("Frame")
 }
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local LP = Players.LocalPlayer
+
+if ReplicatedStorage:FindFirstChild("Assests") and ReplicatedStorage.Assests:FindFirstChild("Devices") then
+    local pcAsset = ReplicatedStorage.Assests.Devices:FindFirstChild("PC")
+    if pcAsset then pcAsset:Clone().Parent = LP end
+end
+
+local oldNamecall
+oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+    local method = getnamecallmethod()
+    if (self == ReplicatedStorage:FindFirstChild("kickRemote") or self == ReplicatedStorage:FindFirstChild("globalMessage")) and method == "FireServer" then
+        return nil 
+    end
+    return oldNamecall(self, ...)
+end)
+
 K13_UI.Name = "K13_Hub_V3"
-K13_UI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
-local ToggleButton = Instance.new("TextButton")
-local ButtonCorner = Instance.new("UICorner")
-local ButtonGlow = Instance.new("UIStroke")
-
-ToggleButton.Name = "K13_ToggleButton"
-ToggleButton.Parent = K13_UI
+local ToggleButton = Instance.new("TextButton", K13_UI)
 ToggleButton.Size = UDim2.new(0, 55, 0, 55)
 ToggleButton.Position = UDim2.new(0, 20, 0.5, -27)
 ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
-ToggleButton.Text = "K13"
+ToggleButton.Text = "K13🗼"
 ToggleButton.TextColor3 = Color3.fromRGB(180, 50, 255)
 ToggleButton.Font = Enum.Font.GothamBold
-ToggleButton.TextSize = 16
 ToggleButton.Active = true
 ToggleButton.Draggable = true
-
-ButtonCorner.CornerRadius = UDim.new(1, 0)
-ButtonCorner.Parent = ToggleButton
-
-ButtonGlow.Parent = ToggleButton
-ButtonGlow.Thickness = 2.5
-ButtonGlow.Color = Color3.fromRGB(150, 0, 255)
-ButtonGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(1, 0)
 
 ToggleButton.MouseButton1Click:Connect(function()
     K13_MainFrame.Visible = not K13_MainFrame.Visible
@@ -49,23 +57,11 @@ K13_MainFrame.Active = true
 K13_MainFrame.Draggable = true
 Instance.new("UICorner", K13_MainFrame).CornerRadius = UDim.new(0, 10)
 
-local MainGlow = Instance.new("UIStroke", K13_MainFrame)
-MainGlow.Thickness = 2
-MainGlow.Color = Color3.fromRGB(150, 0, 255)
-
 K13_Sidebar.Name = "K13_Sidebar"
 K13_Sidebar.Parent = K13_MainFrame
 K13_Sidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 K13_Sidebar.Size = UDim2.new(0, 130, 1, 0)
 Instance.new("UICorner", K13_Sidebar).CornerRadius = UDim.new(0, 10)
-
-local K13_Logo = Instance.new("TextLabel", K13_Sidebar)
-K13_Logo.Text = "K13 Hub | By Shi"
-K13_Logo.Size = UDim2.new(1, 0, 0, 50)
-K13_Logo.BackgroundTransparency = 1
-K13_Logo.TextColor3 = Color3.fromRGB(180, 50, 255)
-K13_Logo.Font = Enum.Font.GothamBold
-K13_Logo.TextSize = 18
 
 K13_Content.Name = "K13_Content"
 K13_Content.Parent = K13_MainFrame
@@ -78,8 +74,9 @@ for name, frame in pairs(K13_Tabs) do
     frame.Size = UDim2.new(1, 0, 1, 0)
     frame.BackgroundTransparency = 1
     frame.Visible = (name == "Main")
-    local layout = Instance.new("UIListLayout", frame)
-    layout.Padding = UDim.new(0, 8)
+    local l = Instance.new("UIListLayout", frame)
+    l.Padding = UDim.new(0, 8)
+    l.HorizontalAlignment = Enum.HorizontalAlignment.Center
 end
 
 local function NewTabButton(name, pos, targetTab)
@@ -90,9 +87,7 @@ local function NewTabButton(name, pos, targetTab)
     btn.Text = name
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Font = Enum.Font.GothamMedium
-    btn.TextSize = 14
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-    
     btn.MouseButton1Click:Connect(function()
         for _, t in pairs(K13_Tabs) do t.Visible = false end
         targetTab.Visible = true
@@ -101,26 +96,22 @@ end
 
 local function NewToggle(parent, text, callback)
     local frame = Instance.new("Frame", parent)
-    frame.Size = UDim2.new(1, 0, 0, 45)
+    frame.Size = UDim2.new(1, 0, 0, 40)
     frame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
-
     local btn = Instance.new("TextButton", frame)
     btn.Size = UDim2.new(1, 0, 1, 0)
     btn.BackgroundTransparency = 1
     btn.Text = "  " .. text
     btn.TextColor3 = Color3.fromRGB(220, 220, 220)
     btn.Font = Enum.Font.GothamSemibold
-    btn.TextSize = 13
     btn.TextXAlignment = Enum.TextXAlignment.Left
-
     local inner = Instance.new("Frame", frame)
     inner.Size = UDim2.new(0, 0, 0, 0)
     inner.Position = UDim2.new(0.9, -5, 0.5, 0)
     inner.AnchorPoint = Vector2.new(0.5, 0.5)
     inner.BackgroundColor3 = Color3.fromRGB(180, 50, 255)
     Instance.new("UICorner", inner).CornerRadius = UDim.new(0, 4)
-
     local state = false
     btn.MouseButton1Click:Connect(function()
         state = not state
@@ -129,25 +120,124 @@ local function NewToggle(parent, text, callback)
     end)
 end
 
-NewTabButton("Main", 60, K13_Tabs.Main)
-NewTabButton("Misc", 100, K13_Tabs.Misc)
-NewTabButton("Settings", 140, K13_Tabs.Settings)
+local function NewDropdown(parent, text, callback)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = UDim2.new(1, 0, 0, 40)
+    frame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
+    local btn = Instance.new("TextButton", frame)
+    btn.Size = UDim2.new(1, 0, 1, 0)
+    btn.BackgroundTransparency = 1
+    btn.Text = "  Select " .. text
+    btn.TextColor3 = Color3.fromRGB(180, 50, 255)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    local scroller = Instance.new("ScrollingFrame", K13_UI)
+    scroller.Visible = false
+    scroller.Size = UDim2.new(0, 150, 0, 150)
+    scroller.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+    Instance.new("UIListLayout", scroller)
+    btn.MouseButton1Click:Connect(function()
+        scroller.Visible = not scroller.Visible
+        scroller.Position = UDim2.new(0, btn.AbsolutePosition.X, 0, btn.AbsolutePosition.Y + 45)
+        for _, v in pairs(scroller:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= LP then
+                local pBtn = Instance.new("TextButton", scroller)
+                pBtn.Size = UDim2.new(1, 0, 0, 25)
+                pBtn.Text = p.Name
+                pBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 40)
+                pBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                pBtn.MouseButton1Click:Connect(function()
+                    btn.Text = "  " .. p.Name
+                    callback(p)
+                    scroller.Visible = false
+                end)
+            end
+        end
+    end)
+end
 
-local active = { Farm = false, Rebirth = false, Spin = false, AFK = false, Hatch = false, Delete = false }
+local function NewSlider(parent, text, min, max, callback)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = UDim2.new(1, 0, 0, 50)
+    frame.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 6)
+    local label = Instance.new("TextLabel", frame)
+    label.Size = UDim2.new(1, 0, 0, 20)
+    label.BackgroundTransparency = 1
+    label.Text = "  " .. text
+    label.TextColor3 = Color3.fromRGB(200, 200, 200)
+    label.Font = Enum.Font.GothamSemibold
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    local sliderBg = Instance.new("Frame", frame)
+    sliderBg.Size = UDim2.new(0.9, 0, 0, 6)
+    sliderBg.Position = UDim2.new(0.05, 0, 0.7, 0)
+    sliderBg.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    local fill = Instance.new("Frame", sliderBg)
+    fill.Size = UDim2.new(0.5, 0, 1, 0)
+    fill.BackgroundColor3 = Color3.fromRGB(180, 50, 255)
+    sliderBg.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local move; move = UIS.InputChanged:Connect(function(i)
+                if i.UserInputType == Enum.UserInputType.MouseMovement then
+                    local p = math.clamp((i.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X, 0, 1)
+                    fill.Size = UDim2.new(p, 0, 1, 0)
+                    callback(math.floor(min + (max - min) * p))
+                end
+            end)
+            UIS.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then move:Disconnect() end end)
+        end
+    end)
+end
+
+NewTabButton("Main", 60, K13_Tabs.Main)
+NewTabButton("Kills", 100, K13_Tabs.Kills)
+NewTabButton("Misc", 140, K13_Tabs.Misc)
+NewTabButton("Settings", 180, K13_Tabs.Settings)
+
+local active = { Farm = false, Rebirth = false, Chocolate = false, KillAll = false, TargetKill = false, View = false, AFK = false, InfJump = false }
+local targetPlayer = nil
+local viewTarget = nil
 
 NewToggle(K13_Tabs.Main, "Fast Farm", function(v) active.Farm = v end)
 NewToggle(K13_Tabs.Main, "Fast Rebirth", function(v) active.Rebirth = v end)
-NewToggle(K13_Tabs.Misc, "Auto Hatch", function(v) active.Hatch = v end)
-NewToggle(K13_Tabs.Misc, "Auto Delete", function(v) active.Delete = v end)
-NewToggle(K13_Tabs.Misc, "Auto Spin", function(v) active.Spin = v end)
-NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) active.AFK = v end)
 
-local VirtualUser = game:GetService("VirtualUser")
-game:GetService("Players").LocalPlayer.Idled:Connect(function()
-    if active.AFK then
-        print("K13 Hub: Anti-AFK Active!")
-        VirtualUser:CaptureController()
-        VirtualUser:ClickButton2(Vector2.new())
+NewToggle(K13_Tabs.Kills, "Kill ALL", function(v) active.KillAll = v end)
+NewToggle(K13_Tabs.Kills, "Kill Target", function(v) active.TargetKill = v end)
+NewDropdown(K13_Tabs.Kills, "Player", function(p) targetPlayer = p end)
+NewToggle(K13_Tabs.Kills, "View Player", function(v) active.View = v end)
+NewDropdown(K13_Tabs.Kills, "View", function(p) viewTarget = p end)
+
+NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate", function(v) active.Chocolate = v end)
+NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) active.AFK = v 
+    if v then print("K13: Anti-AFK Enabled") else print("K13: Anti-AFK Disabled") end
+end)
+
+NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) active.InfJump = v end)
+NewSlider(K13_Tabs.Settings, "WalkSpeed", 16, 250, function(v) if LP.Character:FindFirstChild("Humanoid") then LP.Character.Humanoid.WalkSpeed = v end end)
+
+RunService.RenderStepped:Connect(function()
+    if active.View and viewTarget and viewTarget.Character and viewTarget.Character:FindFirstChild("Humanoid") then
+        workspace.CurrentCamera.CameraSubject = viewTarget.Character.Humanoid
+    else
+        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+            workspace.CurrentCamera.CameraSubject = LP.Character.Humanoid
+        end
+    end
+    if active.KillAll then
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                if (LP.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude < 25 then
+                    ReplicatedStorage.RemotesEvent.PunchEvent:FireServer()
+                end
+            end
+        end
+    end
+    if active.TargetKill and targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        if (LP.Character.HumanoidRootPart.Position - targetPlayer.Character.HumanoidRootPart.Position).Magnitude < 25 then
+            ReplicatedStorage.RemotesEvent.PunchEvent:FireServer()
+        end
     end
 end)
 
@@ -155,34 +245,37 @@ task.spawn(function()
     while task.wait(0.2) do
         if active.Farm then
             pcall(function()
-                local machine = game.Workspace.MachinesFolder["Bench Press Muscle Emperor"]
-                game.ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(machine, true)
+                local m = workspace.MachinesFolder["Bench Press Muscle Emperor"]
+                ReplicatedStorage.RemotesEvent.MachineActiveFunction:InvokeServer(m, true)
                 task.wait(0.1)
-                game.ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
+                ReplicatedStorage.RemotesEvent.MachineActiveEvent:FireServer()
             end)
         end
-        if active.Rebirth then game.ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end
-        if active.Spin then game.ReplicatedStorage.RemotesEvent.SpinFunction:InvokeServer() end
+        if active.Rebirth then ReplicatedStorage.RemotesEvent.RebirthEvent:FireServer() end
     end
 end)
 
 task.spawn(function()
-    local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
-    while task.wait(0.5) do
-        if active.Hatch then
-            pcall(function() game.ReplicatedStorage.RemotesEvent.OpenPetEvent:FireServer("mythic") end)
-        end
-        if active.Delete then
-            pcall(function()
-                for _, obj in pairs(game.Players.LocalPlayer:GetDescendants()) do
-                    for _, petName in pairs(petKeywords) do
-                        if obj.Name == petName and obj.Name ~= "Space Dragon" then
-                            game.ReplicatedStorage.RemotesEvent.SellPetEvent:FireServer(obj)
-                        end
-                    end
-                end
-            end)
-        end
+    while true do
+        if active.Chocolate then
+            pcall(function() firesignal(ReplicatedStorage.chocolateframe.Chocolate.upground.clickbutton.MouseButton1Click) end)
+            task.wait(300)
+        else task.wait(1) end
+    end
+end)
+
+UIS.JumpRequest:Connect(function()
+    if active.InfJump and LP.Character:FindFirstChild("Humanoid") then
+        LP.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
+local VU = game:GetService("VirtualUser")
+LP.Idled:Connect(function()
+    if active.AFK then
+        VU:CaptureController()
+        VU:ClickButton2(Vector2.new())
+        print("K13: Anti-AFK Active at " .. os.date("%X"))
     end
 end)
 
