@@ -20,7 +20,7 @@ local RemotesEvent = ReplicatedStorage:WaitForChild("RemotesEvent")
 local OpenPetEvent = RemotesEvent:WaitForChild("OpenPetEvent")
 local SellPetEvent = RemotesEvent:WaitForChild("SellPetEvent")
 
-local flg = { Farm = false, Reb = false, Choc = false, AFK = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false, Glitch = false }
+local flg = { Farm = false, Reb = false, Choc = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false, Glitch = false }
 local KEEP_PET = "Space Dragon"
 local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
 local machines = {
@@ -29,27 +29,7 @@ local machines = {
     "Bench Press", "Squat", "Pull Ups", "Treadmill", "Push Ups", "Chin Ups", "Stone Squat"
 }
 
-local mt = getrawmetatable(game)
-local oldNamecall = mt.__namecall
-setreadonly(mt, false)
-mt.__namecall = newcclosure(function(self, ...)
-    local method = getnamecallmethod()
-    if method == "Create" and self == TweenService then
-        local args = {...}
-        local obj = args[1]
-        if obj then
-            local ok, name = pcall(function() return obj.Name:lower() end)
-            if ok and (name:find("pet") or name:find("open") or name:find("reveal")) then
-                local be = Instance.new("BindableEvent")
-                return {Play = function() be:Fire() end, Cancel = function() end, Pause = function() end, Completed = be.Event}
-            end
-        end
-    end
-    return oldNamecall(self, ...)
-end)
-setreadonly(mt, true)
-
-K13_UI.Name = "K13_Hub_Ishi_V10"
+K13_UI.Name = "K13_Hub_Sai_V11"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -67,7 +47,7 @@ MainGlow.Thickness = 3
 K13_Title.Parent = K13_MainFrame
 K13_Title.Size = UDim2.new(1, 0, 0, 45)
 K13_Title.BackgroundTransparency = 1
-K13_Title.Text = "K13 Hub | By Ishi"
+K13_Title.Text = "K13 Hub | By Sai"
 K13_Title.TextColor3 = Color3.fromRGB(220, 100, 255)
 K13_Title.Font = Enum.Font.GothamBold
 K13_Title.TextSize = 18
@@ -164,59 +144,99 @@ NewTabBtn("Eggs", 45, K13_Tabs.Eggs)
 NewTabBtn("Misc", 80, K13_Tabs.Misc)
 NewTabBtn("Settings", 115, K13_Tabs.Settings)
 
-NewToggle(K13_Tabs.Main, "Fast Farm (Auto-TP Machines)", function(v) flg.Farm = v end, 1)
+NewToggle(K13_Tabs.Main, "Fast Farm (Auto-TP)", function(v) flg.Farm = v end, 1)
 NewToggle(K13_Tabs.Main, "Fast Rebirth (0.1s)", function(v) flg.Reb = v end, 2)
 NewToggle(K13_Tabs.Main, "Fast Glitch (Rock/Bench)", function(v) flg.Glitch = v end, 3)
 
 NewInput(K13_Tabs.Eggs, "mythic", function(v) flg.EggNm = v end, 1)
-NewToggle(K13_Tabs.Eggs, "Auto Hatch (Skip Anim)", function(v) flg.Hatch = v end, 2)
-NewToggle(K13_Tabs.Eggs, "Auto Sell (Ishi Logic)", function(v) flg.DelAll = v end, 3)
+NewToggle(K13_Tabs.Eggs, "Auto Hatch", function(v) flg.Hatch = v end, 2)
+NewToggle(K13_Tabs.Eggs, "Auto Sell", function(v) flg.DelAll = v end, 3)
 
-NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate (Per Sec)", function(v) flg.Choc = v end, 1)
-NewToggle(K13_Tabs.Misc, "Anti-AFK", function(v) flg.AFK = v end, 2)
+NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate (1s)", function(v) flg.Choc = v end, 1)
 
 NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) flg.Jump = v end, 1)
 NewInput(K13_Tabs.Settings, "WalkSpeed", function(v) flg.Speed = tonumber(v) or 16 end, 2)
 
-local CloseBtn = Instance.new("TextButton", K13_Tabs.Settings)
-CloseBtn.Size = UDim2.new(1, 0, 0, 35)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(110, 25, 160)
-CloseBtn.Text = "Destroy UI"
-CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.LayoutOrder = 999
-Instance.new("UICorner", CloseBtn)
-CloseBtn.MouseButton1Click:Connect(function() K13_UI:Destroy() end)
-
+-- AUTO FARM LOOP
 task.spawn(function()
     while task.wait() do
         if flg.Farm then
-            pcall(function()
-                for _, name in pairs(machines) do
+            for _, name in pairs(machines) do
+                if not flg.Farm then break end
+                pcall(function()
                     local m = workspace.MachinesFolder:FindFirstChild(name)
                     if m and LP.Character:FindFirstChild("HumanoidRootPart") then
                         LP.Character.HumanoidRootPart.CFrame = m.InteractionPart.CFrame
                         RemotesEvent.MachineActiveFunction:InvokeServer(m, true)
                         RemotesEvent.MachineActiveEvent:FireServer()
                     end
-                end
-            end)
+                end)
+            end
         end
+    end
+end)
+
+-- AUTO GLITCH LOOP
+task.spawn(function()
+    while task.wait() do
         if flg.Glitch then
             pcall(function()
                 local r = workspace.MachinesFolder:FindFirstChild("Rock Squat Muscle Emperor") or workspace.MachinesFolder:FindFirstChild("Bench Press Muscle Emperor")
                 if r and LP.Character:FindFirstChild("HumanoidRootPart") then
                     LP.Character.HumanoidRootPart.CFrame = r.InteractionPart.CFrame
                     RemotesEvent.MachineActiveFunction:InvokeServer(r, true)
-                    for i = 1, 15 do RemotesEvent.MachineActiveEvent:FireServer() end
+                    for i = 1, 30 do 
+                        RemotesEvent.MachineActiveEvent:FireServer() 
+                    end
                 end
             end)
         end
-        if flg.Reb then task.wait(0.1) pcall(function() RemotesEvent.RebirthEvent:FireServer() end) end
-        if LP.Character and LP.Character:FindFirstChild("Humanoid") then LP.Character.Humanoid.WalkSpeed = flg.Speed end
     end
 end)
 
+-- AUTO REBIRTH LOOP
+task.spawn(function()
+    while task.wait(0.1) do
+        if flg.Reb then
+            pcall(function() RemotesEvent.RebirthEvent:FireServer() end)
+        end
+    end
+end)
+
+-- CHOCOLATE LOOP
+task.spawn(function()
+    while task.wait(1) do
+        if flg.Choc then
+            pcall(function()
+                local g = LP.PlayerGui:FindFirstChild("chocolateframe")
+                if g then firesignal(g.Chocolate.upground.clickbutton.MouseButton1Click) end
+            end)
+        end
+    end
+end)
+
+-- WALK SPEED & JUMP
+task.spawn(function()
+    while task.wait() do
+        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+            LP.Character.Humanoid.WalkSpeed = flg.Speed
+        end
+    end
+end)
+
+UIS.JumpRequest:Connect(function()
+    if flg.Jump and LP.Character and LP.Character:FindFirstChild("Humanoid") then
+        LP.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
+-- DIRECT ANTI-AFK (Always On)
+LP.Idled:Connect(function()
+    game:GetService("VirtualUser"):CaptureController()
+    game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+end)
+
+-- AUTO HATCH & SELL (UNTOUCHED LOGIC)
 task.spawn(function()
     while task.wait(0.3) do
         if flg.Hatch then pcall(function() OpenPetEvent:FireServer(flg.EggNm) end) end
@@ -232,27 +252,4 @@ task.spawn(function()
             end)
         end
     end
-end)
-
-task.spawn(function()
-    while task.wait(1) do
-        if flg.Choc then
-            pcall(function()
-                local g = LP.PlayerGui:FindFirstChild("chocolateframe")
-                if g then 
-                    firesignal(g.Chocolate.upground.clickbutton.MouseButton1Click) 
-                end
-            end)
-        end
-    end
-end)
-
-UIS.JumpRequest:Connect(function()
-    if flg.Jump and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-    end
-end)
-
-LP.Idled:Connect(function()
-    if flg.AFK then game:GetService("VirtualUser"):CaptureController() game:GetService("VirtualUser"):ClickButton2(Vector2.new()) end
 end)
