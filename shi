@@ -28,7 +28,7 @@ local KEEP_PET = "Space Dragon"
 local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
 local emperorMachines = {"Bench Press Muscle Emperor", "Pull Ups Muscle Emperor", "Rock Squat Muscle Emperor"}
 
-K13_UI.Name = "K13_Hub_Sai_V19"
+K13_UI.Name = "K13_Hub_Sai_V20"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -167,7 +167,7 @@ task.spawn(function()
                     local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
                     local seat = m and m:FindFirstChild("SeatMahcine")
                     if m and hrp and seat then
-                        hrp.CFrame = seat.CFrame
+                        hrp.CFrame = seat.CFrame * CFrame.new(0, 3, 0) -- TELEPORT HIGHER
                         task.wait(0.5)
                         if not seat.Occupant then seat:Sit(LP.Character.Humanoid) end
                         MachineActiveFunction:InvokeServer(m, true)
@@ -187,8 +187,8 @@ task.spawn(function()
                 local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
                 local seat = r and r:FindFirstChild("SeatMahcine")
                 if r and hrp and seat then
-                    hrp.CFrame = seat.CFrame
-                    hrp.Anchored = true -- LOCK POSITION ON
+                    hrp.CFrame = seat.CFrame * CFrame.new(0, 3, 0) -- TELEPORT HIGHER
+                    hrp.Anchored = true
                     task.wait(0.5)
                     if not seat.Occupant then seat:Sit(LP.Character.Humanoid) end
                     MachineActiveFunction:InvokeServer(r, true)
@@ -198,7 +198,7 @@ task.spawn(function()
         else
             pcall(function()
                 if LP.Character:FindFirstChild("HumanoidRootPart") then
-                    LP.Character.HumanoidRootPart.Anchored = false -- UNLOCK KAPAG OFF
+                    LP.Character.HumanoidRootPart.Anchored = false
                 end
             end)
         end
