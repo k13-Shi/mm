@@ -13,6 +13,7 @@ local K13_Tabs = {
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 local LP = Players.LocalPlayer
 
 local RemotesEvent = ReplicatedStorage:WaitForChild("RemotesEvent")
@@ -29,7 +30,7 @@ local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss T
 local farmMachines = {"Pull Ups Muscle Emperor", "Bench Press Muscle Emperor"}
 local glitchMachines = {"Rock Squat Muscle Emperor"}
 
-K13_UI.Name = "K13_Hub_Sai_V26"
+K13_UI.Name = "K13_Hub_Sai_V27"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -152,6 +153,16 @@ NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate (1s)", function(v) flg.Choc = v end
 NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) flg.Jump = v end, 1)
 NewInput(K13_Tabs.Settings, "WalkSpeed", function(v) flg.Speed = tonumber(v) or 16 end, 2)
 
+local function SafeTP(targetCFrame)
+    local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
+        local tween = TweenService:Create(hrp, tweenInfo, {CFrame = targetCFrame})
+        tween:Play()
+        tween.Completed:Wait()
+    end
+end
+
 local function AutoTrain(machineTable, isGlitch)
     local hum = LP.Character:FindFirstChild("Humanoid")
     if hum and hum.SeatPart then
@@ -163,8 +174,8 @@ local function AutoTrain(machineTable, isGlitch)
             local m = workspace.MachinesFolder:FindFirstChild(name)
             local seat = m and m:FindFirstChild("SeatMahcine")
             if seat and not seat.Occupant then
-                LP.Character.HumanoidRootPart.CFrame = seat.CFrame
-                task.wait(0.1)
+                SafeTP(seat.CFrame)
+                task.wait(0.2)
                 seat:Sit(hum)
                 break
             end
@@ -173,7 +184,7 @@ local function AutoTrain(machineTable, isGlitch)
 end
 
 task.spawn(function()
-    while task.wait(0.1) do
+    while task.wait(0.5) do
         if flg.Farm then AutoTrain(farmMachines, false)
         elseif flg.Glitch then AutoTrain(glitchMachines, true)
         else
