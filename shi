@@ -21,22 +21,14 @@ local SellPetEvent = RemotesEvent:WaitForChild("SellPetEvent")
 local RebirthEvent = RemotesEvent:WaitForChild("RebirthEvent")
 local MachineActiveFunction = RemotesEvent:WaitForChild("MachineActiveFunction")
 local MachineActiveEvent = RemotesEvent:WaitForChild("MachineActiveEvent")
+local ChocFrame = ReplicatedStorage:WaitForChild("chocolateframe")
 
 local flg = { Farm = false, Reb = false, Choc = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false, Glitch = false, AFK = false }
 local KEEP_PET = "Space Dragon"
 local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
+local machines = {"Bench Press Muscle Emperor", "Squat Muscle Emperor", "Pull Ups Muscle Emperor", "Treadmill Muscle Emperor", "Rock Squat Muscle Emperor", "Push Ups Muscle Emperor"}
 
--- Focus on Emperor/King Machines
-local emperorMachines = {
-    "Bench Press Muscle Emperor", 
-    "Squat Muscle Emperor", 
-    "Pull Ups Muscle Emperor", 
-    "Treadmill Muscle Emperor", 
-    "Rock Squat Muscle Emperor", 
-    "Push Ups Muscle Emperor"
-}
-
-K13_UI.Name = "K13_Hub_Sai_V15"
+K13_UI.Name = "K13_Hub_Sai_V17"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -151,9 +143,9 @@ NewTabBtn("Eggs", 45, K13_Tabs.Eggs)
 NewTabBtn("Misc", 80, K13_Tabs.Misc)
 NewTabBtn("Settings", 115, K13_Tabs.Settings)
 
-NewToggle(K13_Tabs.Main, "Fast Farm (Emperor TP)", function(v) flg.Farm = v end, 1)
+NewToggle(K13_Tabs.Main, "Fast Farm (Emperor)", function(v) flg.Farm = v end, 1)
 NewToggle(K13_Tabs.Main, "Fast Rebirth (0.1s)", function(v) flg.Reb = v end, 2)
-NewToggle(K13_Tabs.Main, "Fast Glitch (Emperor Only)", function(v) flg.Glitch = v end, 3)
+NewToggle(K13_Tabs.Main, "Fast Glitch (Rock Squat)", function(v) flg.Glitch = v end, 3)
 NewToggle(K13_Tabs.Main, "Anti-AFK", function(v) flg.AFK = v end, 4)
 
 NewInput(K13_Tabs.Eggs, "mythic", function(v) flg.EggNm = v end, 1)
@@ -165,18 +157,17 @@ NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate (1s)", function(v) flg.Choc = v end
 NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) flg.Jump = v end, 1)
 NewInput(K13_Tabs.Settings, "WalkSpeed", function(v) flg.Speed = tonumber(v) or 16 end, 2)
 
--- AUTO FARM: Emperor TP
 task.spawn(function()
     while task.wait() do
         if flg.Farm then
-            for _, name in pairs(emperorMachines) do
+            for _, name in pairs(machines) do
                 if not flg.Farm then break end
                 pcall(function()
                     local m = workspace.MachinesFolder:FindFirstChild(name)
-                    local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
                     local seat = m and m:FindFirstChild("SeatMahcine")
-                    if m and hrp and seat then
-                        hrp.CFrame = seat.CFrame
+                    if m and LP.Character:FindFirstChild("HumanoidRootPart") and seat then
+                        LP.Character.HumanoidRootPart.CFrame = seat.CFrame
+                        task.wait(0.5)
                         if not seat.Occupant then seat:Sit(LP.Character.Humanoid) end
                         MachineActiveFunction:InvokeServer(m, true)
                         MachineActiveEvent:FireServer()
@@ -187,57 +178,48 @@ task.spawn(function()
     end
 end)
 
--- AUTO GLITCH: Emperor Squat/Bench
 task.spawn(function()
     while task.wait() do
         if flg.Glitch then
             pcall(function()
-                local target = workspace.MachinesFolder:FindFirstChild("Squat Muscle Emperor") or workspace.MachinesFolder:FindFirstChild("Bench Press Muscle Emperor")
-                local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
-                local seat = target and target:FindFirstChild("SeatMahcine")
-                
-                if target and hrp and seat then
-                    hrp.CFrame = seat.CFrame
+                local r = workspace.MachinesFolder:FindFirstChild("Rock Squat Muscle Emperor")
+                local seat = r and r:FindFirstChild("SeatMahcine")
+                if r and LP.Character:FindFirstChild("HumanoidRootPart") and seat then
+                    LP.Character.HumanoidRootPart.CFrame = seat.CFrame
+                    task.wait(0.5)
                     if not seat.Occupant then seat:Sit(LP.Character.Humanoid) end
-                    MachineActiveFunction:InvokeServer(target, true)
-                    for i = 1, 50 do MachineActiveEvent:FireServer() end
+                    MachineActiveFunction:InvokeServer(r, true)
+                    for i = 1, 45 do MachineActiveEvent:FireServer() end
                 end
             end)
         end
     end
 end)
 
--- FAST REBIRTH
 task.spawn(function()
     while task.wait(0.1) do
-        if flg.Reb then
-            RebirthEvent:FireServer()
-        end
+        if flg.Reb then RebirthEvent:FireServer() end
     end
 end)
 
--- ANTI-AFK
-LP.Idled:Connect(function()
-    if flg.AFK then
-        game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-        task.wait(0.1)
-        game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-    end
-end)
-
--- CHOCOLATE
 task.spawn(function()
     while task.wait(1) do
         if flg.Choc then
             pcall(function()
-                local g = LP.PlayerGui:FindFirstChild("chocolateframe")
-                if g then firesignal(g.Chocolate.upground.clickbutton.MouseButton1Click) end
+                firesignal(ChocFrame.Chocolate.upground.clickbutton.MouseButton1Click)
             end)
         end
     end
 end)
 
--- WALK SPEED & JUMP
+LP.Idled:Connect(function()
+    if flg.AFK then
+        game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        task.wait(0.2)
+        game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    end
+end)
+
 task.spawn(function()
     while task.wait() do
         if LP.Character and LP.Character:FindFirstChild("Humanoid") then
@@ -252,7 +234,6 @@ UIS.JumpRequest:Connect(function()
     end
 end)
 
--- HATCH & SELL (NO TOUCH)
 task.spawn(function()
     while task.wait(0.3) do
         if flg.Hatch then pcall(function() OpenPetEvent:FireServer(flg.EggNm) end) end
