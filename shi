@@ -26,11 +26,10 @@ local ChocFrame = ReplicatedStorage:WaitForChild("chocolateframe")
 local flg = { Farm = false, Reb = false, Choc = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false, Glitch = false, AFK = false }
 local KEEP_PET = "Space Dragon"
 local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
-
 local farmMachines = {"Pull Ups Muscle Emperor", "Bench Press Muscle Emperor"}
 local glitchMachines = {"Rock Squat Muscle Emperor"}
 
-K13_UI.Name = "K13_Hub_Sai_V23"
+K13_UI.Name = "K13_Hub_Sai_V26"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -63,16 +62,13 @@ ToggleButton.Font = Enum.Font.GothamBold
 Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(1, 0)
 Instance.new("UIStroke", ToggleButton).Color = Color3.fromRGB(180, 50, 255)
 
-ToggleButton.MouseButton1Click:Connect(function()
-    K13_MainFrame.Visible = not K13_MainFrame.Visible
-end)
+ToggleButton.MouseButton1Click:Connect(function() K13_MainFrame.Visible = not K13_MainFrame.Visible end)
 
 K13_Sidebar.Parent = K13_MainFrame
 K13_Sidebar.BackgroundColor3 = Color3.fromRGB(20, 10, 40)
 K13_Sidebar.Position = UDim2.new(0, 12, 0, 55)
 K13_Sidebar.Size = UDim2.new(0, 125, 1, -70)
 Instance.new("UICorner", K13_Sidebar)
-Instance.new("UIStroke", K13_Sidebar).Color = Color3.fromRGB(180, 50, 255)
 
 K13_Content.Parent = K13_MainFrame
 K13_Content.Position = UDim2.new(0, 145, 0, 55)
@@ -94,23 +90,12 @@ local function NewTabBtn(n, p, t)
     end)
 end
 
-for name, frame in pairs(K13_Tabs) do
-    frame.Parent = K13_Content
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundTransparency = 1
-    frame.Visible = (name == "Main")
-    local l = Instance.new("UIListLayout", frame)
-    l.Padding = UDim.new(0, 5)
-    l.SortOrder = Enum.SortOrder.LayoutOrder
-end
-
 local function NewToggle(p, t, c, lo)
     local f = Instance.new("Frame", p)
     f.Size = UDim2.new(1, 0, 0, 30)
     f.BackgroundColor3 = Color3.fromRGB(30, 15, 55)
     f.LayoutOrder = lo or 0
     Instance.new("UICorner", f)
-    Instance.new("UIStroke", f).Color = Color3.fromRGB(180, 50, 255)
     local b = Instance.new("TextButton", f)
     b.Size = UDim2.new(1, 0, 1, 0)
     b.BackgroundTransparency = 1
@@ -131,7 +116,6 @@ local function NewInput(p, t, c, lo)
     f.BackgroundColor3 = Color3.fromRGB(30, 15, 55)
     f.LayoutOrder = lo or 0
     Instance.new("UICorner", f)
-    Instance.new("UIStroke", f).Color = Color3.fromRGB(180, 50, 255)
     local i = Instance.new("TextBox", f)
     i.Size = UDim2.new(1, 0, 1, 0)
     i.BackgroundTransparency = 1
@@ -140,14 +124,23 @@ local function NewInput(p, t, c, lo)
     i.FocusLost:Connect(function() c(i.Text) end)
 end
 
+for name, frame in pairs(K13_Tabs) do
+    frame.Parent = K13_Content
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundTransparency = 1
+    frame.Visible = (name == "Main")
+    local l = Instance.new("UIListLayout", frame)
+    l.Padding = UDim.new(0, 5)
+end
+
 NewTabBtn("Main", 10, K13_Tabs.Main)
 NewTabBtn("Eggs", 45, K13_Tabs.Eggs)
 NewTabBtn("Misc", 80, K13_Tabs.Misc)
 NewTabBtn("Settings", 115, K13_Tabs.Settings)
 
-NewToggle(K13_Tabs.Main, "Fast Farm (Pull/Bench)", function(v) flg.Farm = v end, 1)
-NewToggle(K13_Tabs.Main, "Fast Rebirth", function(v) flg.Reb = v end, 2)
-NewToggle(K13_Tabs.Main, "Fast Glitch (Rock Squat)", function(v) flg.Glitch = v end, 3)
+NewToggle(K13_Tabs.Main, "Fast Farm", function(v) flg.Farm = v end, 1)
+NewToggle(K13_Tabs.Main, "Fast Glitch", function(v) flg.Glitch = v end, 2)
+NewToggle(K13_Tabs.Main, "Fast Rebirth", function(v) flg.Reb = v end, 3)
 NewToggle(K13_Tabs.Main, "Anti-AFK", function(v) flg.AFK = v end, 4)
 
 NewInput(K13_Tabs.Eggs, "mythic", function(v) flg.EggNm = v end, 1)
@@ -159,109 +152,49 @@ NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate (1s)", function(v) flg.Choc = v end
 NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) flg.Jump = v end, 1)
 NewInput(K13_Tabs.Settings, "WalkSpeed", function(v) flg.Speed = tonumber(v) or 16 end, 2)
 
-task.spawn(function()
-    while task.wait() do
-        if flg.Farm then
-            pcall(function()
-                local hum = LP.Character:FindFirstChild("Humanoid")
-                if hum and hum.SeatPart then
-                    MachineActiveFunction:InvokeServer(hum.SeatPart.Parent, true)
-                    MachineActiveEvent:FireServer()
-                else
-                    for _, name in pairs(farmMachines) do
-                        local m = workspace.MachinesFolder:FindFirstChild(name)
-                        local seat = m and m:FindFirstChild("SeatMahcine")
-                        if m and seat and not seat.Occupant then
-                            LP.Character.HumanoidRootPart.CFrame = seat.CFrame
-                            task.wait(0.1)
-                            seat:Sit(hum)
-                            break 
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end)
-
-task.spawn(function()
-    while task.wait() do
-        if flg.Glitch then
-            pcall(function()
-                local hum = LP.Character:FindFirstChild("Humanoid")
-                if hum and hum.SeatPart then
-                    LP.Character.HumanoidRootPart.Anchored = true
-                    MachineActiveFunction:InvokeServer(hum.SeatPart.Parent, true)
-                    for i = 1, 50 do MachineActiveEvent:FireServer() end
-                else
-                    for _, name in pairs(glitchMachines) do
-                        local r = workspace.MachinesFolder:FindFirstChild(name)
-                        local seat = r and r:FindFirstChild("SeatMahcine")
-                        if r and seat and not seat.Occupant then
-                            LP.Character.HumanoidRootPart.CFrame = seat.CFrame
-                            task.wait(0.1)
-                            seat:Sit(hum)
-                            break
-                        end
-                    end
-                end
-            end)
-        else
-            if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
-                LP.Character.HumanoidRootPart.Anchored = false
+local function AutoTrain(machineTable, isGlitch)
+    local hum = LP.Character:FindFirstChild("Humanoid")
+    if hum and hum.SeatPart then
+        if isGlitch then LP.Character.HumanoidRootPart.Anchored = true end
+        MachineActiveFunction:InvokeServer(hum.SeatPart.Parent, true)
+        if isGlitch then for i=1,20 do MachineActiveEvent:FireServer() end else MachineActiveEvent:FireServer() end
+    else
+        for _, name in pairs(machineTable) do
+            local m = workspace.MachinesFolder:FindFirstChild(name)
+            local seat = m and m:FindFirstChild("SeatMahcine")
+            if seat and not seat.Occupant then
+                LP.Character.HumanoidRootPart.CFrame = seat.CFrame
+                task.wait(0.1)
+                seat:Sit(hum)
+                break
             end
         end
     end
-end)
+end
 
 task.spawn(function()
     while task.wait(0.1) do
-        if flg.Reb then RebirthEvent:FireServer() end
-    end
-end)
-
-task.spawn(function()
-    while task.wait(1) do
-        if flg.Choc then
-            pcall(function()
-                firesignal(ChocFrame.Chocolate.upground.clickbutton.MouseButton1Click)
-            end)
+        if flg.Farm then AutoTrain(farmMachines, false)
+        elseif flg.Glitch then AutoTrain(glitchMachines, true)
+        else
+            if LP.Character:FindFirstChild("HumanoidRootPart") then LP.Character.HumanoidRootPart.Anchored = false end
         end
     end
 end)
 
-LP.Idled:Connect(function()
-    if flg.AFK then
-        game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-        task.wait(0.1)
-        game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-    end
-end)
-
+task.spawn(function() while task.wait(0.1) do if flg.Reb then RebirthEvent:FireServer() end end end)
+task.spawn(function() while task.wait(1) do if flg.Choc then pcall(function() firesignal(ChocFrame.Chocolate.upground.clickbutton.MouseButton1Click) end) end end end)
+LP.Idled:Connect(function() if flg.AFK then game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame) task.wait(0.1) game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame) end end)
+task.spawn(function() while task.wait() do if LP.Character and LP.Character:FindFirstChild("Humanoid") then LP.Character.Humanoid.WalkSpeed = flg.Speed end end end)
+UIS.JumpRequest:Connect(function() if flg.Jump and LP.Character:FindFirstChild("Humanoid") then LP.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping) end end)
 task.spawn(function()
-    while task.wait() do
-        if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-            LP.Character.Humanoid.WalkSpeed = flg.Speed
-        end
-    end
-end)
-
-UIS.JumpRequest:Connect(function()
-    if flg.Jump and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-    end
-end)
-
-task.spawn(function()
-    while task.wait(0.3) do
+    while task.wait(0.5) do
         if flg.Hatch then pcall(function() OpenPetEvent:FireServer(flg.EggNm) end) end
         if flg.DelAll then
             pcall(function()
                 for _, obj in pairs(LP.Character:GetDescendants()) do
                     for _, petName in pairs(petKeywords) do
-                        if obj.Name == petName and obj.Name ~= KEEP_PET then
-                            SellPetEvent:FireServer(obj)
-                        end
+                        if obj.Name == petName and obj.Name ~= KEEP_PET then SellPetEvent:FireServer(obj) end
                     end
                 end
             end)
