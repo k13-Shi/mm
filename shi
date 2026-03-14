@@ -26,7 +26,7 @@ local ChocFrame = ReplicatedStorage:WaitForChild("chocolateframe")
 local flg = { Farm = false, Reb = false, Choc = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false, Glitch = false, AFK = false }
 local KEEP_PET = "Space Dragon"
 local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
-local emperorMachines = {"Bench Press Muscle Emperor", "Squat Muscle Emperor", "Pull Ups Muscle Emperor", "Treadmill Muscle Emperor", "Rock Squat Muscle Emperor", "Push Ups Muscle Emperor"}
+local emperorMachines = {"Bench Press Muscle Emperor", "Pull Ups Muscle Emperor", "Rock Squat Muscle Emperor", }
 
 K13_UI.Name = "K13_Hub_Sai_V18"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
