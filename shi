@@ -26,9 +26,11 @@ local ChocFrame = ReplicatedStorage:WaitForChild("chocolateframe")
 local flg = { Farm = false, Reb = false, Choc = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false, Glitch = false, AFK = false }
 local KEEP_PET = "Space Dragon"
 local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
-local emperorMachines = {"Bench Press Muscle Emperor", "Pull Ups Muscle Emperor", "Rock Squat Muscle Emperor"}
 
-K13_UI.Name = "K13_Hub_Sai_V20"
+local farmMachines = {"Pull Ups Muscle Emperor", "Bench Press Muscle Emperor"}
+local glitchMachines = {"Rock Squat Muscle Emperor"}
+
+K13_UI.Name = "K13_Hub_Sai_V21"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -160,16 +162,17 @@ NewInput(K13_Tabs.Settings, "WalkSpeed", function(v) flg.Speed = tonumber(v) or 
 task.spawn(function()
     while task.wait() do
         if flg.Farm then
-            for _, name in pairs(emperorMachines) do
+            for _, name in pairs(farmMachines) do
                 if not flg.Farm then break end
                 pcall(function()
                     local m = workspace.MachinesFolder:FindFirstChild(name)
                     local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
                     local seat = m and m:FindFirstChild("SeatMahcine")
                     if m and hrp and seat then
-                        hrp.CFrame = seat.CFrame * CFrame.new(0, 3, 0) -- TELEPORT HIGHER
-                        task.wait(0.5)
-                        if not seat.Occupant then seat:Sit(LP.Character.Humanoid) end
+                        hrp.CFrame = seat.CFrame * CFrame.new(0, 1.5, 0)
+                        task.wait(0.1)
+                        seat:Sit(LP.Character.Humanoid)
+                        task.wait(0.1)
                         MachineActiveFunction:InvokeServer(m, true)
                         MachineActiveEvent:FireServer()
                     end
@@ -182,25 +185,27 @@ end)
 task.spawn(function()
     while task.wait() do
         if flg.Glitch then
-            pcall(function()
-                local r = workspace.MachinesFolder:FindFirstChild("Rock Squat Muscle Emperor")
-                local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
-                local seat = r and r:FindFirstChild("SeatMahcine")
-                if r and hrp and seat then
-                    hrp.CFrame = seat.CFrame * CFrame.new(0, 3, 0) -- TELEPORT HIGHER
-                    hrp.Anchored = true
-                    task.wait(0.5)
-                    if not seat.Occupant then seat:Sit(LP.Character.Humanoid) end
-                    MachineActiveFunction:InvokeServer(r, true)
-                    for i = 1, 50 do MachineActiveEvent:FireServer() end
-                end
-            end)
+            for _, name in pairs(glitchMachines) do
+                if not flg.Glitch then break end
+                pcall(function()
+                    local r = workspace.MachinesFolder:FindFirstChild(name)
+                    local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
+                    local seat = r and r:FindFirstChild("SeatMahcine")
+                    if r and hrp and seat then
+                        hrp.CFrame = seat.CFrame * CFrame.new(0, 1.5, 0)
+                        hrp.Anchored = true
+                        task.wait(0.1)
+                        seat:Sit(LP.Character.Humanoid)
+                        task.wait(0.1)
+                        MachineActiveFunction:InvokeServer(r, true)
+                        for i = 1, 50 do MachineActiveEvent:FireServer() end
+                    end
+                end)
+            end
         else
-            pcall(function()
-                if LP.Character:FindFirstChild("HumanoidRootPart") then
-                    LP.Character.HumanoidRootPart.Anchored = false
-                end
-            end)
+            if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                LP.Character.HumanoidRootPart.Anchored = false
+            end
         end
     end
 end)
