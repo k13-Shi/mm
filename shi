@@ -26,9 +26,9 @@ local ChocFrame = ReplicatedStorage:WaitForChild("chocolateframe")
 local flg = { Farm = false, Reb = false, Choc = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false, Glitch = false, AFK = false }
 local KEEP_PET = "Space Dragon"
 local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
-local machines = {"Bench Press Muscle Emperor", "Squat Muscle Emperor", "Pull Ups Muscle Emperor", "Treadmill Muscle Emperor", "Rock Squat Muscle Emperor", "Push Ups Muscle Emperor"}
+local emperorMachines = {"Bench Press Muscle Emperor", "Squat Muscle Emperor", "Pull Ups Muscle Emperor", "Treadmill Muscle Emperor", "Rock Squat Muscle Emperor", "Push Ups Muscle Emperor"}
 
-K13_UI.Name = "K13_Hub_Sai_V17"
+K13_UI.Name = "K13_Hub_Sai_V18"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -146,26 +146,28 @@ NewTabBtn("Settings", 115, K13_Tabs.Settings)
 NewToggle(K13_Tabs.Main, "Fast Farm", function(v) flg.Farm = v end, 1)
 NewToggle(K13_Tabs.Main, "Fast Rebirth", function(v) flg.Reb = v end, 2)
 NewToggle(K13_Tabs.Main, "Fast Glitch", function(v) flg.Glitch = v end, 3)
-newtoggle(k13_tabs.Main, "Anti-AFK", function(v) flg.AFK = v end, 4)
+NewToggle(K13_Tabs.Main, "Anti-AFK", function(v) flg.AFK = v end, 4)
 
 NewInput(K13_Tabs.Eggs, "mythic", function(v) flg.EggNm = v end, 1)
 NewToggle(K13_Tabs.Eggs, "Auto Hatch", function(v) flg.Hatch = v end, 2)
 NewToggle(K13_Tabs.Eggs, "Auto Sell", function(v) flg.DelAll = v end, 3)
 
-NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate", function(v) flg.Choc = v end, 1)
+NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate (1s)", function(v) flg.Choc = v end, 1)
+
 NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) flg.Jump = v end, 1)
 NewInput(K13_Tabs.Settings, "WalkSpeed", function(v) flg.Speed = tonumber(v) or 16 end, 2)
 
 task.spawn(function()
     while task.wait() do
         if flg.Farm then
-            for _, name in pairs(machines) do
+            for _, name in pairs(emperorMachines) do
                 if not flg.Farm then break end
                 pcall(function()
                     local m = workspace.MachinesFolder:FindFirstChild(name)
+                    local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
                     local seat = m and m:FindFirstChild("SeatMahcine")
-                    if m and LP.Character:FindFirstChild("HumanoidRootPart") and seat then
-                        LP.Character.HumanoidRootPart.CFrame = seat.CFrame
+                    if m and hrp and seat then
+                        hrp.CFrame = seat.CFrame
                         task.wait(0.5)
                         if not seat.Occupant then seat:Sit(LP.Character.Humanoid) end
                         MachineActiveFunction:InvokeServer(m, true)
@@ -182,13 +184,14 @@ task.spawn(function()
         if flg.Glitch then
             pcall(function()
                 local r = workspace.MachinesFolder:FindFirstChild("Rock Squat Muscle Emperor")
+                local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
                 local seat = r and r:FindFirstChild("SeatMahcine")
-                if r and LP.Character:FindFirstChild("HumanoidRootPart") and seat then
-                    LP.Character.HumanoidRootPart.CFrame = seat.CFrame
+                if r and hrp and seat then
+                    hrp.CFrame = seat.CFrame
                     task.wait(0.5)
                     if not seat.Occupant then seat:Sit(LP.Character.Humanoid) end
                     MachineActiveFunction:InvokeServer(r, true)
-                    for i = 1, 45 do MachineActiveEvent:FireServer() end
+                    for i = 1, 50 do MachineActiveEvent:FireServer() end
                 end
             end)
         end
@@ -197,7 +200,9 @@ end)
 
 task.spawn(function()
     while task.wait(0.1) do
-        if flg.Reb then RebirthEvent:FireServer() end
+        if flg.Reb then
+            RebirthEvent:FireServer()
+        end
     end
 end)
 
@@ -214,7 +219,7 @@ end)
 LP.Idled:Connect(function()
     if flg.AFK then
         game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-        task.wait(0.2)
+        task.wait(0.1)
         game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
     end
 end)
