@@ -30,7 +30,7 @@ local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss T
 local farmMachines = {"Pull Ups Muscle Emperor", "Bench Press Muscle Emperor"}
 local glitchMachines = {"Rock Squat Muscle Emperor"}
 
-K13_UI.Name = "K13_Hub_Sai_V21"
+K13_UI.Name = "K13_Hub_Sai_V22"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -145,9 +145,9 @@ NewTabBtn("Eggs", 45, K13_Tabs.Eggs)
 NewTabBtn("Misc", 80, K13_Tabs.Misc)
 NewTabBtn("Settings", 115, K13_Tabs.Settings)
 
-NewToggle(K13_Tabs.Main, "Fast Farm", function(v) flg.Farm = v end, 1)
+NewToggle(K13_Tabs.Main, "Fast Farm (Pull/Bench)", function(v) flg.Farm = v end, 1)
 NewToggle(K13_Tabs.Main, "Fast Rebirth", function(v) flg.Reb = v end, 2)
-NewToggle(K13_Tabs.Main, "Fast Glitch", function(v) flg.Glitch = v end, 3)
+NewToggle(K13_Tabs.Main, "Fast Glitch (Rock Squat)", function(v) flg.Glitch = v end, 3)
 NewToggle(K13_Tabs.Main, "Anti-AFK", function(v) flg.AFK = v end, 4)
 
 NewInput(K13_Tabs.Eggs, "mythic", function(v) flg.EggNm = v end, 1)
@@ -167,11 +167,13 @@ task.spawn(function()
                 pcall(function()
                     local m = workspace.MachinesFolder:FindFirstChild(name)
                     local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
+                    local hum = LP.Character:FindFirstChild("Humanoid")
                     local seat = m and m:FindFirstChild("SeatMahcine")
-                    if m and hrp and seat then
-                        hrp.CFrame = seat.CFrame * CFrame.new(0, 1.5, 0)
+                    
+                    if m and hrp and seat and not seat.Occupant then
+                        hrp.CFrame = seat.CFrame
                         task.wait(0.1)
-                        seat:Sit(LP.Character.Humanoid)
+                        seat:Sit(hum)
                         task.wait(0.1)
                         MachineActiveFunction:InvokeServer(m, true)
                         MachineActiveEvent:FireServer()
@@ -190,12 +192,14 @@ task.spawn(function()
                 pcall(function()
                     local r = workspace.MachinesFolder:FindFirstChild(name)
                     local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
+                    local hum = LP.Character:FindFirstChild("Humanoid")
                     local seat = r and r:FindFirstChild("SeatMahcine")
-                    if r and hrp and seat then
-                        hrp.CFrame = seat.CFrame * CFrame.new(0, 1.5, 0)
+                    
+                    if r and hrp and seat and not seat.Occupant then
+                        hrp.CFrame = seat.CFrame
                         hrp.Anchored = true
                         task.wait(0.1)
-                        seat:Sit(LP.Character.Humanoid)
+                        seat:Sit(hum)
                         task.wait(0.1)
                         MachineActiveFunction:InvokeServer(r, true)
                         for i = 1, 50 do MachineActiveEvent:FireServer() end
