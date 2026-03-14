@@ -30,7 +30,7 @@ local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss T
 local farmMachines = {"Pull Ups Muscle Emperor", "Bench Press Muscle Emperor"}
 local glitchMachines = {"Rock Squat Muscle Emperor"}
 
-K13_UI.Name = "K13_Hub_Sai_V22"
+K13_UI.Name = "K13_Hub_Sai_V23"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -162,24 +162,24 @@ NewInput(K13_Tabs.Settings, "WalkSpeed", function(v) flg.Speed = tonumber(v) or 
 task.spawn(function()
     while task.wait() do
         if flg.Farm then
-            for _, name in pairs(farmMachines) do
-                if not flg.Farm then break end
-                pcall(function()
-                    local m = workspace.MachinesFolder:FindFirstChild(name)
-                    local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
-                    local hum = LP.Character:FindFirstChild("Humanoid")
-                    local seat = m and m:FindFirstChild("SeatMahcine")
-                    
-                    if m and hrp and seat and not seat.Occupant then
-                        hrp.CFrame = seat.CFrame
-                        task.wait(0.1)
-                        seat:Sit(hum)
-                        task.wait(0.1)
-                        MachineActiveFunction:InvokeServer(m, true)
-                        MachineActiveEvent:FireServer()
+            pcall(function()
+                local hum = LP.Character:FindFirstChild("Humanoid")
+                if hum and hum.SeatPart then
+                    MachineActiveFunction:InvokeServer(hum.SeatPart.Parent, true)
+                    MachineActiveEvent:FireServer()
+                else
+                    for _, name in pairs(farmMachines) do
+                        local m = workspace.MachinesFolder:FindFirstChild(name)
+                        local seat = m and m:FindFirstChild("SeatMahcine")
+                        if m and seat and not seat.Occupant then
+                            LP.Character.HumanoidRootPart.CFrame = seat.CFrame
+                            task.wait(0.1)
+                            seat:Sit(hum)
+                            break 
+                        end
                     end
-                end)
-            end
+                end
+            end)
         end
     end
 end)
@@ -187,25 +187,25 @@ end)
 task.spawn(function()
     while task.wait() do
         if flg.Glitch then
-            for _, name in pairs(glitchMachines) do
-                if not flg.Glitch then break end
-                pcall(function()
-                    local r = workspace.MachinesFolder:FindFirstChild(name)
-                    local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
-                    local hum = LP.Character:FindFirstChild("Humanoid")
-                    local seat = r and r:FindFirstChild("SeatMahcine")
-                    
-                    if r and hrp and seat and not seat.Occupant then
-                        hrp.CFrame = seat.CFrame
-                        hrp.Anchored = true
-                        task.wait(0.1)
-                        seat:Sit(hum)
-                        task.wait(0.1)
-                        MachineActiveFunction:InvokeServer(r, true)
-                        for i = 1, 50 do MachineActiveEvent:FireServer() end
+            pcall(function()
+                local hum = LP.Character:FindFirstChild("Humanoid")
+                if hum and hum.SeatPart then
+                    LP.Character.HumanoidRootPart.Anchored = true
+                    MachineActiveFunction:InvokeServer(hum.SeatPart.Parent, true)
+                    for i = 1, 50 do MachineActiveEvent:FireServer() end
+                else
+                    for _, name in pairs(glitchMachines) do
+                        local r = workspace.MachinesFolder:FindFirstChild(name)
+                        local seat = r and r:FindFirstChild("SeatMahcine")
+                        if r and seat and not seat.Occupant then
+                            LP.Character.HumanoidRootPart.CFrame = seat.CFrame
+                            task.wait(0.1)
+                            seat:Sit(hum)
+                            break
+                        end
                     end
-                end)
-            end
+                end
+            end)
         else
             if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
                 LP.Character.HumanoidRootPart.Anchored = false
