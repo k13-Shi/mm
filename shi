@@ -146,13 +146,13 @@ NewTabBtn("Settings", 115, K13_Tabs.Settings)
 NewToggle(K13_Tabs.Main, "Fast Farm", function(v) flg.Farm = v end, 1)
 NewToggle(K13_Tabs.Main, "Fast Rebirth", function(v) flg.Reb = v end, 2)
 NewToggle(K13_Tabs.Main, "Fast Glitch", function(v) flg.Glitch = v end, 3)
+newtoggle(k13_tabs.Main, "Anti-AFK", function(v) flg.AFK = v end, 4)
 
 NewInput(K13_Tabs.Eggs, "mythic", function(v) flg.EggNm = v end, 1)
 NewToggle(K13_Tabs.Eggs, "Auto Hatch", function(v) flg.Hatch = v end, 2)
 NewToggle(K13_Tabs.Eggs, "Auto Sell", function(v) flg.DelAll = v end, 3)
 
 NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate", function(v) flg.Choc = v end, 1)
-newtoggle(k13_tabs.Misc, "Anti-AFK", function(v) flg.AFK = v end, 4)
 NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) flg.Jump = v end, 1)
 NewInput(K13_Tabs.Settings, "WalkSpeed", function(v) flg.Speed = tonumber(v) or 16 end, 2)
 
