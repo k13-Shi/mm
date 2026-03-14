@@ -26,9 +26,9 @@ local ChocFrame = ReplicatedStorage:WaitForChild("chocolateframe")
 local flg = { Farm = false, Reb = false, Choc = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false, Glitch = false, AFK = false }
 local KEEP_PET = "Space Dragon"
 local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
-local emperorMachines = {"Bench Press Muscle Emperor", "Pull Ups Muscle Emperor", "Rock Squat Muscle Emperor", }
+local emperorMachines = {"Bench Press Muscle Emperor", "Pull Ups Muscle Emperor", "Rock Squat Muscle Emperor"}
 
-K13_UI.Name = "K13_Hub_Sai_V18"
+K13_UI.Name = "K13_Hub_Sai_V19"
 K13_UI.Parent = LP:WaitForChild("PlayerGui")
 K13_UI.ResetOnSpawn = false
 
@@ -188,10 +188,17 @@ task.spawn(function()
                 local seat = r and r:FindFirstChild("SeatMahcine")
                 if r and hrp and seat then
                     hrp.CFrame = seat.CFrame
+                    hrp.Anchored = true -- LOCK POSITION ON
                     task.wait(0.5)
                     if not seat.Occupant then seat:Sit(LP.Character.Humanoid) end
                     MachineActiveFunction:InvokeServer(r, true)
                     for i = 1, 50 do MachineActiveEvent:FireServer() end
+                end
+            end)
+        else
+            pcall(function()
+                if LP.Character:FindFirstChild("HumanoidRootPart") then
+                    LP.Character.HumanoidRootPart.Anchored = false -- UNLOCK KAPAG OFF
                 end
             end)
         end
@@ -200,9 +207,7 @@ end)
 
 task.spawn(function()
     while task.wait(0.1) do
-        if flg.Reb then
-            RebirthEvent:FireServer()
-        end
+        if flg.Reb then RebirthEvent:FireServer() end
     end
 end)
 
