@@ -1,214 +1,123 @@
-local K13_UI = Instance.new("ScreenGui")
-local K13_MainFrame = Instance.new("Frame")
-local K13_Sidebar = Instance.new("Frame")
-local K13_Content = Instance.new("Frame")
-local K13_Title = Instance.new("TextLabel")
-local K13_Tabs = {
-    Main = Instance.new("Frame"),
-    Eggs = Instance.new("Frame"),
-    Misc = Instance.new("Frame"),
-    Settings = Instance.new("Frame")
-}
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local LP = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualUser = game:GetService("VirtualUser")
+local RunService = game:GetService("RunService")
 
-local RemotesEvent = ReplicatedStorage:WaitForChild("RemotesEvent")
-local OpenPetEvent = RemotesEvent:WaitForChild("OpenPetEvent")
-local SellPetEvent = RemotesEvent:WaitForChild("SellPetEvent")
-local RebirthEvent = RemotesEvent:WaitForChild("RebirthEvent")
-local MachineActiveFunction = RemotesEvent:WaitForChild("MachineActiveFunction")
-local MachineActiveEvent = RemotesEvent:WaitForChild("MachineActiveEvent")
-local ChocFrame = ReplicatedStorage:WaitForChild("chocolateframe")
+local Player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local displayName = Player.DisplayName
 
-local flg = { Farm = false, Reb = false, Choc = false, Jump = false, Hatch = false, Speed = 16, EggNm = "mythic", DelAll = false, Glitch = false, AFK = false }
-local KEEP_PET = "Space Dragon"
-local petKeywords = {"Violet Fury", "Ragehorn", "RedHorn", "Leviathos", "Abyss Titan"}
-local farmMachines = {"Pull Ups Muscle Emperor", "Bench Press Muscle Emperor"}
-local glitchMachines = {"Rock Squat Muscle Emperor"}
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-K13_UI.Name = "K13_Hub_Sai_V27"
-K13_UI.Parent = LP:WaitForChild("PlayerGui")
-K13_UI.ResetOnSpawn = false
+local Window = Rayfield:CreateWindow({
+   Name = "K13 | Muscle Masters",
+   LoadingTitle = "K13 Executor",
+   LoadingSubtitle = "by Sai Espinoza",
+   ConfigurationSaving = { Enabled = false },
+   KeySystem = false
+})
 
-K13_MainFrame.Parent = K13_UI
-K13_MainFrame.BackgroundColor3 = Color3.fromRGB(12, 6, 22)
-K13_MainFrame.Position = UDim2.new(0.5, -225, 0.5, -140)
-K13_MainFrame.Size = UDim2.new(0, 480, 0, 320)
-K13_MainFrame.Active = true
-K13_MainFrame.Draggable = true
-Instance.new("UICorner", K13_MainFrame).CornerRadius = UDim.new(0, 15)
-local MainGlow = Instance.new("UIStroke", K13_MainFrame)
-MainGlow.Color = Color3.fromRGB(180, 50, 255)
-MainGlow.Thickness = 3
+local isAutoPunch = false
+local isAutoKillAll = false
+local isTinyCombo = false
+local isSticking = false
+local selectedTarget = nil
+local currentTargetConnection = nil
 
-K13_Title.Parent = K13_MainFrame
-K13_Title.Size = UDim2.new(1, 0, 0, 45)
-K13_Title.BackgroundTransparency = 1
-K13_Title.Text = "K13 Hub | By Sai"
-K13_Title.TextColor3 = Color3.fromRGB(220, 100, 255)
-K13_Title.Font = Enum.Font.GothamBold
-K13_Title.TextSize = 18
-
-local ToggleButton = Instance.new("TextButton", K13_UI)
-ToggleButton.Size = UDim2.new(0, 60, 0, 60)
-ToggleButton.Position = UDim2.new(0, 20, 0.5, -30)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 5, 30)
-ToggleButton.Text = "K13"
-ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.Font = Enum.Font.GothamBold
-Instance.new("UICorner", ToggleButton).CornerRadius = UDim.new(1, 0)
-Instance.new("UIStroke", ToggleButton).Color = Color3.fromRGB(180, 50, 255)
-
-ToggleButton.MouseButton1Click:Connect(function() K13_MainFrame.Visible = not K13_MainFrame.Visible end)
-
-K13_Sidebar.Parent = K13_MainFrame
-K13_Sidebar.BackgroundColor3 = Color3.fromRGB(20, 10, 40)
-K13_Sidebar.Position = UDim2.new(0, 12, 0, 55)
-K13_Sidebar.Size = UDim2.new(0, 125, 1, -70)
-Instance.new("UICorner", K13_Sidebar)
-
-K13_Content.Parent = K13_MainFrame
-K13_Content.Position = UDim2.new(0, 145, 0, 55)
-K13_Content.Size = UDim2.new(1, -160, 1, -70)
-K13_Content.BackgroundTransparency = 1
-
-local function NewTabBtn(n, p, t)
-    local b = Instance.new("TextButton", K13_Sidebar)
-    b.Size = UDim2.new(0.9, 0, 0, 30)
-    b.Position = UDim2.new(0.05, 0, 0, p)
-    b.BackgroundColor3 = Color3.fromRGB(45, 20, 80)
-    b.Text = n
-    b.TextColor3 = Color3.fromRGB(255, 255, 255)
-    b.Font = Enum.Font.GothamMedium
-    Instance.new("UICorner", b)
-    b.MouseButton1Click:Connect(function()
-        for _, f in pairs(K13_Tabs) do f.Visible = false end
-        t.Visible = true
-    end)
-end
-
-local function NewToggle(p, t, c, lo)
-    local f = Instance.new("Frame", p)
-    f.Size = UDim2.new(1, 0, 0, 30)
-    f.BackgroundColor3 = Color3.fromRGB(30, 15, 55)
-    f.LayoutOrder = lo or 0
-    Instance.new("UICorner", f)
-    local b = Instance.new("TextButton", f)
-    b.Size = UDim2.new(1, 0, 1, 0)
-    b.BackgroundTransparency = 1
-    b.Text = "  " .. t
-    b.TextColor3 = Color3.fromRGB(230, 200, 255)
-    b.TextXAlignment = Enum.TextXAlignment.Left
-    local on = false
-    b.MouseButton1Click:Connect(function()
-        on = not on
-        f.BackgroundColor3 = on and Color3.fromRGB(80, 40, 150) or Color3.fromRGB(30, 15, 55)
-        c(on)
-    end)
-end
-
-local function NewInput(p, t, c, lo)
-    local f = Instance.new("Frame", p)
-    f.Size = UDim2.new(1, 0, 0, 30)
-    f.BackgroundColor3 = Color3.fromRGB(30, 15, 55)
-    f.LayoutOrder = lo or 0
-    Instance.new("UICorner", f)
-    local i = Instance.new("TextBox", f)
-    i.Size = UDim2.new(1, 0, 1, 0)
-    i.BackgroundTransparency = 1
-    i.Text = t
-    i.TextColor3 = Color3.fromRGB(255, 255, 255)
-    i.FocusLost:Connect(function() c(i.Text) end)
-end
-
-for name, frame in pairs(K13_Tabs) do
-    frame.Parent = K13_Content
-    frame.Size = UDim2.new(1, 0, 1, 0)
-    frame.BackgroundTransparency = 1
-    frame.Visible = (name == "Main")
-    local l = Instance.new("UIListLayout", frame)
-    l.Padding = UDim.new(0, 5)
-end
-
-NewTabBtn("Main", 10, K13_Tabs.Main)
-NewTabBtn("Eggs", 45, K13_Tabs.Eggs)
-NewTabBtn("Misc", 80, K13_Tabs.Misc)
-NewTabBtn("Settings", 115, K13_Tabs.Settings)
-
-NewToggle(K13_Tabs.Main, "Fast Farm", function(v) flg.Farm = v end, 1)
-NewToggle(K13_Tabs.Main, "Fast Glitch", function(v) flg.Glitch = v end, 2)
-NewToggle(K13_Tabs.Main, "Fast Rebirth", function(v) flg.Reb = v end, 3)
-NewToggle(K13_Tabs.Main, "Anti-AFK", function(v) flg.AFK = v end, 4)
-
-NewInput(K13_Tabs.Eggs, "mythic", function(v) flg.EggNm = v end, 1)
-NewToggle(K13_Tabs.Eggs, "Auto Hatch", function(v) flg.Hatch = v end, 2)
-NewToggle(K13_Tabs.Eggs, "Auto Sell", function(v) flg.DelAll = v end, 3)
-
-NewToggle(K13_Tabs.Misc, "Auto Eat Chocolate (1s)", function(v) flg.Choc = v end, 1)
-
-NewToggle(K13_Tabs.Settings, "Infinite Jump", function(v) flg.Jump = v end, 1)
-NewInput(K13_Tabs.Settings, "WalkSpeed", function(v) flg.Speed = tonumber(v) or 16 end, 2)
-
-local function SafeTP(targetCFrame)
-    local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
-    if hrp then
-        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear)
-        local tween = TweenService:Create(hrp, tweenInfo, {CFrame = targetCFrame})
-        tween:Play()
-        tween.Completed:Wait()
-    end
-end
-
-local function AutoTrain(machineTable, isGlitch)
-    local hum = LP.Character:FindFirstChild("Humanoid")
-    if hum and hum.SeatPart then
-        if isGlitch then LP.Character.HumanoidRootPart.Anchored = true end
-        MachineActiveFunction:InvokeServer(hum.SeatPart.Parent, true)
-        if isGlitch then for i=1,20 do MachineActiveEvent:FireServer() end else MachineActiveEvent:FireServer() end
-    else
-        for _, name in pairs(machineTable) do
-            local m = workspace.MachinesFolder:FindFirstChild(name)
-            local seat = m and m:FindFirstChild("SeatMahcine")
-            if seat and not seat.Occupant then
-                SafeTP(seat.CFrame)
-                task.wait(0.2)
-                seat:Sit(hum)
-                break
+local function setCharSize(size)
+    pcall(function() 
+        ReplicatedStorage.RemotesEvent.SizeChanged:FireServer(size)
+        local char = Player.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.BodyDepthScale.Value = size
+                hum.BodyHeightScale.Value = size
+                hum.BodyWidthScale.Value = size
+                hum.HeadScale.Value = size
             end
         end
-    end
+    end)
 end
 
-task.spawn(function()
-    while task.wait(0.5) do
-        if flg.Farm then AutoTrain(farmMachines, false)
-        elseif flg.Glitch then AutoTrain(glitchMachines, true)
-        else
-            if LP.Character:FindFirstChild("HumanoidRootPart") then LP.Character.HumanoidRootPart.Anchored = false end
+local MainTab = Window:CreateTab("Farm", 4483362458)
+local KillTab = Window:CreateTab("Killing", 4483362458)
+
+MainTab:CreateToggle({
+   Name = "Auto Strength",
+   CurrentValue = false,
+   Callback = function(state) isAutoPunch = state end,
+})
+
+KillTab:CreateToggle({
+   Name = "Auto Kill Everyone",
+   CurrentValue = false,
+   Callback = function(state) isAutoKillAll = state end,
+})
+
+KillTab:CreateToggle({
+   Name = "Tiny Size Combo",
+   CurrentValue = false,
+   Callback = function(state)
+      isTinyCombo = state
+      if state then
+         setCharSize(0.001)
+         isAutoPunch = true
+      else
+         setCharSize(1)
+      end
+   end,
+})
+
+local playerList = {}
+for _, plr in pairs(Players:GetPlayers()) do
+    if plr ~= Player then table.insert(playerList, plr.DisplayName) end
+end
+
+local PlayerDropdown = KillTab:CreateDropdown({
+   Name = "Select Target",
+   Options = playerList,
+   CurrentOption = "",
+   Callback = function(selected)
+      for _, plr in pairs(Players:GetPlayers()) do
+         if plr.DisplayName == selected then
+            selectedTarget = plr
+            isSticking = true
+            break
+         end
+      end
+   end,
+})
+
+KillTab:CreateButton({
+   Name = "Stop Teleport/Kill",
+   Callback = function()
+      isSticking = false
+      selectedTarget = nil
+   end,
+})
+
+RunService.RenderStepped:Connect(function()
+    if isAutoPunch then
+        ReplicatedStorage.RemotesEvent.PunchEvent:FireServer("RightHand")
+    end
+
+    if isAutoKillAll then
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= Player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                if plr.Character.Humanoid.Health > 0 then
+                    Player.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 2)
+                    break
+                end
+            end
         end
+    elseif isSticking and selectedTarget and selectedTarget.Character and selectedTarget.Character:FindFirstChild("HumanoidRootPart") then
+        Player.Character.HumanoidRootPart.CFrame = selectedTarget.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 2)
     end
 end)
 
-task.spawn(function() while task.wait(0.1) do if flg.Reb then RebirthEvent:FireServer() end end end)
-task.spawn(function() while task.wait(1) do if flg.Choc then pcall(function() firesignal(ChocFrame.Chocolate.upground.clickbutton.MouseButton1Click) end) end end end)
-LP.Idled:Connect(function() if flg.AFK then game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame) task.wait(0.1) game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame) end end)
-task.spawn(function() while task.wait() do if LP.Character and LP.Character:FindFirstChild("Humanoid") then LP.Character.Humanoid.WalkSpeed = flg.Speed end end end)
-UIS.JumpRequest:Connect(function() if flg.Jump and LP.Character:FindFirstChild("Humanoid") then LP.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping) end end)
-task.spawn(function()
-    while task.wait(0.5) do
-        if flg.Hatch then pcall(function() OpenPetEvent:FireServer(flg.EggNm) end) end
-        if flg.DelAll then
-            pcall(function()
-                for _, obj in pairs(LP.Character:GetDescendants()) do
-                    for _, petName in pairs(petKeywords) do
-                        if obj.Name == petName and obj.Name ~= KEEP_PET then SellPetEvent:FireServer(obj) end
-                    end
-                end
-            end)
-        end
-    end
-end)
+Rayfield:Notify({
+   Title = "K13 Active",
+   Content = "Auto Kill and Farm ready.",
+   Duration = 5,
+})
