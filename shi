@@ -699,59 +699,103 @@ local lastStr = initialStrength
 local lastReb = initialRebirths
 local lastEnd = initialEndur
 
-calcTab:AddLabel("â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”")
+calcTab:AddLabel("━━━━━━━━━━━━━━━━━━━━━━━━━")
 local calcHeader = calcTab:AddLabel("CALCULATOR STATS")
 calcHeader.Font = Enum.Font.LuckiestGuy
 calcHeader.TextSize = 20
-local stopwatchLabel = calcTab:AddLabel("â±ï¸ Session Time: 0d 0h 0m 0s")
-calcTab:AddLabel("") calcTab:AddLabel("") calcTab:AddLabel("")
-local projStrLabel   = calcTab:AddLabel("ðŸ’ª Strength:   -") projStrLabel.Font   = Enum.Font.Bodoni projStrLabel.TextSize   = 20
-local projRebLabel   = calcTab:AddLabel("ðŸ”„ Rebirths:   -") projRebLabel.Font   = Enum.Font.Bodoni projRebLabel.TextSize   = 20
-local projEndLabel   = calcTab:AddLabel("ðŸ›¡ï¸ Endurance:  -") projEndLabel.Font   = Enum.Font.Bodoni projEndLabel.TextSize   = 20
-local strengthLabel  = calcTab:AddLabel("ðŸ’ª Strength:   -") strengthLabel.Font  = Enum.Font.Bodoni strengthLabel.TextSize  = 20
-local rebirthsLabel  = calcTab:AddLabel("ðŸ”„ Rebirths:   -") rebirthsLabel.Font  = Enum.Font.Bodoni rebirthsLabel.TextSize  = 20
-local enduranceLabel = calcTab:AddLabel("ðŸ›¡ï¸ Endurance:  -") enduranceLabel.Font = Enum.Font.Bodoni enduranceLabel.TextSize = 20
+
+local stopwatchLabel = calcTab:AddLabel("⏳ Session Time: 0d 0h 0m 0s")
+calcTab:AddLabel("") 
+calcTab:AddLabel("") 
+calcTab:AddLabel("")
+
+local projStrLabel = calcTab:AddLabel("💪 Strength: -") 
+projStrLabel.Font = Enum.Font.Bodoni 
+projStrLabel.TextSize = 20
+
+local projRebLabel = calcTab:AddLabel("♻️ Rebirths: -") 
+projRebLabel.Font = Enum.Font.Bodoni 
+projRebLabel.TextSize = 20
+
+local projEndLabel = calcTab:AddLabel("🛡️ Endurance: -") 
+projEndLabel.Font = Enum.Font.Bodoni 
+projEndLabel.TextSize = 20
+
+local strengthLabel = calcTab:AddLabel("💪 Strength: -") 
+strengthLabel.Font = Enum.Font.Bodoni 
+strengthLabel.TextSize = 20
+
+local rebirthsLabel = calcTab:AddLabel("♻️ Rebirths: -") 
+rebirthsLabel.Font = Enum.Font.Bodoni 
+rebirthsLabel.TextSize = 20
+
+local enduranceLabel = calcTab:AddLabel("🛡️ Endurance: -") 
+enduranceLabel.Font = Enum.Font.Bodoni 
+enduranceLabel.TextSize = 20
+
 calcTab:AddButton("Reset Session", function()
-    statsStartTime  = tick()
+    statsStartTime = tick()
     initialStrength = tonumber(strong.Value) or 0
     initialRebirths = rebirthValObj and (tonumber(rebirthValObj.Value) or 0) or 0
-    initialEndur    = endurValObj   and (tonumber(endurValObj.Value)   or 0) or 0
-    totalStrGained  = 0 totalRebGained = 0 totalEndGained = 0
-    lastStr = initialStrength lastReb = initialRebirths lastEnd = initialEndur
-    stopwatchLabel.Text = "â±ï¸ Session Time: 0d 0h 0m 0s"
-    projStrLabel.Text = "ðŸ’ª Strength:   -" projRebLabel.Text = "ðŸ”„ Rebirths:   -" projEndLabel.Text = "ðŸ›¡ï¸ Endurance:  -"
-    strengthLabel.Text = "ðŸ’ª Strength:   -" rebirthsLabel.Text = "ðŸ”„ Rebirths:   -" enduranceLabel.Text = "ðŸ›¡ï¸ Endurance:  -"
+    initialEndur = endurValObj and (tonumber(endurValObj.Value) or 0) or 0
+    totalStrGained = 0 
+    totalRebGained = 0 
+    totalEndGained = 0
+    lastStr = initialStrength 
+    lastReb = initialRebirths 
+    lastEnd = initialEndur
+    
+    stopwatchLabel.Text = "⏳ Session Time: 0d 0h 0m 0s"
+    projStrLabel.Text = "💪 Strength: -" 
+    projRebLabel.Text = "♻️ Rebirths: -" 
+    projEndLabel.Text = "🛡️ Endurance: -"
+    strengthLabel.Text = "💪 Strength: -" 
+    rebirthsLabel.Text = "♻️ Rebirths: -" 
+    enduranceLabel.Text = "🛡️ Endurance: -"
 end)
+
 task.spawn(function()
     local lastProjected = 0
     while task.wait(0.2) do
         local elapsed = tick() - statsStartTime
         if elapsed >= 1 then
-            local days  = math.floor(elapsed/86400)
+            local days = math.floor(elapsed/86400)
             local hours = math.floor((elapsed%86400)/3600)
-            local mins  = math.floor((elapsed%3600)/60)
-            local secs  = math.floor(elapsed%60)
-            stopwatchLabel.Text = string.format("â±ï¸ Session Time: %dd %dh %dm %ds", days, hours, mins, secs)
+            local mins = math.floor((elapsed%3600)/60)
+            local secs = math.floor(elapsed%60)
+            
+            stopwatchLabel.Text = string.format("⏳ Session Time: %dd %dh %dm %ds", days, hours, mins, secs)
+            
             local cStr = tonumber(strong.Value) or 0
             local cReb = rebirthValObj and (tonumber(rebirthValObj.Value) or 0) or 0
-            local cEnd = endurValObj   and (tonumber(endurValObj.Value)   or 0) or 0
-            local dS = cStr-lastStr local dR = cReb-lastReb local dE = cEnd-lastEnd
+            local cEnd = endurValObj and (tonumber(endurValObj.Value) or 0) or 0
+            
+            local dS = cStr - lastStr 
+            local dR = cReb - lastReb 
+            local dE = cEnd - lastEnd
+            
             if dS > 0 then totalStrGained = totalStrGained + dS end
             if dR > 0 then totalRebGained = totalRebGained + dR end
             if dE > 0 then totalEndGained = totalEndGained + dE end
-            lastStr = cStr lastReb = cReb lastEnd = cEnd
-            strengthLabel.Text  = "ðŸ’ª Strength:  " .. AbbrevNumber(cStr) .. " | +" .. AbbrevNumber(totalStrGained)
-            rebirthsLabel.Text  = "ðŸ”„ Rebirths:  " .. AbbrevNumber(cReb) .. " | +" .. AbbrevNumber(totalRebGained)
-            enduranceLabel.Text = "ðŸ›¡ï¸ Endurance: " .. AbbrevNumber(cEnd) .. " | +" .. AbbrevNumber(totalEndGained)
-            if tick()-lastProjected >= 3 and elapsed >= 5 then
+            
+            lastStr = cStr 
+            lastReb = cReb 
+            lastEnd = cEnd
+            
+            strengthLabel.Text = "💪 Strength: " .. AbbrevNumber(cStr) .. " | +" .. AbbrevNumber(totalStrGained)
+            rebirthsLabel.Text = "♻️ Rebirths: " .. AbbrevNumber(cReb) .. " | +" .. AbbrevNumber(totalRebGained)
+            enduranceLabel.Text = "🛡️ Endurance: " .. AbbrevNumber(cEnd) .. " | +" .. AbbrevNumber(totalEndGained)
+            
+            if tick() - lastProjected >= 3 and elapsed >= 5 then
                 lastProjected = tick()
-                local sSec = totalStrGained/elapsed
-                local rSec = totalRebGained/elapsed
-                local eSec = totalEndGained/elapsed
-                local h,d = 3600,86400
-                projStrLabel.Text = "ðŸ’ª Strength:  " .. AbbrevNumber(math.floor(sSec*h)) .. "/h | " .. AbbrevNumber(math.floor(sSec*d)) .. "/d"
-                projRebLabel.Text = "ðŸ”„ Rebirths:  " .. AbbrevNumber(math.floor(rSec*h)) .. "/h | " .. AbbrevNumber(math.floor(rSec*d)) .. "/d"
-                projEndLabel.Text = "ðŸ›¡ï¸ Endurance: " .. AbbrevNumber(math.floor(eSec*h)) .. "/h | " .. AbbrevNumber(math.floor(eSec*d)) .. "/d"
+                local sSec = totalStrGained / elapsed
+                local rSec = totalRebGained / elapsed
+                local eSec = totalEndGained / elapsed
+                local h, d = 3600, 86400
+                
+                projStrLabel.Text = "💪 Strength: " .. AbbrevNumber(math.floor(sSec * h)) .. "/h | " .. AbbrevNumber(math.floor(sSec * d)) .. "/d"
+                projRebLabel.Text = "♻️ Rebirths: " .. AbbrevNumber(math.floor(rSec * h)) .. "/h | " .. AbbrevNumber(math.floor(rSec * d)) .. "/d"
+                projEndLabel.Text = "🛡️ Endurance: " .. AbbrevNumber(math.floor(eSec * h)) .. "/h | " .. AbbrevNumber(math.floor(eSec * d)) .. "/d"
             end
         end
     end
