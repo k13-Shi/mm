@@ -491,11 +491,11 @@ local function showKillPlayerStats(plr)
     pcall(function()
         addStat("â”€â”€ " .. plr.DisplayName .. " â”€â”€")
         local numStats = {
-            {name="Strong",    icon="ðŸ’ª", folder="leaderstats"},
-            {name="Rebirths",  icon="ðŸ”„", folder="leaderstats"},
-            {name="Kills",     icon="ðŸ’€", folder="leaderstats"},
-            {name="Endurance", icon="ðŸ›¡ï¸", folder=nil},
-            {name="Mobility",  icon="ðŸ‘Ÿ", folder=nil},
+            {name="Strong",    icon="💪", folder="leaderstats"},
+            {name="Rebirths",  icon="♻️", folder="leaderstats"},
+            {name="Kills",     icon="💀", folder="leaderstats"},
+            {name="Endurance", icon="🛡️", folder=nil},
+            {name="Mobility",  icon="👟", folder=nil},
         }
         for _, s in ipairs(numStats) do
             local val = getVal(s.name, s.folder)
@@ -571,44 +571,68 @@ local spectateSwitch, specSwitchObj = killTab:AddSwitch("Spectate", function(boo
     end
 end)
 
+local function formatNumber(value)
+    if not value or type(value) ~= "number" then return value or 0 end
+    local formatted = tostring(value)
+    while true do  
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if k == 0 then
+            break
+        end
+    end
+    return formatted
+end
+
 local spyStatLabels = {}
+
 local function clearSpyStats()
-    for _, lbl in pairs(spyStatLabels) do pcall(function() lbl:Remove() end) end
+    for _, lbl in pairs(spyStatLabels) do 
+        pcall(function() lbl:Remove() end) 
+    end
     spyStatLabels = {}
 end
+
 local function showPlayerStats(plr)
     clearSpyStats()
+    
     local function addStat(text)
         local lbl = spyTab:AddLabel(text)
         table.insert(spyStatLabels, lbl)
     end
+    
     local function getVal(name, folder)
         local src = folder and plr:FindFirstChild(folder) or plr
         local v = src and src:FindFirstChild(name)
         return v and v.Value or nil
     end
+
     pcall(function()
-        addStat("ðŸ‘¤ " .. plr.DisplayName .. " (@" .. plr.Name .. ")")
-        addStat("ðŸ“± Device: " .. tostring(getVal("Device") or "Unknown"))
-        addStat("ðŸ‘‘ Premium: " .. tostring(getVal("IsPremium") or false))
-        addStat("ðŸ”§ Admin: " .. tostring(getVal("IsAdmin") or false))
-        addStat("â”€â”€ STATS â”€â”€")
+        addStat("👤 " .. plr.DisplayName .. " (@" .. plr.Name .. ")")
+        addStat("📱 Device: " .. tostring(getVal("Device") or "Unknown"))
+        addStat("👑 Premium: " .. tostring(getVal("IsPremium") or false))
+        addStat("🛠️ Admin: " .. tostring(getVal("IsAdmin") or false))
+        addStat("━━━━━━━━ STATS ━━━━━━━━")
+
         local numStats = {
-            {name="Strong",            icon="ðŸ’ª", folder="leaderstats"},
-            {name="Endurance",         icon="ðŸ›¡ï¸", folder=nil},
-            {name="Mobility",          icon="ðŸ‘Ÿ", folder=nil},
-            {name="Rebirths",          icon="ðŸ”„", folder="leaderstats"},
-            {name="Kills",             icon="ðŸ’€", folder="leaderstats"},
-            {name="Coins",             icon="ðŸª™", folder=nil},
-            {name="Spins",             icon="ðŸŽ°", folder=nil},
-            {name="MuscleEmperorReps", icon="ðŸ‹ï¸", folder=nil},
-            {name="Pet_Storage",       icon="ðŸ¾", folder=nil},
-            {name="Donated",           icon="ðŸ’", folder=nil},
+            {name="Strong",            icon="💪", folder="leaderstats"},
+            {name="Endurance",         icon="🛡️", folder=nil},
+            {name="Mobility",          icon="👟", folder=nil},
+            {name="Rebirths",          icon="♻️", folder="leaderstats"},
+            {name="Kills",             icon="💀", folder="leaderstats"},
+            {name="Coins",             icon="🪙", folder=nil},
+            {name="Spins",             icon="🎰", folder=nil},
+            {name="MuscleEmperorReps", icon="🏋️", folder=nil},
+            {name="Pet_Storage",       icon="🎒", folder=nil},
+            {name="Donated",           icon="❤️", folder=nil},
         }
+
         for _, s in ipairs(numStats) do
             local val = getVal(s.name, s.folder)
-            if val ~= nil then addStat(s.icon .. " " .. s.name .. ": " .. formatNumber(val)) end
+            if val ~= nil then 
+                addStat(s.icon .. " " .. s.name .. ": " .. formatNumber(val)) 
+            end
         end
+
         local petsFolder = plr:FindFirstChild("PetsFolder")
         if petsFolder then
             local petCount = {}
@@ -618,14 +642,15 @@ local function showPlayerStats(plr)
             local total = 0
             for _, c in pairs(petCount) do total = total + c end
             if total > 0 then
-                addStat("â”€â”€ PETS (" .. total .. ") â”€â”€")
+                addStat("━━━━━━━━ PETS (" .. total .. ") ━━━━━━━━")
                 for name, count in pairs(petCount) do
-                    addStat("ðŸ¾ " .. name .. (count > 1 and " x"..count or ""))
+                    addStat("🐾 " .. name .. (count > 1 and " x"..count or ""))
                 end
             end
         end
     end)
 end
+
 local spyDropdown = spyTab:AddDropdown("SELECT PLAYER", function(selected)
     task.spawn(function()
         task.wait(0.1)
