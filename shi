@@ -584,8 +584,14 @@ local function formatNumber(value)
 end
 
 local spyStatLabels = {}
+local spyConnections = {}
 
 local function clearSpyStats()
+    for _, connection in pairs(spyConnections) do
+        connection:Disconnect()
+    end
+    spyConnections = {}
+
     for _, lbl in pairs(spyStatLabels) do 
         pcall(function() lbl:Remove() end) 
     end
@@ -598,19 +604,18 @@ local function showPlayerStats(plr)
     local function addStat(text)
         local lbl = spyTab:AddLabel(text)
         table.insert(spyStatLabels, lbl)
+        return lbl
     end
     
-    local function getVal(name, folder)
+    local function getStatObject(name, folder)
         local src = folder and plr:FindFirstChild(folder) or plr
-        local v = src and src:FindFirstChild(name)
-        return v and v.Value or nil
+        return src and src:FindFirstChild(name)
     end
 
     pcall(function()
         addStat("👤 " .. plr.DisplayName .. " (@" .. plr.Name .. ")")
-        addStat("📱 Device: " .. tostring(getVal("Device") or "Unknown"))
-        addStat("👑 Premium: " .. tostring(getVal("IsPremium") or false))
-        addStat("🛠️ Admin: " .. tostring(getVal("IsAdmin") or false))
+        addStat("📱 Device: " .. tostring(plr:FindFirstChild("Device") and plr.Device.Value or "Unknown"))
+        addStat("👑 Premium: " .. tostring(plr:FindFirstChild("IsPremium") and plr.IsPremium.Value or false))
         addStat("━━━━━━━━ STATS ━━━━━━━━")
 
         local numStats = {
@@ -622,14 +627,17 @@ local function showPlayerStats(plr)
             {name="Coins",             icon="🪙", folder=nil},
             {name="Spins",             icon="🎰", folder=nil},
             {name="MuscleEmperorReps", icon="🏋️", folder=nil},
-            {name="Pet_Storage",       icon="🎒", folder=nil},
-            {name="Donated",           icon="❤️", folder=nil},
         }
 
         for _, s in ipairs(numStats) do
-            local val = getVal(s.name, s.folder)
-            if val ~= nil then 
-                addStat(s.icon .. " " .. s.name .. ": " .. formatNumber(val)) 
+            local statObj = getStatObject(s.name, s.folder)
+            if statObj then
+                local label = addStat(s.icon .. " " .. s.name .. ": " .. formatNumber(statObj.Value))
+                
+                local conn = statObj.Changed:Connect(function(newVal)
+                    label.Text = s.icon .. " " .. s.name .. ": " .. formatNumber(newVal)
+                end)
+                table.insert(spyConnections, conn)
             end
         end
 
@@ -644,7 +652,7 @@ local function showPlayerStats(plr)
             if total > 0 then
                 addStat("━━━━━━━━ PETS (" .. total .. ") ━━━━━━━━")
                 for name, count in pairs(petCount) do
-                    addStat("🐾 " .. name .. (count > 1 and " x"..count or ""))
+                    addStat("🐾 " .. name .. (count > 1 and " x" .. count or ""))
                 end
             end
         end
