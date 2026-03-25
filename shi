@@ -117,6 +117,7 @@ local BodyMovement       = ReplicatedStorage.RemotesEvent.BodyMovement
 local SizeChanged        = ReplicatedStorage.RemotesEvent.SizeChanged
 local eggsFolder         = workspace:WaitForChild("EggsFolder")
 local chestsFolder       = workspace:WaitForChild("ChestsFolder")
+local rewardClaimFunction = ReplicatedStorage.RemotesEvent:WaitForChild("rewardClaim", 5)
 
 local isAuto            = false
 local isAutolift        = false
@@ -130,14 +131,17 @@ local isAutoKillAll     = false
 local isTinyCombo       = false
 local isAutoEat         = false
 local isEating          = false
+local isAutoRewards     = false
 local lastSpinTime      = 0
 local lastHatchTime     = 0
 local lastChestTime     = 0
 local lastEatTime       = 0
+local lastRewardTime    = 0
 local SPIN_COOLDOWN     = 0.35
 local HATCH_COOLDOWN    = 1.5
 local CHEST_COOLDOWN    = 1.0
 local EAT_COOLDOWN      = 1.5
+local REWARD_COOLDOWN   = 3.0 -- Binago natin to 3 seconds para di masyadong mabilis ang pag-spam sa server
 local savedLighting     = {}
 local selectedEggFolder = "Mythic"
 local selectedSellPets  = {}
@@ -384,7 +388,7 @@ autoSellLabel.Font = Enum.Font.Bodoni
 autoSellLabel.TextSize = 25
 local rarityGroups = {
     {label="COMMON EGG",idx=1},{label="RARE EGG",idx=2},{label="EPIC EGG",idx=3},
-    {label="LEGENDARY EGG",idx=4},{label="MYTHIC EGG",idx=5},{label="MASTERS EGG",  idx=6},
+    {label="LEGENDARY EGG",idx=4},{label="MYTHIC EGG",idx=5},{label="MASTERS EGG",idx=6},
 }
 for _, grp in ipairs(rarityGroups) do
     petsTab:AddLabel(grp.label)
@@ -399,6 +403,12 @@ local autoClaimLabel = miscTab:AddLabel("AUTO CLAIM CHEST")
 autoClaimLabel.Font = Enum.Font.Bodoni
 autoClaimLabel.TextSize = 20
 miscTab:AddSwitch("Auto Claim All Chest", function(state) isAutoChest = state end)
+
+local autoRewardLabel = miscTab:AddLabel("AUTO CLAIM REWARDS")
+autoRewardLabel.Font = Enum.Font.Bodoni
+autoRewardLabel.TextSize = 20
+miscTab:AddSwitch("Auto Claim Rewards", function(state) isAutoRewards = state end)
+
 local hideshowLabel = miscTab:AddLabel("HIDE & SHOW PETS")
 hideshowLabel.Font = Enum.Font.Bodoni
 hideshowLabel.TextSize = 20
@@ -418,7 +428,7 @@ teleportChestsLabel.TextSize = 20
 local chestFolder = miscTab:AddFolder("TELEPORT TO CHEST")
 for _, chest in ipairs(CHESTS) do
     local pos = chest.pos
-    chestFolder:AddButton("Ã°Å¸â€œÂ¦ "..chest.name, function() teleportTo(pos) end)
+    chestFolder:AddButton("ðŸ“¦ "..chest.name, function() teleportTo(pos) end)
 end
 
 killTab:AddButton("STOP TELEPORT", function() isSticking = false end)
@@ -489,7 +499,7 @@ local function showKillPlayerStats(plr)
         return v and v.Value or nil
     end
     pcall(function()
-        addStat("Ã¢â€â‚¬Ã¢â€â‚¬ " .. plr.DisplayName .. " Ã¢â€â‚¬Ã¢â€â‚¬")
+        addStat("â”€â”€ " .. plr.DisplayName .. " â”€â”€")
         local numStats = {
             {name="Strong",    icon="ðŸ’ª", folder="leaderstats"},
             {name="Rebirths",  icon="â™»ï¸", folder="leaderstats"},
@@ -574,11 +584,9 @@ end)
 local function formatNumber(value)
     if not value or type(value) ~= "number" then return value or 0 end
     local formatted = tostring(value)
-    while true do  
+    while true do
         formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-        if k == 0 then
-            break
-        end
+        if k == 0 then break end
     end
     return formatted
 end
@@ -587,37 +595,28 @@ local spyStatLabels = {}
 local spyConnections = {}
 
 local function clearSpyStats()
-    for _, connection in pairs(spyConnections) do
-        connection:Disconnect()
-    end
+    for _, connection in pairs(spyConnections) do connection:Disconnect() end
     spyConnections = {}
-
-    for _, lbl in pairs(spyStatLabels) do 
-        pcall(function() lbl:Remove() end) 
-    end
+    for _, lbl in pairs(spyStatLabels) do pcall(function() lbl:Remove() end) end
     spyStatLabels = {}
 end
 
 local function showPlayerStats(plr)
     clearSpyStats()
-    
     local function addStat(text)
         local lbl = spyTab:AddLabel(text)
         table.insert(spyStatLabels, lbl)
         return lbl
     end
-    
     local function getStatObject(name, folder)
         local src = folder and plr:FindFirstChild(folder) or plr
         return src and src:FindFirstChild(name)
     end
-
     pcall(function()
         addStat("ðŸ‘¤ " .. plr.DisplayName .. " (@" .. plr.Name .. ")")
         addStat("ðŸ“± Device: " .. tostring(plr:FindFirstChild("Device") and plr.Device.Value or "Unknown"))
         addStat("ðŸ‘‘ Premium: " .. tostring(plr:FindFirstChild("IsPremium") and plr.IsPremium.Value or false))
         addStat("â”â”â”â”â”â”â”â” STATS â”â”â”â”â”â”â”â”")
-
         local numStats = {
             {name="Strong",            icon="ðŸ’ª", folder="leaderstats"},
             {name="Endurance",         icon="ðŸ›¡ï¸", folder=nil},
@@ -628,19 +627,16 @@ local function showPlayerStats(plr)
             {name="Spins",             icon="ðŸŽ°", folder=nil},
             {name="MuscleEmperorReps", icon="ðŸ‹ï¸", folder=nil},
         }
-
         for _, s in ipairs(numStats) do
             local statObj = getStatObject(s.name, s.folder)
             if statObj then
                 local label = addStat(s.icon .. " " .. s.name .. ": " .. formatNumber(statObj.Value))
-                
                 local conn = statObj.Changed:Connect(function(newVal)
                     label.Text = s.icon .. " " .. s.name .. ": " .. formatNumber(newVal)
                 end)
                 table.insert(spyConnections, conn)
             end
         end
-
         local petsFolder = plr:FindFirstChild("PetsFolder")
         if petsFolder then
             local petCount = {}
@@ -682,7 +678,7 @@ end)
 Players.PlayerRemoving:Connect(function(plr)
     if selectedSpyPlayer and selectedSpyPlayer == plr then
         clearSpyStats()
-        local lbl = spyTab:AddLabel("Ã¢Å¡ Ã¯Â¸Â " .. plr.DisplayName .. " left!")
+        local lbl = spyTab:AddLabel("âš ï¸ " .. plr.DisplayName .. " left!")
         table.insert(spyStatLabels, lbl)
         selectedSpyPlayer = nil
     end
@@ -713,32 +709,32 @@ calcHeader.Font = Enum.Font.LuckiestGuy
 calcHeader.TextSize = 20
 
 local stopwatchLabel = calcTab:AddLabel("â³ Session Time: 0d 0h 0m 0s")
-calcTab:AddLabel("") 
-calcTab:AddLabel("") 
+calcTab:AddLabel("")
+calcTab:AddLabel("")
 calcTab:AddLabel("")
 
-local projStrLabel = calcTab:AddLabel("ðŸ’ª Strength: -") 
-projStrLabel.Font = Enum.Font.Bodoni 
+local projStrLabel = calcTab:AddLabel("ðŸ’ª Strength: -")
+projStrLabel.Font = Enum.Font.Bodoni
 projStrLabel.TextSize = 20
 
-local projRebLabel = calcTab:AddLabel("â™»ï¸ Rebirths: -") 
-projRebLabel.Font = Enum.Font.Bodoni 
+local projRebLabel = calcTab:AddLabel("â™»ï¸ Rebirths: -")
+projRebLabel.Font = Enum.Font.Bodoni
 projRebLabel.TextSize = 20
 
-local projEndLabel = calcTab:AddLabel("ðŸ›¡ï¸ Endurance: -") 
-projEndLabel.Font = Enum.Font.Bodoni 
+local projEndLabel = calcTab:AddLabel("ðŸ›¡ï¸ Endurance: -")
+projEndLabel.Font = Enum.Font.Bodoni
 projEndLabel.TextSize = 20
 
-local strengthLabel = calcTab:AddLabel("ðŸ’ª Strength: -") 
-strengthLabel.Font = Enum.Font.Bodoni 
+local strengthLabel = calcTab:AddLabel("ðŸ’ª Strength: -")
+strengthLabel.Font = Enum.Font.Bodoni
 strengthLabel.TextSize = 20
 
-local rebirthsLabel = calcTab:AddLabel("â™»ï¸ Rebirths: -") 
-rebirthsLabel.Font = Enum.Font.Bodoni 
+local rebirthsLabel = calcTab:AddLabel("â™»ï¸ Rebirths: -")
+rebirthsLabel.Font = Enum.Font.Bodoni
 rebirthsLabel.TextSize = 20
 
-local enduranceLabel = calcTab:AddLabel("ðŸ›¡ï¸ Endurance: -") 
-enduranceLabel.Font = Enum.Font.Bodoni 
+local enduranceLabel = calcTab:AddLabel("ðŸ›¡ï¸ Endurance: -")
+enduranceLabel.Font = Enum.Font.Bodoni
 enduranceLabel.TextSize = 20
 
 calcTab:AddButton("Reset Session", function()
@@ -746,20 +742,11 @@ calcTab:AddButton("Reset Session", function()
     initialStrength = tonumber(strong.Value) or 0
     initialRebirths = rebirthValObj and (tonumber(rebirthValObj.Value) or 0) or 0
     initialEndur = endurValObj and (tonumber(endurValObj.Value) or 0) or 0
-    totalStrGained = 0 
-    totalRebGained = 0 
-    totalEndGained = 0
-    lastStr = initialStrength 
-    lastReb = initialRebirths 
-    lastEnd = initialEndur
-    
+    totalStrGained = 0 totalRebGained = 0 totalEndGained = 0
+    lastStr = initialStrength lastReb = initialRebirths lastEnd = initialEndur
     stopwatchLabel.Text = "â³ Session Time: 0d 0h 0m 0s"
-    projStrLabel.Text = "ðŸ’ª Strength: -" 
-    projRebLabel.Text = "â™»ï¸ Rebirths: -" 
-    projEndLabel.Text = "ðŸ›¡ï¸ Endurance: -"
-    strengthLabel.Text = "ðŸ’ª Strength: -" 
-    rebirthsLabel.Text = "â™»ï¸ Rebirths: -" 
-    enduranceLabel.Text = "ðŸ›¡ï¸ Endurance: -"
+    projStrLabel.Text = "ðŸ’ª Strength: -" projRebLabel.Text = "â™»ï¸ Rebirths: -" projEndLabel.Text = "ðŸ›¡ï¸ Endurance: -"
+    strengthLabel.Text = "ðŸ’ª Strength: -" rebirthsLabel.Text = "â™»ï¸ Rebirths: -" enduranceLabel.Text = "ðŸ›¡ï¸ Endurance: -"
 end)
 
 task.spawn(function()
@@ -771,39 +758,27 @@ task.spawn(function()
             local hours = math.floor((elapsed%86400)/3600)
             local mins = math.floor((elapsed%3600)/60)
             local secs = math.floor(elapsed%60)
-            
             stopwatchLabel.Text = string.format("â³ Session Time: %dd %dh %dm %ds", days, hours, mins, secs)
-            
             local cStr = tonumber(strong.Value) or 0
             local cReb = rebirthValObj and (tonumber(rebirthValObj.Value) or 0) or 0
             local cEnd = endurValObj and (tonumber(endurValObj.Value) or 0) or 0
-            
-            local dS = cStr - lastStr 
-            local dR = cReb - lastReb 
-            local dE = cEnd - lastEnd
-            
+            local dS = cStr - lastStr local dR = cReb - lastReb local dE = cEnd - lastEnd
             if dS > 0 then totalStrGained = totalStrGained + dS end
             if dR > 0 then totalRebGained = totalRebGained + dR end
             if dE > 0 then totalEndGained = totalEndGained + dE end
-            
-            lastStr = cStr 
-            lastReb = cReb 
-            lastEnd = cEnd
-            
+            lastStr = cStr lastReb = cReb lastEnd = cEnd
             strengthLabel.Text = "ðŸ’ª Strength: " .. AbbrevNumber(cStr) .. " | +" .. AbbrevNumber(totalStrGained)
             rebirthsLabel.Text = "â™»ï¸ Rebirths: " .. AbbrevNumber(cReb) .. " | +" .. AbbrevNumber(totalRebGained)
             enduranceLabel.Text = "ðŸ›¡ï¸ Endurance: " .. AbbrevNumber(cEnd) .. " | +" .. AbbrevNumber(totalEndGained)
-            
             if tick() - lastProjected >= 3 and elapsed >= 5 then
                 lastProjected = tick()
                 local sSec = totalStrGained / elapsed
                 local rSec = totalRebGained / elapsed
                 local eSec = totalEndGained / elapsed
                 local h, d = 3600, 86400
-                
-                projStrLabel.Text = "ðŸ’ª Strength: " .. AbbrevNumber(math.floor(sSec * h)) .. "/h | " .. AbbrevNumber(math.floor(sSec * d)) .. "/d"
-                projRebLabel.Text = "â™»ï¸ Rebirths: " .. AbbrevNumber(math.floor(rSec * h)) .. "/h | " .. AbbrevNumber(math.floor(rSec * d)) .. "/d"
-                projEndLabel.Text = "ðŸ›¡ï¸ Endurance: " .. AbbrevNumber(math.floor(eSec * h)) .. "/h | " .. AbbrevNumber(math.floor(eSec * d)) .. "/d"
+                projStrLabel.Text = "ðŸ’ª Strength: " .. AbbrevNumber(math.floor(sSec*h)) .. "/h | " .. AbbrevNumber(math.floor(sSec*d)) .. "/d"
+                projRebLabel.Text = "â™»ï¸ Rebirths: " .. AbbrevNumber(math.floor(rSec*h)) .. "/h | " .. AbbrevNumber(math.floor(rSec*d)) .. "/d"
+                projEndLabel.Text = "ðŸ›¡ï¸ Endurance: " .. AbbrevNumber(math.floor(eSec*h)) .. "/h | " .. AbbrevNumber(math.floor(eSec*d)) .. "/d"
             end
         end
     end
@@ -826,7 +801,6 @@ chocoRateLabel.Font = Enum.Font.Bodoni
 chocoRateLabel.TextSize = 18
 
 invTab:AddSwitch("Auto Eat Chocolate", function(state) isAutoEat = state end)
-
 invTab:AddButton("Reset Choco Stats", function()
     totalChocoEaten = 0
     chocoSessionStart = tick()
@@ -847,9 +821,7 @@ task.spawn(function()
             local bp = Player:FindFirstChild("Backpack")
             if bp then
                 for _, v in pairs(bp:GetChildren()) do
-                    if v:IsA("Tool") and string.lower(v.Name):find("chocolate") then
-                        count = count + 1
-                    end
+                    if v:IsA("Tool") and string.lower(v.Name):find("chocolate") then count = count + 1 end
                 end
             end
             chocoCountLabel.Text = "Chocolates: " .. formatNumber(count)
@@ -861,67 +833,13 @@ task.spawn(function()
     end
 end)
 
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-        if isAutoEat and not isEating then
-            local now = tick()
-            if now - lastEatTime >= EAT_COOLDOWN then
-                lastEatTime = now
-                task.spawn(function()
-                    isEating = true
-                    pcall(function()
-                        local char = Player.Character
-                        if not char then isEating = false return end
-                        local hum = char:FindFirstChildOfClass("Humanoid")
-                        if not hum then isEating = false return end
-                        local bp = Player:FindFirstChild("Backpack")
-                        if not bp then isEating = false return end
-                        local choco = nil
-                        for _, tool in pairs(bp:GetChildren()) do
-                            if string.lower(tool.Name):find("chocolate") then
-                                choco = tool break
-                            end
-                        end
-                        if not choco then
-                            local chocoFolder = Player:FindFirstChild("ChocolatesFolder")
-                            if not chocoFolder then isEating = false return end
-                            local c = chocoFolder:FindFirstChildOfClass("Tool")
-                            if not c then isEating = false return end
-                            c.Parent = bp
-                            task.wait(0.2)
-                            choco = bp:FindFirstChild(c.Name)
-                        end
-                        if not choco then isEating = false return end
-                        hum:EquipTool(choco)
-                        task.wait(0.1)
-                        local equipped = char:FindFirstChild(choco.Name)
-                        if equipped then
-                            equipped:Activate()
-                            pcall(function() ChocolateEatEvent:FireServer(equipped) end)
-                            task.wait(0.6)
-                            totalChocoEaten = totalChocoEaten + 1
-                            chocoEatenLabel.Text = "Eaten this session: " .. totalChocoEaten
-                        end
-                    end)
-                    isEating = false
-                end)
-            end
-        end
-    end
-end)
-
 local myLabel = infoTab:AddLabel("Muscle Masters")
-myLabel.Font = Enum.Font.LuckiestGuy
-myLabel.TextSize = 22
-myLabel.TextXAlignment = Enum.TextXAlignment.Center
-myLabel.Size = UDim2.new(1, 0, 0, 25)
+myLabel.Font = Enum.Font.LuckiestGuy myLabel.TextSize = 22
+myLabel.TextXAlignment = Enum.TextXAlignment.Center myLabel.Size = UDim2.new(1,0,0,25)
 
 local devLabel = infoTab:AddLabel("K13 On Top")
-devLabel.Font = Enum.Font.LuckiestGuy
-devLabel.TextSize = 20
-devLabel.TextXAlignment = Enum.TextXAlignment.Center
-devLabel.Size = UDim2.new(1, 0, 0, 25)
+devLabel.Font = Enum.Font.LuckiestGuy devLabel.TextSize = 20
+devLabel.TextXAlignment = Enum.TextXAlignment.Center devLabel.Size = UDim2.new(1,0,0,25)
 
 task.spawn(function()
     local t = 0
@@ -938,15 +856,12 @@ task.spawn(function()
 end)
 
 local closeFriendsLabel = infoTab:AddLabel("Close Friends:")
-closeFriendsLabel.Font = Enum.Font.LuckiestGuy
-closeFriendsLabel.TextSize = 18
+closeFriendsLabel.Font = Enum.Font.LuckiestGuy closeFriendsLabel.TextSize = 18
 
 task.spawn(function()
     local colors = {
-        Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 100, 0),
-        Color3.fromRGB(255, 255, 0), Color3.fromRGB(0, 255, 0),
-        Color3.fromRGB(0, 150, 255), Color3.fromRGB(150, 0, 255),
-        Color3.fromRGB(255, 0, 150),
+        Color3.fromRGB(255,0,0), Color3.fromRGB(255,100,0), Color3.fromRGB(255,255,0),
+        Color3.fromRGB(0,255,0), Color3.fromRGB(0,150,255), Color3.fromRGB(150,0,255), Color3.fromRGB(255,0,150),
     }
     local i = 1
     while task.wait(0.3) do
@@ -955,8 +870,7 @@ task.spawn(function()
 end)
 
 local f2Label = infoTab:AddLabel("K13_Shi-OneEyedKing")
-f2Label.Font = Enum.Font.Bodoni
-f2Label.TextSize = 18
+f2Label.Font = Enum.Font.Bodoni f2Label.TextSize = 18
 
 task.spawn(function()
     local hue = 0
@@ -967,39 +881,33 @@ task.spawn(function()
 end)
 
 local function addSeparator(tab)
-    local sep = tab:AddLabel("Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬")
-    sep.TextColor3 = Color3.fromRGB(60, 10, 10)
-    sep.TextSize = 10
-    sep.TextXAlignment = Enum.TextXAlignment.Center
-    sep.Size = UDim2.new(1, 0, 0, 12)
-    sep.TextTransparency = 0.4
+    local sep = tab:AddLabel("â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€")
+    sep.TextColor3 = Color3.fromRGB(60,10,10) sep.TextSize = 10
+    sep.TextXAlignment = Enum.TextXAlignment.Center sep.Size = UDim2.new(1,0,0,12) sep.TextTransparency = 0.4
     return sep
 end
 
 local headerLabel = infoTab:AddLabel("Clans That Always On Top:")
-headerLabel.Font = Enum.Font.Oswald
-headerLabel.TextSize = 20
-headerLabel.TextXAlignment = Enum.TextXAlignment.Center
-headerLabel.Size = UDim2.new(1, 0, 0, 20)
-headerLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
-headerLabel.TextTransparency = 0.3
+headerLabel.Font = Enum.Font.Oswald headerLabel.TextSize = 20
+headerLabel.TextXAlignment = Enum.TextXAlignment.Center headerLabel.Size = UDim2.new(1,0,0,20)
+headerLabel.TextColor3 = Color3.fromRGB(180,180,180) headerLabel.TextTransparency = 0.3
 
 task.spawn(function()
     while task.wait(0.05) do
-        pcall(function() headerLabel.TextColor3 = Color3.fromRGB(220, 0, 0) headerLabel.TextTransparency = 0 end)
+        pcall(function() headerLabel.TextColor3 = Color3.fromRGB(220,0,0) headerLabel.TextTransparency = 0 end)
         task.wait(0.05)
-        pcall(function() headerLabel.TextColor3 = Color3.fromRGB(120, 0, 0) headerLabel.TextTransparency = 0.5 end)
+        pcall(function() headerLabel.TextColor3 = Color3.fromRGB(120,0,0) headerLabel.TextTransparency = 0.5 end)
     end
 end)
 
 addSeparator(infoTab)
 local clan1Label = infoTab:AddLabel("SNM")
 clan1Label.Font = Enum.Font.Bodoni clan1Label.TextSize = 20
-clan1Label.TextXAlignment = Enum.TextXAlignment.Center clan1Label.Size = UDim2.new(1, 0, 0, 28)
+clan1Label.TextXAlignment = Enum.TextXAlignment.Center clan1Label.Size = UDim2.new(1,0,0,28)
 addSeparator(infoTab)
 local clan2Label = infoTab:AddLabel("K13")
 clan2Label.Font = Enum.Font.Bodoni clan2Label.TextSize = 20
-clan2Label.TextXAlignment = Enum.TextXAlignment.Center clan2Label.Size = UDim2.new(1, 0, 0, 28)
+clan2Label.TextXAlignment = Enum.TextXAlignment.Center clan2Label.Size = UDim2.new(1,0,0,28)
 addSeparator(infoTab)
 
 task.spawn(function()
@@ -1012,29 +920,21 @@ task.spawn(function()
     while task.wait(0.025) do
         t = t + 0.055 fi = (fi % 200) + 1
         local pulse1 = math.abs(math.sin(t * 4.5))
-        local r1 = math.floor(160 + pulse1 * 95)
-        local g1 = math.floor(pulse1 * 15)
-        local b1 = math.floor(pulse1 * 8)
+        local r1 = math.floor(160 + pulse1 * 95) local g1 = math.floor(pulse1 * 15) local b1 = math.floor(pulse1 * 8)
         local pulse2 = math.abs(math.sin(t * 3.2 + 1.2))
-        local r2 = math.floor(90 + pulse2 * 100)
-        local g2 = math.floor(pulse2 * 8)
-        local b2 = math.floor(140 + pulse2 * 100)
+        local r2 = math.floor(90 + pulse2 * 100) local g2 = math.floor(pulse2 * 8) local b2 = math.floor(140 + pulse2 * 100)
         local heartbeat = math.max(math.abs(math.sin(t*5.8)), math.abs(math.sin(t*5.8+0.25)))
-        local size1 = math.floor(17 + heartbeat * 5)
-        local size2 = math.floor(18 + heartbeat * 5)
-        local f1v = flickerPool[fi] > 0.88 and math.random(3, 7) * 0.1 or 0
-        local f2v = flickerPool[(fi + 67) % 200 + 1] > 0.9 and math.random(3, 6) * 0.1 or 0
-        local shake1 = math.sin(t * 22) * 1.8
-        local shake2 = math.sin(t * 19 + 1) * 1.8
+        local size1 = math.floor(17 + heartbeat * 5) local size2 = math.floor(18 + heartbeat * 5)
+        local f1v = flickerPool[fi] > 0.88 and math.random(3,7)*0.1 or 0
+        local f2v = flickerPool[(fi+67)%200+1] > 0.9 and math.random(3,6)*0.1 or 0
+        local shake1 = math.sin(t*22)*1.8 local shake2 = math.sin(t*19+1)*1.8
         pcall(function()
-            clan1Label.TextColor3 = Color3.fromRGB(r1, g1, b1)
-            clan2Label.TextColor3 = Color3.fromRGB(r2, g2, b2)
-            stroke1.Color = Color3.fromRGB(r1, g1, b1) stroke1.Transparency = 1 - pulse1 * 0.7
-            stroke2.Color = Color3.fromRGB(r2, g2, b2) stroke2.Transparency = 1 - pulse2 * 0.7
+            clan1Label.TextColor3 = Color3.fromRGB(r1,g1,b1) clan2Label.TextColor3 = Color3.fromRGB(r2,g2,b2)
+            stroke1.Color = Color3.fromRGB(r1,g1,b1) stroke1.Transparency = 1-pulse1*0.7
+            stroke2.Color = Color3.fromRGB(r2,g2,b2) stroke2.Transparency = 1-pulse2*0.7
             clan1Label.TextSize = size1 clan2Label.TextSize = size2
             clan1Label.TextTransparency = f1v clan2Label.TextTransparency = f2v
-            clan1Label.Position = UDim2.new(0, shake1, 0, 0)
-            clan2Label.Position = UDim2.new(0, -shake2, 0, 0)
+            clan1Label.Position = UDim2.new(0,shake1,0,0) clan2Label.Position = UDim2.new(0,-shake2,0,0)
         end)
     end
 end)
@@ -1043,7 +943,7 @@ local devLabel2 = infoTab:AddLabel("Developer: Prime Jelo")
 devLabel2.Font = Enum.Font.PermanentMarker devLabel2.TextSize = 18
 local devLabel3 = infoTab:AddLabel("Make Your Own Risk")
 devLabel3.Font = Enum.Font.PermanentMarker devLabel3.TextSize = 18
-devLabel3.TextColor3 = Color3.fromRGB(255, 255, 255)
+devLabel3.TextColor3 = Color3.fromRGB(255,255,255)
 
 task.spawn(function()
     task.wait(3)
@@ -1055,7 +955,7 @@ task.spawn(function()
             for _, v in ipairs(imgui:GetDescendants()) do
                 if v:IsA("TextButton") then
                     local txt = v.Text or ""
-                    if string.find(txt,"Ã°Å¸â€œÂ¦") or string.find(txt,"HIDE") or string.find(txt,"SHOW")
+                    if string.find(txt,"ðŸ“¦") or string.find(txt,"HIDE") or string.find(txt,"SHOW")
                     or string.find(txt,"ISLANDS") or string.find(txt,"TELEPORT TO CHEST")
                     or string.find(txt,"Main") or string.find(txt,"Stone Realm")
                     or string.find(txt,"Frost") or string.find(txt,"Muscle Emperor")
@@ -1064,7 +964,7 @@ task.spawn(function()
                     or string.find(txt,"Stone Chest") or string.find(txt,"Frost Chest")
                     or string.find(txt,"Master Chest") or string.find(txt,"Emperor Chest")
                     or string.find(txt,"Ocean Chest") then
-                        v.TextColor3 = Color3.fromRGB(255, 255, 255)
+                        v.TextColor3 = Color3.fromRGB(255,255,255)
                     end
                 end
             end
@@ -1226,16 +1126,85 @@ task.spawn(function()
                 end
             end
         end
+        if isAutoRewards then
+            local now = tick()
+            if now - lastRewardTime >= 3.0 then
+                lastRewardTime = now
+                task.spawn(function()
+                    for i = 1, 5 do
+                        pcall(function()
+                            local remote = game:GetService("ReplicatedStorage").RemotesEvent:FindFirstChild("rewardClaim")
+                            if remote then
+                                if remote:IsA("RemoteFunction") then
+                                    pcall(function() remote:InvokeServer("reward"..i) end)
+                                    pcall(function() remote:InvokeServer(i) end)
+                                elseif remote:IsA("RemoteEvent") then
+                                    pcall(function() remote:FireServer("reward"..i) end)
+                                    pcall(function() remote:FireServer(i) end)
+                                end
+                            end
+                        end)
+                        task.wait(0.1)
+                    end
+                end)
+            end
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        if isAutoEat and not isEating then
+            local now = tick()
+            if now - lastEatTime >= EAT_COOLDOWN then
+                lastEatTime = now
+                task.spawn(function()
+                    isEating = true
+                    pcall(function()
+                        local char = Player.Character
+                        if not char then isEating = false return end
+                        local hum = char:FindFirstChildOfClass("Humanoid")
+                        if not hum then isEating = false return end
+                        local bp = Player:FindFirstChild("Backpack")
+                        if not bp then isEating = false return end
+                        local choco = nil
+                        for _, tool in pairs(bp:GetChildren()) do
+                            if string.lower(tool.Name):find("chocolate") then choco = tool break end
+                        end
+                        if not choco then
+                            local chocoFolder = Player:FindFirstChild("ChocolatesFolder")
+                            if not chocoFolder then isEating = false return end
+                            local c = chocoFolder:FindFirstChildOfClass("Tool")
+                            if not c then isEating = false return end
+                            c.Parent = bp
+                            task.wait(0.2)
+                            choco = bp:FindFirstChild(c.Name)
+                        end
+                        if not choco then isEating = false return end
+                        hum:EquipTool(choco)
+                        task.wait(0.1)
+                        local equipped = char:FindFirstChild(choco.Name)
+                        if equipped then
+                            equipped:Activate()
+                            pcall(function() ChocolateEatEvent:FireServer(equipped) end)
+                            task.wait(0.6)
+                            totalChocoEaten = totalChocoEaten + 1
+                            chocoEatenLabel.Text = "Eaten this session: " .. totalChocoEaten
+                        end
+                    end)
+                    isEating = false
+                end)
+            end
+        end
     end
 end)
 
 local settingsHeader = settingsTab:AddLabel("SET UP UI SETTINGS YOU WANT")
-settingsHeader.Font = Enum.Font.LuckiestGuy
-settingsHeader.TextSize = 20
+settingsHeader.Font = Enum.Font.LuckiestGuy settingsHeader.TextSize = 20
 local transHeader = settingsTab:AddLabel("BACKGROUND TRANSPARENCY")
-transHeader.Font = Enum.Font.Bodoni
-transHeader.TextSize = 18
-local transOptions = {"0.0 (Solid)", "0.1 (Default)", "0.2", "0.3", "0.5 (Half)", "0.8", "0.95 (Clear)"}
+transHeader.Font = Enum.Font.Bodoni transHeader.TextSize = 18
+local transOptions = {"0.0 (Solid)","0.1 (Default)","0.2","0.3","0.5 (Half)","0.8","0.95 (Clear)"}
 local transValues  = {0.0, 0.1, 0.2, 0.3, 0.5, 0.8, 0.95}
 local transDropdown = settingsTab:AddDropdown("Transparency", function(selected)
     for i, lbl in ipairs(transOptions) do
@@ -1245,17 +1214,13 @@ local transDropdown = settingsTab:AddDropdown("Transparency", function(selected)
                 local bar = windowFrame:FindFirstChild("Bar")
                 if bar then bar.BackgroundTransparency = transValues[i] end
                 local tabSel = windowFrame:FindFirstChild("TabSelection")
-                if tabSel then tabSel.ImageTransparency = math.min(0.4 + transValues[i], 0.95) end
+                if tabSel then tabSel.ImageTransparency = math.min(0.4+transValues[i], 0.95) end
                 for _, v in pairs(windowFrame:GetDescendants()) do
                     pcall(function()
                         if v:IsA("ImageLabel") and v.Name == "TextButton_Roundify_4px" then
-                            if v.Parent and v.Parent.Name ~= "TabButton" then
-                                v.ImageTransparency = transValues[i]
-                            end
+                            if v.Parent and v.Parent.Name ~= "TabButton" then v.ImageTransparency = transValues[i] end
                         end
-                        if v:IsA("ImageButton") and v.Name == "Box" then
-                            v.ImageTransparency = transValues[i]
-                        end
+                        if v:IsA("ImageButton") and v.Name == "Box" then v.ImageTransparency = transValues[i] end
                     end)
                 end
             end)
@@ -1264,9 +1229,9 @@ local transDropdown = settingsTab:AddDropdown("Transparency", function(selected)
     end
 end)
 for _, lbl in ipairs(transOptions) do transDropdown:Add(lbl) end
+
 local colorHeader = settingsTab:AddLabel("MAIN COLOR THEME")
-colorHeader.Font = Enum.Font.Bodoni
-colorHeader.TextSize = 18
+colorHeader.Font = Enum.Font.Bodoni colorHeader.TextSize = 18
 local colorOptions = {
     {name="Purple (Default)", colors={Color3.fromRGB(10,0,40),   Color3.fromRGB(60,0,120),   Color3.fromRGB(120,0,180),  Color3.fromRGB(180,0,255),  Color3.fromRGB(255,50,180)}},
     {name="Red",              colors={Color3.fromRGB(40,0,0),    Color3.fromRGB(120,0,0),    Color3.fromRGB(200,0,0),    Color3.fromRGB(255,50,50),  Color3.fromRGB(255,100,100)}},
@@ -1325,9 +1290,9 @@ local colorDropdown = settingsTab:AddDropdown("Main Color", function(selected)
     end
 end)
 for _, opt in ipairs(colorOptions) do colorDropdown:Add(opt.name) end
+
 local wmHeader = settingsTab:AddLabel("WATERMARK")
-wmHeader.Font = Enum.Font.Bodoni
-wmHeader.TextSize = 18
+wmHeader.Font = Enum.Font.Bodoni wmHeader.TextSize = 18
 local watermark = nil
 settingsTab:AddSwitch("Show Watermark", function(state)
     if state then
@@ -1343,7 +1308,7 @@ settingsTab:AddSwitch("Show Watermark", function(state)
             local stroke = Instance.new("UIStroke") stroke.Color = Color3.fromRGB(180,0,255) stroke.Thickness = 1.2 stroke.Parent = frame
             local label = Instance.new("TextLabel")
             label.Size = UDim2.new(1,0,1,0) label.BackgroundTransparency = 1
-            label.Text = "Ã°Å¸â€Â® K13 | Muscle Masters" label.Font = Enum.Font.PermanentMarker
+            label.Text = "ðŸ”® K13 | Muscle Masters" label.Font = Enum.Font.PermanentMarker
             label.TextSize = 13 label.TextColor3 = Color3.fromRGB(200,100,255) label.Parent = frame
             watermark = gui
             task.spawn(function()
@@ -1362,10 +1327,10 @@ settingsTab:AddSwitch("Show Watermark", function(state)
         if watermark then pcall(function() watermark:Destroy() end) watermark = nil end
     end
 end)
+
 local resetHeader = settingsTab:AddLabel("RESET")
-resetHeader.Font = Enum.Font.Bodoni
-resetHeader.TextSize = 18
-settingsTab:AddButton(" Reset All Settings", function()
+resetHeader.Font = Enum.Font.Bodoni resetHeader.TextSize = 18
+settingsTab:AddButton("Reset All Settings", function()
     pcall(function()
         windowFrame.ImageTransparency = 0.1
         local bar = windowFrame:FindFirstChild("Bar")
@@ -1400,9 +1365,9 @@ settingsTab:AddButton(" Reset All Settings", function()
         if resizer then resizer.Active = true end
     end)
 end)
+
 local rainbowHeader = settingsTab:AddLabel("RAINBOW MODE")
-rainbowHeader.Font = Enum.Font.LuckiestGuy
-rainbowHeader.TextSize = 20
+rainbowHeader.Font = Enum.Font.LuckiestGuy rainbowHeader.TextSize = 20
 local isRainbow = false
 local rainbowSpeed = 0.003
 settingsTab:AddSwitch("Rainbow Gui", function(state)
@@ -1493,18 +1458,18 @@ settingsTab:AddSwitch("Rainbow Gui", function(state)
         end)
     end
 end)
+
 local speedHeader = settingsTab:AddLabel("Rainbow Speed")
-speedHeader.Font = Enum.Font.Bodoni
-speedHeader.TextSize = 16
+speedHeader.Font = Enum.Font.Bodoni speedHeader.TextSize = 16
 local speedOptions = {"Slow","Normal","Fast","Very Fast","Ultra Fast"}
 local speedValues  = {0.001,0.003,0.006,0.012,0.025}
 local speedDropdown = settingsTab:AddDropdown("Rainbow Speed", function(selected)
     for i, lbl in ipairs(speedOptions) do if lbl == selected then rainbowSpeed = speedValues[i] break end end
 end)
 for _, lbl in ipairs(speedOptions) do speedDropdown:Add(lbl) end
+
 local sizeHeader = settingsTab:AddLabel("WINDOW SIZE")
-sizeHeader.Font = Enum.Font.Bodoni
-sizeHeader.TextSize = 18
+sizeHeader.Font = Enum.Font.Bodoni sizeHeader.TextSize = 18
 local sizeOptions = {"Small (400x280)","Medium (500x380)","Large (600x480)","Extra Large (700x550)"}
 local sizeValues  = {Vector2.new(400,280),Vector2.new(500,380),Vector2.new(600,480),Vector2.new(700,550)}
 local sizeDropdown = settingsTab:AddDropdown("Window Size", function(selected)
