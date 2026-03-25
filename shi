@@ -117,7 +117,7 @@ local BodyMovement       = ReplicatedStorage.RemotesEvent.BodyMovement
 local SizeChanged        = ReplicatedStorage.RemotesEvent.SizeChanged
 local eggsFolder         = workspace:WaitForChild("EggsFolder")
 local chestsFolder       = workspace:WaitForChild("ChestsFolder")
-local rewardClaimFunction = ReplicatedStorage.RemotesEvent:WaitForChild("rewardClaim", 5)
+local rewardClaimRemote = ReplicatedStorage.RemotesEvent:WaitForChild("rewardClaim", 5)
 
 local isAuto            = false
 local isAutolift        = false
@@ -141,7 +141,7 @@ local SPIN_COOLDOWN     = 0.35
 local HATCH_COOLDOWN    = 1.5
 local CHEST_COOLDOWN    = 1.0
 local EAT_COOLDOWN      = 1.5
-local REWARD_COOLDOWN   = 0.5
+local REWARD_COOLDOWN   = 10.0
 local savedLighting     = {}
 local selectedEggFolder = "Mythic"
 local selectedSellPets  = {}
@@ -407,29 +407,11 @@ miscTab:AddSwitch("Auto Claim All Chest", function(state) isAutoChest = state en
 local autoRewardLabel = miscTab:AddLabel("AUTO CLAIM REWARDS")
 autoRewardLabel.Font = Enum.Font.Bodoni
 autoRewardLabel.TextSize = 20
-miscTab:AddToggle("Auto Claim Rewards", {
-    Default = false,
-    Callback = function(Value)
-        _G.AutoClaimRewards = Value
-        if Value then
-            task.spawn(function()
-                while _G.AutoClaimRewards do
-                    local rewardRemote = game:GetService("ReplicatedStorage").RemotesEvent:WaitForChild("rewardClaim", 5)
-                    
-                    if rewardRemote then
-                        for i = 1, 5 do
-                            if not _G.AutoClaimRewards then break end
-                            rewardRemote:FireServer(i)
-                            task.wait(0.5) 
-                        end
-                    end
-                    
-                    task.wait(30)
-                end
-            end)
-        end
-    end
-})
+miscTab:AddSwitch("Auto Claim Rewards", function(state)
+    isAutoRewards = state
+    if state then claimAllRewards() end
+end)
+
 local hideshowLabel = miscTab:AddLabel("HIDE & SHOW PETS")
 hideshowLabel.Font = Enum.Font.Bodoni
 hideshowLabel.TextSize = 20
