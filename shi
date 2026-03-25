@@ -407,8 +407,29 @@ miscTab:AddSwitch("Auto Claim All Chest", function(state) isAutoChest = state en
 local autoRewardLabel = miscTab:AddLabel("AUTO CLAIM REWARDS")
 autoRewardLabel.Font = Enum.Font.Bodoni
 autoRewardLabel.TextSize = 20
-miscTab:AddSwitch("Auto Claim Rewards", function(state) isAutoRewards = state end)
-
+miscTab:AddToggle("Auto Claim Rewards", {
+    Default = false,
+    Callback = function(Value)
+        _G.AutoClaimRewards = Value
+        if Value then
+            task.spawn(function()
+                while _G.AutoClaimRewards do
+                    local rewardRemote = game:GetService("ReplicatedStorage").RemotesEvent:WaitForChild("rewardClaim", 5)
+                    
+                    if rewardRemote then
+                        for i = 1, 5 do
+                            if not _G.AutoClaimRewards then break end
+                            rewardRemote:FireServer(i)
+                            task.wait(0.5) 
+                        end
+                    end
+                    
+                    task.wait(30)
+                end
+            end)
+        end
+    end
+})
 local hideshowLabel = miscTab:AddLabel("HIDE & SHOW PETS")
 hideshowLabel.Font = Enum.Font.Bodoni
 hideshowLabel.TextSize = 20
