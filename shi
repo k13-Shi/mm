@@ -324,17 +324,20 @@ local function updateSpectateTarget(player)
     end
 end
 
-mainTab:AddSwitch("Bad Mode", function(state)
+mainTab:AddSwitch("Kupal Mode", function(state)
     isAutolift = state
     if isAutolift then
         task.spawn(function()
             while isAutolift do
                 if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-                    Player.Character.HumanoidRootPart.CFrame = BenchEmperor.CFrame * CFrame.new(0, 3, 0)
+                    Player.Character.HumanoidRootPart.CFrame = bechmemp.CFrame * CFrame.new(0, 3, 0)
                 end
-                MachineActiveEvent:FireServer(BenchEmperor)
-                PunchEvent:FireServer()
-                task.wait()
+                
+                MachineActiveEvent:FireServer(bechmemp)
+                task.wait(0.01)
+                
+                ReplicatedStorage.RemotesEvent.PunchEvent:FireServer()
+                task.wait(0.01)
             end
         end)
     end
