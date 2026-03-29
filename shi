@@ -324,30 +324,16 @@ local function updateSpectateTarget(player)
     end
 end
 
-mainTab:AddSwitch("Fast Farm", function(state)
-    _G.AutoDual = state
-    if _G.AutoDual then
+mainTab:AddSwitch("Auto Strength & Endurance", function(state)
+    isAutolift = state
+    
+    if isAutolift then
         task.spawn(function()
-            while _G.AutoDual do
-                if Player.Character then
-                    local CenterPos = BenchEmperor.CFrame:Lerp(RockEmperor.CFrame, 0.5)
-                    Player.Character:PivotTo(CenterPos * CFrame.new(0, 5, 0))
-                end
-                task.wait(0.1)
-            end
-        end)
-
-        task.spawn(function()
-            while _G.AutoDual do
-                MachineActiveEvent:FireServer(BenchEmperor)
-                task.wait()
-            end
-        end)
-
-        task.spawn(function()
-            while _G.AutoDual do
-                RockAnim:FireServer()
-                task.wait()
+            while isAutolift do
+                MachineActiveEvent:FireServer(bechmemp)
+                PunchEvent:FireServer()
+                
+                task.wait() 
             end
         end)
     end
