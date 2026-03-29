@@ -325,46 +325,27 @@ local function updateSpectateTarget(player)
 end
 
 mainTab:AddSwitch("Fast Farm", function(state)
-    isAutolift = state
-    if isAutolift then
+    _G.AutoDual = state
+    if _G.AutoDual then
         task.spawn(function()
-            while isAutolift do
-                if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-                    Player.Character.HumanoidRootPart.CFrame = bechmemp.CFrame * CFrame.new(0, 3, 0)
+            while _G.AutoDual do
+                if Player.Character then
+                    local CenterPos = BenchEmperor.CFrame:Lerp(RockEmperor.CFrame, 0.5)
+                    Player.Character:PivotTo(CenterPos * CFrame.new(0, 5, 0))
                 end
-                MachineActiveEvent:FireServer(bechmemp)
+                task.wait(0.1)
+            end
+        end)
+
+        task.spawn(function()
+            while _G.AutoDual do
+                MachineActiveEvent:FireServer(BenchEmperor)
                 task.wait()
             end
         end)
+
         task.spawn(function()
-            while isAutolift do
-                PunchEvent:FireServer()
-                task.wait()
-            end
-        end)
-        task.spawn(function()
-            while isAutolift do
-                MachineActiveEvent:FireServer(bechmemp)
-                PunchEvent:FireServer()
-                task.wait()
-            end
-        end)
-    end
-end)
-mainTab:AddSwitch("Fast Glitch", function(state)
-    isAutoRock = state
-    if isAutoRock then
-        task.spawn(function()
-            while isAutoRock do
-                if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-                    Player.Character.HumanoidRootPart.CFrame = RockSquat.CFrame * CFrame.new(0, 3, 0)
-                end
-                MachineActiveEvent:FireServer(RockSquat)
-                task.wait()
-            end
-        end)
-        task.spawn(function()
-            while isAutoRock do
+            while _G.AutoDual do
                 RockAnim:FireServer()
                 task.wait()
             end
