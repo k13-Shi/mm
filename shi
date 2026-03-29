@@ -27,6 +27,19 @@ local function formatNumber(n)
     else return tostring(math.floor(n)) end
 end
 
+local function AbbrevNumber(num)
+    num = tonumber(num) or 0
+    if num <= 0 then return "0" end
+    local abbrev = {"", "K", "M", "B", "T", "Qa", "Qi"}
+    local i = 1
+    while num >= 1000 and i < #abbrev do
+        num = num / 1000
+        i = i + 1
+    end
+    return string.format("%.2f%s", num, abbrev[i])
+end
+
+
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GeloXOshiru/K13Image.png/refs/heads/main/Lua", true))()
 
 local window, windowFrame = library:AddWindow("K13 | Muscle Masters", {
