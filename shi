@@ -108,6 +108,9 @@ local machineactive      = ReplicatedStorage.RemotesEvent.MachineActiveFunction
 local MachineActiveEvent = ReplicatedStorage.RemotesEvent.MachineActiveEvent
 local machineuse         = Player:WaitForChild("Machineuse")
 local bechmemp           = workspace:WaitForChild("MachinesFolder"):WaitForChild("Bench Press Muscle Emperor")
+local MachineActiveEvent = ReplicatedStorage.RemotesEvent.MachineActiveEvent
+local RockSquat = workspace:WaitForChild("MachinesFolder"):WaitForChild("Rock Squat Muscle Emperor")
+local RockAnim = ReplicatedStorage.machineanimations["Rock Squat Muscle Emperor"].RepAnimation
 local spinfu             = ReplicatedStorage.RemotesEvent.SpinFunction
 local SellPetEvent       = ReplicatedStorage.RemotesEvent.SellPetEvent
 local ChestClaimEvent    = ReplicatedStorage.RemotesEvent.ChestClaimEvent
@@ -320,16 +323,17 @@ local function updateSpectateTarget(player)
     end
 end
 
-mainTab:AddSwitch("Auto Strength & Endurance", function(state)
+mainTab:AddSwitch("Fast Farm", function(state)
     isAutolift = state
-    
     if isAutolift then
         task.spawn(function()
             while isAutolift do
-                MachineActiveEvent:FireServer(bechmemp)
-                PunchEvent:FireServer()
-                
-                task.wait() 
+                if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+                    Player.Character.HumanoidRootPart.CFrame = BenchEmperor.CFrame * CFrame.new(0, 3, 0)
+                end
+                MachineActiveEvent:FireServer(BenchEmperor)
+                RockRepAnim:FireServer()
+                task.wait()
             end
         end)
     end
