@@ -332,6 +332,11 @@ mainTab:AddSwitch("Fast Farm", function(state)
                     Player.Character.HumanoidRootPart.CFrame = BenchEmperor.CFrame * CFrame.new(0, 3, 0)
                 end
                 MachineActiveEvent:FireServer(BenchEmperor)
+                task.wait()
+            end
+        end)
+        task.spawn(function()
+            while isAutolift do
                 RockRepAnim:FireServer()
                 task.wait()
             end
