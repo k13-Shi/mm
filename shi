@@ -325,7 +325,7 @@ local function updateSpectateTarget(player)
     end
 end
 
-mainTab:AddSwitch("Turbo Dual Farm", function(state)
+mainTab:AddSwitch("Fast Farm", function(state)
     isAutolift = state
     if isAutolift then
         task.spawn(function()
@@ -339,6 +339,13 @@ mainTab:AddSwitch("Turbo Dual Farm", function(state)
         end)
         task.spawn(function()
             while isAutolift do
+                PunchEvent:FireServer()
+                task.wait()
+            end
+        end)
+        task.spawn(function()
+            while isAutolift do
+                MachineActiveEvent:FireServer(bechmemp)
                 PunchEvent:FireServer()
                 task.wait()
             end
