@@ -109,7 +109,6 @@ local machineactive      = ReplicatedStorage.RemotesEvent.MachineActiveFunction
 local MachineActiveEvent = ReplicatedStorage.RemotesEvent.MachineActiveEvent
 local machineuse         = Player:WaitForChild("Machineuse")
 local bechmemp           = workspace:WaitForChild("MachinesFolder"):WaitForChild("Bench Press Muscle Emperor")
-local PunchEvent = ReplicatedStorage.RemotesEvent.PunchEvent
 local MachineActiveEvent = ReplicatedStorage.RemotesEvent.MachineActiveEvent
 local RockSquat = workspace:WaitForChild("MachinesFolder"):WaitForChild("Rock Squat Muscle Emperor")
 local RockAnim = ReplicatedStorage.machineanimations["Rock Squat Muscle Emperor"].RepAnimation
@@ -347,6 +346,26 @@ mainTab:AddSwitch("Fast Farm", function(state)
             while isAutolift do
                 MachineActiveEvent:FireServer(bechmemp)
                 PunchEvent:FireServer()
+                task.wait()
+            end
+        end)
+    end
+end)
+mainTab:AddSwitch("Fast Glitch", function(state)
+    isAutoRock = state
+    if isAutoRock then
+        task.spawn(function()
+            while isAutoRock do
+                if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+                    Player.Character.HumanoidRootPart.CFrame = RockSquat.CFrame * CFrame.new(0, 3, 0)
+                end
+                MachineActiveEvent:FireServer(RockSquat)
+                task.wait()
+            end
+        end)
+        task.spawn(function()
+            while isAutoRock do
+                RockAnim:FireServer()
                 task.wait()
             end
         end)
