@@ -320,7 +320,7 @@ local function updateSpectateTarget(player)
     end
 end
 
-mainTab:AddSwitch("Kupal Mode", function(state)
+mainTab:AddSwitch("Fast Mode", function(state)
     isAutolift = state
     if isAutolift then
         task.spawn(function()
