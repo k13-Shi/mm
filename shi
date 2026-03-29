@@ -342,6 +342,21 @@ mainTab:AddSwitch("Kupal Mode", function(state)
         end)
     end
 end)
+mainTab:AddSwitch("Fast Glitch", function(state)
+    isGlitch = state
+    if isGlitch then
+        task.spawn(function()
+            while isGlitch do
+                if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+                    Player.Character.HumanoidRootPart.CFrame = RockSquat.CFrame * CFrame.new(0, 3, 0)
+                end
+                MachineActiveEvent:FireServer(RockSquat)
+                RockAnim:FireServer()
+                task.wait()
+            end
+        end)
+    end
+end)
 mainTab:AddSwitch("Auto Spin Wheel", function(state) isapin = state end)
 mainTab:AddSwitch("Anti Afk", function(state)
     if state then
