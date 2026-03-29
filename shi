@@ -325,7 +325,7 @@ local function updateSpectateTarget(player)
     end
 end
 
-mainTab:AddSwitch("Fast Mode", function(state)
+mainTab:AddSwitch("Auto Dual Stats", function(state)
     isAutolift = state
     if isAutolift then
         task.spawn(function()
@@ -333,12 +333,9 @@ mainTab:AddSwitch("Fast Mode", function(state)
                 if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
                     Player.Character.HumanoidRootPart.CFrame = bechmemp.CFrame * CFrame.new(0, 3, 0)
                 end
-                
                 MachineActiveEvent:FireServer(bechmemp)
-                task.wait(0.01)
-                
-                ReplicatedStorage.RemotesEvent.PunchEvent:FireServer()
-                task.wait(0.01)
+                PunchEvent:FireServer()
+                task.wait()
             end
         end)
     end
