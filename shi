@@ -16,14 +16,6 @@ local function getGreeting()
     else return "🌙 Good Night" end
 end
 
-local greetingLabel = mainTab:AddLabel(getGreeting() .. ", " .. game.Players.LocalPlayer.DisplayName)
-
-task.spawn(function()
-    while task.wait(60) do
-        greetingLabel:SetText(getGreeting() .. ", " .. game.Players.LocalPlayer.DisplayName)
-    end
-end)
-
 local function formatNumber(n)
     n = tonumber(n) or 0
     if n >= 1e18 then return string.format("%.1fQi", n/1e18)
