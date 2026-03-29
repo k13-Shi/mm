@@ -325,7 +325,7 @@ local function updateSpectateTarget(player)
     end
 end
 
-mainTab:AddSwitch("Auto Dual Stats", function(state)
+mainTab:AddSwitch("Turbo Dual Farm", function(state)
     isAutolift = state
     if isAutolift then
         task.spawn(function()
@@ -334,6 +334,11 @@ mainTab:AddSwitch("Auto Dual Stats", function(state)
                     Player.Character.HumanoidRootPart.CFrame = bechmemp.CFrame * CFrame.new(0, 3, 0)
                 end
                 MachineActiveEvent:FireServer(bechmemp)
+                task.wait()
+            end
+        end)
+        task.spawn(function()
+            while isAutolift do
                 PunchEvent:FireServer()
                 task.wait()
             end
