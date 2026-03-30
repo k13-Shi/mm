@@ -337,12 +337,14 @@ task.spawn(function()
                         machineactive:InvokeServer(squatmemper, true) 
                     end)
                 else
-                    pcall(function() 
-                        MachineActiveEvent:FireServer("Rep")
-                    end)
-                    pcall(function()
-                        PunchEvent:FireServer()
-                    end)
+                    for i = 1, 10 do 
+                        pcall(function() 
+                            MachineActiveEvent:FireServer("Rep")
+                        end)
+                        pcall(function()
+                            PunchEvent:FireServer()
+                        end)
+                    end
                 end
             end
         end
