@@ -105,12 +105,10 @@ local infoTab     = window:AddTab("Info")
 
 local remoterebirths     = ReplicatedStorage.RemotesEvent.RebirthEvent
 local strong             = Player:WaitForChild("leaderstats"):WaitForChild("Strong")
-local endurance          = Player:WaitForChild("leaderstats"):WaitForChild("Endurance")
 local machineactive      = ReplicatedStorage.RemotesEvent.MachineActiveFunction
 local MachineActiveEvent = ReplicatedStorage.RemotesEvent.MachineActiveEvent
 local machineuse         = Player:WaitForChild("Machineuse")
 local bechmemp           = workspace:WaitForChild("MachinesFolder"):WaitForChild("Bench Press Muscle Emperor")
-local squatmemper        = workspace:WaitForChild("MachinesFolder"):WaitForChild("Rock Squat Muscle Emperor")
 local spinfu             = ReplicatedStorage.RemotesEvent.SpinFunction
 local SellPetEvent       = ReplicatedStorage.RemotesEvent.SellPetEvent
 local ChestClaimEvent    = ReplicatedStorage.RemotesEvent.ChestClaimEvent
