@@ -324,7 +324,7 @@ local function updateSpectateTarget(player)
     end
 end
 
-mainTab:AddSwitch("Fast Glitch", function(state) isAutoSquat = state end)
+
 
 mainTab:AddSwitch("Fast Farm", function(state)
     isAutolift = state
@@ -340,6 +340,7 @@ mainTab:AddSwitch("Fast Farm", function(state)
         end)
     end
 end)
+mainTab:AddSwitch("Auto Rock Squat", function(state) isAutoSquat = state end)
 mainTab:AddSwitch("Auto Spin Wheel", function(state) isapin = state end)
 mainTab:AddSwitch("Anti Afk", function(state)
     if state then
