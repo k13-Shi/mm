@@ -109,9 +109,7 @@ local machineactive      = ReplicatedStorage.RemotesEvent.MachineActiveFunction
 local MachineActiveEvent = ReplicatedStorage.RemotesEvent.MachineActiveEvent
 local machineuse         = Player:WaitForChild("Machineuse")
 local bechmemp           = workspace:WaitForChild("MachinesFolder"):WaitForChild("Bench Press Muscle Emperor")
-local MachineActiveEvent = ReplicatedStorage.RemotesEvent.MachineActiveEvent
-local RockSquat = workspace:WaitForChild("MachinesFolder"):WaitForChild("Rock Squat Muscle Emperor")
-local RockAnim = ReplicatedStorage.machineanimations["Rock Squat Muscle Emperor"].RepAnimation
+local squatmemper        = workspace:WaitForChild("MachinesFolder"):WaitForChild("Rock Squat Muscle Emperor")
 local spinfu             = ReplicatedStorage.RemotesEvent.SpinFunction
 local SellPetEvent       = ReplicatedStorage.RemotesEvent.SellPetEvent
 local ChestClaimEvent    = ReplicatedStorage.RemotesEvent.ChestClaimEvent
@@ -324,7 +322,9 @@ local function updateSpectateTarget(player)
     end
 end
 
-mainTab:AddSwitch("Auto Strength & Endurance", function(state)
+mainTab:AddSwitch("Fast Glitch", function(state) isAutoSquat = state end)
+
+mainTab:AddSwitch("Fast Farm", function(state)
     isAutolift = state
     
     if isAutolift then
