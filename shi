@@ -105,6 +105,7 @@ local infoTab     = window:AddTab("Info")
 
 local remoterebirths     = ReplicatedStorage.RemotesEvent.RebirthEvent
 local strong             = Player:WaitForChild("leaderstats"):WaitForChild("Strong")
+local endurance          = Player:WaitForChild("leaderstats"):WaitForChild("Endurance")
 local machineactive      = ReplicatedStorage.RemotesEvent.MachineActiveFunction
 local MachineActiveEvent = ReplicatedStorage.RemotesEvent.MachineActiveEvent
 local machineuse         = Player:WaitForChild("Machineuse")
@@ -119,7 +120,7 @@ local BodyMovement       = ReplicatedStorage.RemotesEvent.BodyMovement
 local SizeChanged        = ReplicatedStorage.RemotesEvent.SizeChanged
 local eggsFolder         = workspace:WaitForChild("EggsFolder")
 local chestsFolder       = workspace:WaitForChild("ChestsFolder")
-local rewardClaimRemote = ReplicatedStorage.RemotesEvent:WaitForChild("rewardClaim", 5)
+local rewardClaimRemote  = ReplicatedStorage.RemotesEvent:WaitForChild("rewardClaim", 5)
 
 local isAuto            = false
 local isAutolift        = false
