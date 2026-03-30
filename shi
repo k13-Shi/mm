@@ -122,7 +122,6 @@ local rewardClaimRemote  = ReplicatedStorage.RemotesEvent:WaitForChild("rewardCl
 
 local isAuto            = false
 local isAutolift        = false
-local isAutoSquat       = false
 local isapin            = false
 local isAutoHatch       = false
 local isAutoSell        = false
