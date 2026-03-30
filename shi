@@ -325,7 +325,7 @@ end
 
 task.spawn(function()
     while true do
-        task.wait(0.1)
+        task.wait() 
         if isAutoGlitch then
             local character = Player.Character
             local rootPart = character and character:FindFirstChild("HumanoidRootPart")
@@ -333,14 +333,15 @@ task.spawn(function()
             if squatmemper and rootPart then
                 if machineuse.Value == nil then
                     rootPart.CFrame = squatmemper.PrimaryPart.CFrame * CFrame.new(0, 0, 3)
-                    task.wait(0.2)
                     pcall(function() 
                         machineactive:InvokeServer(squatmemper, true) 
                     end)
-                    task.wait(0.5)
                 else
                     pcall(function() 
-                        MachineActiveEvent:FireServer() 
+                        MachineActiveEvent:FireServer("Rep")
+                    end)
+                    pcall(function()
+                        PunchEvent:FireServer()
                     end)
                 end
             end
