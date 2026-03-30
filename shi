@@ -109,6 +109,7 @@ local machineactive      = ReplicatedStorage.RemotesEvent.MachineActiveFunction
 local MachineActiveEvent = ReplicatedStorage.RemotesEvent.MachineActiveEvent
 local machineuse         = Player:WaitForChild("Machineuse")
 local bechmemp           = workspace:WaitForChild("MachinesFolder"):WaitForChild("Bench Press Muscle Emperor")
+local squatmemper        = workspace:WaitForChild("MachinesFolder"):WaitForChild("Rock Squat Muscle Emperor")
 local spinfu             = ReplicatedStorage.RemotesEvent.SpinFunction
 local SellPetEvent       = ReplicatedStorage.RemotesEvent.SellPetEvent
 local ChestClaimEvent    = ReplicatedStorage.RemotesEvent.ChestClaimEvent
@@ -122,6 +123,7 @@ local rewardClaimRemote  = ReplicatedStorage.RemotesEvent:WaitForChild("rewardCl
 
 local isAuto            = false
 local isAutolift        = false
+local isAutoGlitch      = false 
 local isapin            = false
 local isAutoHatch       = false
 local isAutoSell        = false
@@ -321,6 +323,30 @@ local function updateSpectateTarget(player)
     end
 end
 
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        if isAutoGlitch then
+            local character = Player.Character
+            local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+            
+            if squatmemper and rootPart then
+                if machineuse.Value == nil then
+                    rootPart.CFrame = squatmemper.PrimaryPart.CFrame * CFrame.new(0, 0, 3)
+                    task.wait(0.2)
+                    pcall(function() 
+                        machineactive:InvokeServer(squatmemper, true) 
+                    end)
+                    task.wait(0.5)
+                else
+                    pcall(function() 
+                        MachineActiveEvent:FireServer() 
+                    end)
+                end
+            end
+        end
+    end
+end)
 
 
 mainTab:AddSwitch("Fast Farm", function(state)
@@ -337,7 +363,7 @@ mainTab:AddSwitch("Fast Farm", function(state)
         end)
     end
 end)
-mainTab:AddSwitch("Fast Glitch", function(state) isAutoSquat = state end)
+mainTab:AddSwitch("Fast Glitch", function(state) isAutoGlitch = state end)
 mainTab:AddSwitch("Auto Spin Wheel", function(state) isapin = state end)
 mainTab:AddSwitch("Anti Afk", function(state)
     if state then
