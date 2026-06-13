@@ -42,7 +42,7 @@ end
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GeloXOshiru/K13Image.png/refs/heads/main/Lua", true))()
 
-local window, windowFrame = library:AddWindow("K13 | Muscle Masters", {
+local window, windowFrame = library:AddWindow("Shi-OneEyedKing | Muscle Masters", {
     title_bar = {
         Color3.fromRGB(70, 0, 110),
         Color3.fromRGB(130, 0, 190),
@@ -187,6 +187,7 @@ local EGG_DATA = {
     {label="Epic  (20K)",     folder="Epic",      pets={"Captain","Tiger","TigEye","Dino","NerthEye"}},
     {label="Legendary (75K)", folder="Legendary", pets={"Dragon","Farmer","Military","Mighty Bull","Pyroclaw"}},
     {label="Mythic  (500K)",  folder="Mythic",    pets={"Violet Fury","Leviathos","Abyss Titan","Ragehorn","Space Dragon","RedHorn"}},
+    {label="Mythic 2",        folder="Mythic2",   pets={"Void Kraken,"Shadow Phoenix"}}, 
     {label="Masters (500M)",  folder="Masters",   pets={"Hedgehog","Bee","Panda","Kelpie"}},
 }
 
