@@ -188,6 +188,7 @@ local EGG_DATA = {
     {label="Legendary (75K)", folder="Legendary", pets={"Dragon","Farmer","Military","Mighty Bull","Pyroclaw"}},
     {label="Mythic  (500K)",  folder="Mythic",    pets={"Violet Fury","Leviathos","Abyss Titan","Ragehorn","Space Dragon","RedHorn"}},
     {label="Masters (500M)",  folder="Masters",   pets={"Hedgehog","Bee","Panda","Kelpie"}},
+    {label="Mythic Pets (25M)", folder="mythic2",  pets={"Thunder Wolf", "Titan Gorilla", "Shadow Phoenix", "Void Kraken"}},
 }
 
 local labelToFolder = {}
