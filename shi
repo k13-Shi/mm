@@ -1158,6 +1158,15 @@ task.spawn(function()
         task.wait(0.1)
         
         if isAutoHatch and (tick() - lastHatchTime >= HATCH_COOLDOWN) then
+            -- SEGURIDAD: Teleport sa egg habang naghahatch para tanggapin ng laro ang remote
+            pcall(function()
+                local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+                local eggModel = eggsFolder:FindFirstChild(selectedEggFolder)
+                if root and eggModel then
+                    root.CFrame = eggModel:GetPivot() * CFrame.new(0, 0, 4)
+                end
+            end)
+            
             if OpenPetEvent then
                 pcall(function()
                     OpenPetEvent:FireServer(selectedEggFolder)
