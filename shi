@@ -1158,18 +1158,11 @@ task.spawn(function()
         task.wait(0.1)
         
         if isAutoHatch and (tick() - lastHatchTime >= HATCH_COOLDOWN) then
-            local prompt = getEggPrompt(selectedEggFolder)
-            if prompt then
-                fireproximityprompt(prompt)
+            if OpenPetEvent then
+                pcall(function()
+                    OpenPetEvent:FireServer(selectedEggFolder)
+                end)
                 lastHatchTime = tick()
-            else
-                for _, v in ipairs(workspace:GetDescendants()) do
-                    if v:IsA("ProximityPrompt") and v.Name == "VisiblePrompt" and Player:DistanceFromCharacter(v.Parent.Position) < 15 then
-                        fireproximityprompt(v)
-                        lastHatchTime = tick()
-                        break
-                    end
-                end
             end
         end
         if isAutoSell then
@@ -1177,8 +1170,7 @@ task.spawn(function()
             if petsItem then
                 for _, petFolder in ipairs(petsItem:GetChildren()) do
                     local petName = petFolder.Name
-                    
-                    local isMythic2Trash = (selectedEggFolder == "mythic2" and (petName == "Thunder Wolf" or petName == "Titan Gorilla" or petName == "Shadow Phoenix"))
+                    local isMythic2Trash = (selectedEggFolder == "mythic2") and (petName == "Thunder Wolf" or petName == "Titan Gorilla" or petName == "Shadow Phoenix")
                     
                     if selectedSellPets[petName] or isMythic2Trash then
                         local statFolder = petFolder:FindFirstChild("PetStatFolder")
