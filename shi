@@ -1158,7 +1158,6 @@ task.spawn(function()
         task.wait(0.1)
         
         if isAutoHatch and (tick() - lastHatchTime >= HATCH_COOLDOWN) then
-            -- SEGURIDAD: Teleport sa egg habang naghahatch para tanggapin ng laro ang remote
             pcall(function()
                 local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
                 local eggModel = eggsFolder:FindFirstChild(selectedEggFolder)
@@ -1174,6 +1173,7 @@ task.spawn(function()
                 lastHatchTime = tick()
             end
         end
+
         if isAutoSell then
             local petsItem = getPetsMenu()
             if petsItem then
