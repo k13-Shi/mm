@@ -1157,31 +1157,22 @@ task.spawn(function()
     while true do
         task.wait(0.1)
         
-        if isAutoHatch and (tick() - lastHatchTime >= HATCH_COOLDOWN) then
-            pcall(function()
-                local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
-                local eggModel = eggsFolder:FindFirstChild(selectedEggFolder)
-                if root and eggModel then
-                    root.CFrame = eggModel:GetPivot() * CFrame.new(0, 0, 4)
-                end
-            end)
-            
-            if OpenPetEvent then
+        if isAutoHatch then
+            local now = tick()
+            if now - lastHatchTime >= HATCH_COOLDOWN then
+                lastHatchTime = now
                 pcall(function()
-                    OpenPetEvent:FireServer(selectedEggFolder)
+                    local prompt = getEggPrompt(selectedEggFolder)
+                    if prompt then fireproximityprompt(prompt) end
                 end)
-                lastHatchTime = tick()
             end
         end
-
         if isAutoSell then
             local petsItem = getPetsMenu()
             if petsItem then
                 for _, petFolder in ipairs(petsItem:GetChildren()) do
                     local petName = petFolder.Name
-                    local isMythic2Trash = (selectedEggFolder == "mythic2") and (petName == "Thunder Wolf" or petName == "Titan Gorilla" or petName == "Shadow Phoenix")
-                    
-                    if selectedSellPets[petName] or isMythic2Trash then
+                    if selectedSellPets[petName] then
                         local statFolder = petFolder:FindFirstChild("PetStatFolder")
                         local sellVal = statFolder and statFolder:FindFirstChild("SellEnable")
                         if not sellVal or sellVal.Value == true then
