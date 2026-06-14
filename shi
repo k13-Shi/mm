@@ -1153,14 +1153,23 @@ task.spawn(function()
                 pcall(function() MachineActiveEvent:FireServer() end)
             end
         end
-        if isAutoHatch then
-            local now = tick()
-            if now - lastHatchTime >= HATCH_COOLDOWN then
-                lastHatchTime = now
-                pcall(function()
-                    local prompt = getEggPrompt(selectedEggFolder)
-                    if prompt then fireproximityprompt(prompt) end
-                end)
+        task.spawn(function()
+    while true do
+        task.wait(0.1)
+        
+        if isAutoHatch and (tick() - lastHatchTime >= HATCH_COOLDOWN) then
+            local prompt = getEggPrompt(selectedEggFolder)
+            if prompt then
+                fireproximityprompt(prompt)
+                lastHatchTime = tick()
+            else
+                for _, v in ipairs(workspace:GetDescendants()) do
+                    if v:IsA("ProximityPrompt") and v.Name == "VisiblePrompt" and Player:DistanceFromCharacter(v.Parent.Position) < 15 then
+                        fireproximityprompt(v)
+                        lastHatchTime = tick()
+                        break
+                    end
+                end
             end
         end
         if isAutoSell then
