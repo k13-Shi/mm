@@ -146,7 +146,7 @@ local CHEST_COOLDOWN    = 1.0
 local EAT_COOLDOWN      = 1.5
 local REWARD_COOLDOWN   = 0.5
 local savedLighting     = {}
-local selectedEggFolder = "Mythic"
+local selectedEggFolder = "mythic2"
 local selectedSellPets  = {}
 local selectedTarget    = nil
 local selectedSpyPlayer = nil
@@ -436,6 +436,7 @@ autoSellLabel.TextSize = 25
 local rarityGroups = {
     {label="COMMON EGG",idx=1},{label="RARE EGG",idx=2},{label="EPIC EGG",idx=3},
     {label="LEGENDARY EGG",idx=4},{label="MYTHIC EGG",idx=5},{label="MASTERS EGG",idx=6},
+    {label="MYTHIC PETS EGG",idx=7}
 }
 for _, grp in ipairs(rarityGroups) do
     petsTab:AddLabel(grp.label)
@@ -1167,7 +1168,10 @@ task.spawn(function()
             if petsItem then
                 for _, petFolder in ipairs(petsItem:GetChildren()) do
                     local petName = petFolder.Name
-                    if selectedSellPets[petName] then
+                    
+                    local isMythic2Trash = (selectedEggFolder == "mythic2" and (petName == "Thunder Wolf" or petName == "Titan Gorilla" or petName == "Shadow Phoenix"))
+                    
+                    if selectedSellPets[petName] or isMythic2Trash then
                         local statFolder = petFolder:FindFirstChild("PetStatFolder")
                         local sellVal = statFolder and statFolder:FindFirstChild("SellEnable")
                         if not sellVal or sellVal.Value == true then
