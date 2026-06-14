@@ -40,7 +40,7 @@ local function AbbrevNumber(num)
 end
 
 
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GeloXOshiru/K13Image.png/refs/heads/main/Lua", true))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
 
 local window, windowFrame = library:AddWindow("Shi-OneEyedKing | Muscle Masters", {
     title_bar = {
